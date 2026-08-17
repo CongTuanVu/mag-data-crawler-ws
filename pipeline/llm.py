@@ -28,6 +28,13 @@ WEB_TOOLS = [
 
 FENCE_RE = re.compile(r"```(?:json)?\s*(.+?)\s*```", re.S)
 
+WEB_TOOL_PREFIXES = ("web_search", "web_fetch")
+
+
+def _is_web_tool(tool: Dict[str, Any]) -> bool:
+    """Tool tra web của server — endpoint tương thích có thể ánh xạ sang CLI."""
+    return any(str(tool.get("type", "")).startswith(p) for p in WEB_TOOL_PREFIXES)
+
 
 def client() -> anthropic.Anthropic:
     global _client
@@ -79,11 +86,14 @@ def call_json(
     kwargs: Dict[str, Any] = dict(model=config.MODEL, max_tokens=max_tokens)
 
     if config.COMPAT:
-        if tools:
+        if tools and not all(_is_web_tool(t) for t in tools):
             raise SystemExit(
-                f"[{label}] Bước này cần server tool web_search/web_fetch — chỉ có ở API\n"
-                f"  Anthropic chính thức, endpoint {config.BASE_URL} không cung cấp.\n"
-                f"  Cách đi tiếp: tự cấp nguồn bằng --sources <file>, rồi chạy --skip-discover.")
+                f"[{label}] Bước này cần server tool ngoài web_search/web_fetch — chỉ có ở\n"
+                f"  API Anthropic chính thức, endpoint {config.BASE_URL} không cung cấp.")
+        if tools:
+            # Endpoint tương thích có thể ánh xạ web_search/web_fetch sang tool
+            # WebSearch/WebFetch sẵn có của CLI — cứ chuyển tiếp để nó tự quyết.
+            kwargs["tools"] = tools
         system = [{k: v for k, v in b.items() if k != "cache_control"} for b in system]
         system.append({"type": "text", "text":
                        "Chỉ trả về DUY NHẤT một object JSON hợp lệ, không kèm giải thích, "

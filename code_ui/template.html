@@ -1,0 +1,1090 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Benchmark Toà nhà — WS2</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#ffffff; --panel-2:#fbfbfc; --border:#e3e6ea;
+    --text:#151a20; --muted:#69737f; --faint:#9aa3ad;
+    --accent:#1d5fd0; --accent-soft:#e8f0fe;
+    --good:#1a7f4b; --good-soft:#e4f5ec;
+    --warn:#9a6a00; --warn-soft:#fdf2dc;
+    --bad:#b03030; --bad-soft:#fbe9e9;
+    --shadow:0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.06);
+    --radius:10px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#0f1216; --panel:#171b21; --panel-2:#1c2129; --border:#2a313a;
+      --text:#e8ecf1; --muted:#9aa5b1; --faint:#6d7883;
+      --accent:#6ea8fe; --accent-soft:#1b2a44;
+      --good:#5fd39a; --good-soft:#14301f;
+      --warn:#e2b558; --warn-soft:#332708;
+      --bad:#f08585; --bad-soft:#3a1c1c;
+      --shadow:0 1px 2px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0f1216; --panel:#171b21; --panel-2:#1c2129; --border:#2a313a;
+    --text:#e8ecf1; --muted:#9aa5b1; --faint:#6d7883;
+    --accent:#6ea8fe; --accent-soft:#1b2a44;
+    --good:#5fd39a; --good-soft:#14301f;
+    --warn:#e2b558; --warn-soft:#332708;
+    --bad:#f08585; --bad-soft:#3a1c1c;
+    --shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans","Hiragino Sans",
+      "Yu Gothic UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent); text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* ---------- topbar ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:14px;
+    padding:12px 20px; background:var(--panel); border-bottom:1px solid var(--border);
+  }
+  .brand{font-weight:650; font-size:15px; letter-spacing:-.01em; white-space:nowrap}
+  .brand span{color:var(--muted); font-weight:450; margin-left:8px; font-size:12.5px}
+  .spacer{flex:1}
+  .search{
+    width:260px; padding:7px 11px; border:1px solid var(--border); border-radius:8px;
+    background:var(--panel-2); color:var(--text); font-size:13px; outline:none;
+  }
+  .search:focus{border-color:var(--accent)}
+  .tabs{display:flex; gap:4px; background:var(--panel-2); padding:3px; border-radius:9px; border:1px solid var(--border)}
+  .tab{
+    padding:5px 12px; border-radius:6px; font-size:13px; cursor:pointer; border:none;
+    background:transparent; color:var(--muted); font-family:inherit;
+  }
+  .tab.on{background:var(--panel); color:var(--text); font-weight:550; box-shadow:var(--shadow)}
+  .icon-btn{
+    border:1px solid var(--border); background:var(--panel-2); color:var(--muted);
+    width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:15px; line-height:1;
+  }
+  .icon-btn:hover{color:var(--text)}
+
+  /* ---------- filter bar ---------- */
+  .filterbar{
+    position:sticky; top:57px; z-index:19; display:flex; align-items:center; gap:14px;
+    flex-wrap:wrap; padding:9px 20px; background:var(--panel-2);
+    border-bottom:1px solid var(--border); font-size:12.5px;
+  }
+  .fgroup{display:flex; align-items:center; gap:6px}
+  .fgroup label{color:var(--muted)}
+  .sel{
+    height:28px; border-radius:7px; border:1px solid var(--border); background:var(--panel);
+    color:var(--text); font-family:inherit; font-size:12.5px; padding:0 6px; cursor:pointer; max-width:230px;
+  }
+  .sel:focus{outline:none; border-color:var(--accent)}
+  .filterbar .note{color:var(--faint); margin-left:auto}
+  .reset{
+    border:none; background:transparent; color:var(--accent); cursor:pointer;
+    font-family:inherit; font-size:12.5px; padding:0;
+  }
+
+  /* ---------- completeness ---------- */
+  .score{display:flex; align-items:center; gap:6px}
+  .score-bar{
+    flex:1; min-width:42px; height:4px; border-radius:2px; background:var(--border); overflow:hidden;
+  }
+  .score-bar i{display:block; height:100%; border-radius:2px; background:var(--faint)}
+  .score-bar.t3 i{background:var(--good)}
+  .score-bar.t2 i{background:var(--warn)}
+  .score-bar.t1 i{background:var(--bad)}
+  .score-pct{font-size:11px; color:var(--muted); font-variant-numeric:tabular-nums; min-width:26px; text-align:right}
+
+  /* ---------- layout ---------- */
+  .wrap{display:grid; grid-template-columns:290px minmax(0,1fr); gap:18px; padding:18px 20px 60px; align-items:start}
+  .sidebar{position:sticky; top:74px; display:flex; flex-direction:column; gap:8px}
+  .tower-list{display:flex; flex-direction:column; gap:8px; overflow:auto; max-height:calc(100vh - 152px); padding-right:2px}
+  .card{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow);
+  }
+
+  .tower-item{
+    display:block; width:100%; text-align:left; padding:11px 13px; cursor:pointer;
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    color:inherit; font-family:inherit; font-size:13px; transition:border-color .12s;
+  }
+  .tower-item:hover{border-color:var(--accent)}
+  .tower-item.on{border-color:var(--accent); background:var(--accent-soft)}
+  .tower-item .n{font-weight:600; font-size:13.5px; line-height:1.35}
+  .tower-item .l{color:var(--muted); font-size:12px; margin-top:1px}
+  .tower-item .m{color:var(--faint); font-size:11.5px; margin-top:5px; display:flex; gap:8px; flex-wrap:wrap}
+
+  /* ---------- hero ---------- */
+  .hero{padding:20px 22px}
+  .hero h1{margin:0; font-size:24px; letter-spacing:-.02em; line-height:1.2}
+  .hero .local{color:var(--muted); font-size:14px; margin-top:3px}
+  .hero .addr{color:var(--muted); font-size:13px; margin-top:10px}
+  .badges{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
+  .badge{
+    font-size:11.5px; padding:3px 9px; border-radius:999px; border:1px solid var(--border);
+    background:var(--panel-2); color:var(--muted); white-space:nowrap;
+  }
+  .badge.accent{background:var(--accent-soft); color:var(--accent); border-color:transparent}
+  .badge.good{background:var(--good-soft); color:var(--good); border-color:transparent}
+  .badge.warn{background:var(--warn-soft); color:var(--warn); border-color:transparent}
+  .badge.bad{background:var(--bad-soft); color:var(--bad); border-color:transparent}
+
+  /* ---------- stats ---------- */
+  .stats{display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:1px; background:var(--border); border-top:1px solid var(--border)}
+  .stat{background:var(--panel); padding:12px 14px}
+  .stat .k{color:var(--muted); font-size:11.5px; text-transform:uppercase; letter-spacing:.04em}
+  .stat .v{font-size:17px; font-weight:600; margin-top:3px; font-variant-numeric:tabular-nums; letter-spacing:-.01em}
+  .stat .v small{font-size:12px; font-weight:450; color:var(--muted); margin-left:2px}
+
+  /* ---------- sections ---------- */
+  section{margin-top:16px}
+  .sec-head{
+    display:flex; align-items:baseline; gap:9px; padding:14px 18px 12px;
+    border-bottom:1px solid var(--border);
+  }
+  .sec-head h2{margin:0; font-size:14.5px; font-weight:650; letter-spacing:-.01em}
+  .sec-head .cnt{color:var(--faint); font-size:12px}
+  .sec-head .tbl{color:var(--faint); font-size:11px; margin-left:auto; font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .sec-body{padding:14px 18px}
+
+  .kv{display:grid; grid-template-columns:170px minmax(0,1fr); gap:9px 16px; font-size:13px}
+  .kv dt{color:var(--muted)}
+  .kv dd{margin:0}
+
+  .chips{display:flex; flex-wrap:wrap; gap:6px}
+  .chip{font-size:12px; padding:3px 9px; border-radius:6px; background:var(--panel-2); border:1px solid var(--border); color:var(--muted)}
+
+  ul.bullets{margin:0; padding-left:18px}
+  ul.bullets li{margin:3px 0}
+
+  /* ---------- tables ---------- */
+  .tbl-wrap{overflow-x:auto}
+  table{border-collapse:collapse; width:100%; font-size:13px}
+  th,td{padding:8px 12px; text-align:left; border-bottom:1px solid var(--border); vertical-align:top}
+  th{
+    color:var(--muted); font-weight:550; font-size:11.5px; text-transform:uppercase;
+    letter-spacing:.04em; white-space:nowrap; background:var(--panel-2);
+    position:sticky; top:0;
+  }
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover td{background:var(--panel-2)}
+  td.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px}
+
+  /* ---------- grouped lists ---------- */
+  .group{margin-bottom:16px}
+  .group:last-child{margin-bottom:0}
+  .group-title{
+    font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted);
+    font-weight:600; margin-bottom:7px; display:flex; align-items:center; gap:7px;
+  }
+  .group-title::after{content:""; flex:1; height:1px; background:var(--border)}
+  .items{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:8px}
+  .item{border:1px solid var(--border); border-radius:8px; padding:9px 11px; background:var(--panel-2)}
+  .item.hl{border-color:var(--accent); background:var(--accent-soft)}
+  .item .t{font-weight:550; font-size:13px}
+  .item .t .star{color:var(--accent)}
+  .item .jp{color:var(--faint); font-size:11.5px}
+  .item .s{color:var(--muted); font-size:12.5px; margin-top:4px}
+  .item .meta{color:var(--faint); font-size:11.5px; margin-top:5px}
+
+  .empty{color:var(--faint); font-size:13px; font-style:italic}
+  .src-list{display:flex; flex-direction:column; gap:5px; font-size:12.5px; word-break:break-all}
+
+  /* ---------- compare ---------- */
+  .cmp th:first-child, .cmp td:first-child{
+    position:sticky; left:0; background:var(--panel); font-weight:550;
+    border-right:1px solid var(--border); white-space:nowrap; z-index:1;
+  }
+  .cmp thead th:first-child{background:var(--panel-2); z-index:3}
+  .cmp thead th{z-index:2}
+  .cmp tbody tr:hover td:first-child{background:var(--panel-2)}
+
+  /* ---------- pager ---------- */
+  .pager{
+    display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+    padding:9px 11px; background:var(--panel); border:1px solid var(--border);
+    border-radius:var(--radius); box-shadow:var(--shadow);
+  }
+  .pager.inline{border:none; box-shadow:none; background:transparent; padding:10px 18px 0}
+  .pager .rng{color:var(--muted); font-size:12px; font-variant-numeric:tabular-nums; white-space:nowrap}
+  .pager .grow{flex:1}
+  .pg{
+    min-width:27px; height:27px; padding:0 7px; border-radius:7px; cursor:pointer;
+    border:1px solid var(--border); background:var(--panel-2); color:var(--muted);
+    font-family:inherit; font-size:12.5px; font-variant-numeric:tabular-nums;
+  }
+  .pg:hover:not(:disabled){border-color:var(--accent); color:var(--text)}
+  .pg.on{background:var(--accent-soft); border-color:var(--accent); color:var(--accent); font-weight:600}
+  .pg:disabled{opacity:.4; cursor:default}
+  .pg.gap{border:none; background:transparent; cursor:default; min-width:14px; padding:0}
+  .per{
+    height:27px; border-radius:7px; border:1px solid var(--border); background:var(--panel-2);
+    color:var(--muted); font-family:inherit; font-size:12.5px; padding:0 4px; cursor:pointer;
+  }
+
+  .footer{padding:22px 20px; color:var(--faint); font-size:12px; text-align:center}
+
+  @media (max-width:900px){
+    .wrap{grid-template-columns:1fr}
+    .sidebar{position:static; max-height:none}
+    .tower-list{display:flex; flex-direction:row; gap:8px; overflow-x:auto; padding-bottom:2px}
+    .tower-item{min-width:210px}
+    .kv{grid-template-columns:1fr}
+    .kv dt{color:var(--faint); font-size:11.5px; text-transform:uppercase; letter-spacing:.04em}
+    .search{width:150px}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">Benchmark Toà nhà <span id="sub"></span></div>
+  <div class="spacer"></div>
+  <input class="search" id="q" type="search" placeholder="Tìm toà nhà, tiện ích, hạng mục…" autocomplete="off">
+  <div class="tabs">
+    <button class="tab on" data-view="detail">Chi tiết</button>
+    <button class="tab" data-view="compare">So sánh</button>
+  </div>
+  <button class="icon-btn" id="theme" title="Đổi giao diện sáng/tối">◐</button>
+</div>
+
+<div class="filterbar">
+  <div class="fgroup">
+    <label for="country">Quốc gia</label>
+    <select class="sel" id="country"></select>
+  </div>
+  <div class="fgroup">
+    <label for="sort">Sắp xếp</label>
+    <select class="sel" id="sort"></select>
+  </div>
+  <button class="reset" id="reset" hidden>Xoá bộ lọc</button>
+  <span class="note" id="note"></span>
+</div>
+
+<div id="app"></div>
+<div class="footer" id="foot"></div>
+
+<script id="payload" type="application/json">__DATA__</script>
+<script>
+"use strict";
+
+const DATA = JSON.parse(document.getElementById("payload").textContent);
+const BUILDINGS = DATA.buildings || [];
+
+/* ------------------------------------------------------------------ labels */
+const L_BUILDING_TYPE = {
+  chung_cu: "Chung cư", mixed_use: "Mixed-use", condotel: "Condotel",
+  officetel: "Officetel", serviced_apartment: "Căn hộ dịch vụ",
+};
+const L_SEGMENT = {
+  binh_dan: "Bình dân", trung_cap: "Trung cấp", cao_cap: "Cao cấp",
+  hang_sang: "Hạng sang", sieu_sang: "Siêu sang",
+};
+const L_STATUS = {
+  quy_hoach: "Quy hoạch", dang_xay: "Đang xây",
+  da_ban_giao: "Đã bàn giao", dang_van_hanh: "Đang vận hành",
+};
+const L_HANDOVER_STD = {
+  tho: "Bàn giao thô", co_ban: "Hoàn thiện cơ bản",
+  noi_that_lien_tuong: "Nội thất liền tường", full_noi_that: "Full nội thất",
+};
+const L_MARKET = { so_cap: "Sơ cấp", thu_cap: "Thứ cấp", cho_thue: "Cho thuê" };
+const L_PRICE_UNIT = { per_unit: "/căn", per_m2: "/m²", per_tsubo: "/tsubo" };
+const L_PRICE_BASIS = {
+  tim_tuong: "Tim tường", thong_thuy: "Thông thuỷ",
+  khong_ro: "Không rõ", xay_dung: "Diện tích xây dựng",
+};
+const L_AREA_BASIS = { tim_tuong: "Tim tường", thong_thuy: "Thông thuỷ", khong_ro: "Không rõ" };
+const L_CONF = { high: "Tin cậy cao", medium: "Tin cậy TB", low: "Tin cậy thấp" };
+const CONF_CLASS = { high: "good", medium: "warn", low: "bad" };
+
+const L_LAYOUT = {
+  studio: "Studio", "1pn": "1PN", "1pn_plus": "1PN+", "2pn": "2PN",
+  "2pn_plus": "2PN+", "3pn": "3PN", "3pn_plus": "3PN+", "4pn": "4PN",
+  "4pn_plus": "4PN+", duplex: "Duplex", penthouse: "Penthouse", shophouse: "Shophouse",
+};
+const L_AMENITY_CAT = {
+  the_thao: "Thể thao", be_boi: "Bể bơi", suc_khoe: "Sức khoẻ & spa",
+  tre_em: "Trẻ em", cong_dong: "Cộng đồng", lam_viec: "Làm việc",
+  dich_vu_le_tan: "Lễ tân & dịch vụ", an_uong: "Ăn uống",
+  canh_quan: "Cảnh quan", an_ninh: "An ninh", tien_ich_khac: "Khác",
+  do_xe: "Đỗ xe", thuong_mai: "Thương mại", giai_tri: "Giải trí",
+  luu_tru: "Lưu trú", ha_tang: "Hạ tầng",
+};
+const L_ITEM_CAT = {
+  san: "Sàn", tuong: "Tường", tran: "Trần", bep: "Bếp", ve_sinh: "Vệ sinh",
+  cua: "Cửa", dieu_hoa: "Điều hoà", dien: "Điện", nuoc: "Nước",
+  thiet_bi: "Thiết bị", noi_that: "Nội thất", smart_home: "Smart home",
+  an_toan: "An toàn", ban_cong: "Ban công", khac: "Khác",
+};
+
+const pretty = (s) => String(s).replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
+const lbl = (map, v) => (v == null || v === "" ? "—" : map[v] || pretty(v));
+
+/* ------------------------------------------------------------------ utils */
+const esc = (s) =>
+  String(s ?? "").replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+const has = (v) => v !== undefined && v !== null && v !== "";
+
+const nf = new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 2 });
+const num = (v) => (has(v) && typeof v === "number" ? nf.format(v) : has(v) ? esc(v) : "—");
+
+function compact(v) {
+  if (!has(v) || typeof v !== "number") return "—";
+  const a = Math.abs(v);
+  if (a >= 1e9) return (v / 1e9).toFixed(a >= 1e10 ? 0 : 1).replace(".0", "") + " tỷ";
+  if (a >= 1e6) return (v / 1e6).toFixed(a >= 1e7 ? 0 : 1).replace(".0", "") + " tr";
+  if (a >= 1e4) return nf.format(Math.round(v));
+  return nf.format(v);
+}
+
+/** Tách chuỗi list phân tách bằng ';' thành mảng. */
+const splitList = (v) =>
+  has(v) ? String(v).split(/\s*;\s*/).map((s) => s.trim()).filter(Boolean) : [];
+
+const urls = (v) =>
+  has(v) ? String(v).split(/[\s;]+/).map((s) => s.trim()).filter((s) => /^https?:\/\//.test(s)) : [];
+
+const hostOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return u; } };
+
+const name = (b) => b.building_name || b.building_id;
+
+/* ------------------------------------------------------------------ blocks */
+function badge(text, cls) {
+  return `<span class="badge ${cls || ""}">${esc(text)}</span>`;
+}
+
+function statBox(k, v, unit) {
+  return `<div class="stat"><div class="k">${esc(k)}</div>
+    <div class="v">${v}${unit ? `<small>${esc(unit)}</small>` : ""}</div></div>`;
+}
+
+function section(title, count, table, bodyHtml) {
+  return `<section class="card">
+    <div class="sec-head">
+      <h2>${esc(title)}</h2>
+      ${count != null ? `<span class="cnt">${count}</span>` : ""}
+      ${table ? `<span class="tbl">${esc(table)}</span>` : ""}
+    </div>
+    <div class="sec-body">${bodyHtml}</div>
+  </section>`;
+}
+
+function kvRows(pairs) {
+  const rows = pairs.filter(([, v]) => has(v) && v !== "—");
+  if (!rows.length) return `<div class="empty">Chưa có dữ liệu.</div>`;
+  return `<dl class="kv">${rows
+    .map(([k, v]) => `<dt>${esc(k)}</dt><dd>${v}</dd>`)
+    .join("")}</dl>`;
+}
+
+function bulletsOf(v) {
+  const items = splitList(v);
+  if (!items.length) return "";
+  if (items.length === 1) return esc(items[0]);
+  return `<ul class="bullets">${items.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>`;
+}
+
+function chipsOf(v) {
+  const items = splitList(v);
+  return items.length
+    ? `<div class="chips">${items.map((i) => `<span class="chip">${esc(i)}</span>`).join("")}</div>`
+    : "";
+}
+
+/* ------------------------------------------------------------------ completeness
+ * Điểm 0–100 đo mức "dùng được" của một bản ghi, dùng làm thứ tự mặc định:
+ *   45% — tỷ lệ lấp đầy các trường trọng yếu của B1
+ *   35% — độ phủ các bảng con B2–B7 (so với ngưỡng kỳ vọng ở feature_spec)
+ *   20% — độ tin cậy tự đánh giá của pipeline (confidence)
+ * Chỉ để xếp hạng/lọc, không phải thước đo chất lượng nội dung.
+ */
+const B1_KEY_FIELDS = [
+  "building_name", "building_name_local", "developer", "country", "city",
+  "district", "address", "building_type", "segment", "status", "year_launch",
+  "year_handover", "num_towers", "num_floors_above", "num_basements",
+  "height_m", "num_units_total", "land_area_m2", "gfa_m2", "nfa_sale_m2",
+  "efficiency_ratio_pct", "parking_ratio", "unit_area_min_m2",
+  "unit_area_max_m2", "dominant_layout_class", "handover_standard",
+  "architect_firm", "design_concept", "facade_material", "floor_to_ceiling_m",
+  "signature_features", "orientation_note", "official_website", "source_urls",
+];
+
+// [key trong JSON, số bản ghi coi là "đủ", trọng số]
+const CHILD_TARGETS = [
+  ["unit_types", 8, 0.25],
+  ["handover_items", 20, 0.20],
+  ["amenities", 15, 0.20],
+  ["prices", 4, 0.15],
+  ["rooms", 10, 0.12],
+  ["floor_plates", 1, 0.08],
+];
+
+const CONF_WEIGHT = { high: 1, medium: 0.6, low: 0.25 };
+
+function completeness(b) {
+  if (b._score) return b._score;
+
+  const filled = B1_KEY_FIELDS.filter((f) => has(b[f])).length;
+  const fill = filled / B1_KEY_FIELDS.length;
+
+  let child = 0;
+  const childDetail = [];
+  for (const [key, target, weight] of CHILD_TARGETS) {
+    const n = (b[key] || []).length;
+    const ratio = Math.min(1, n / target);
+    child += ratio * weight;
+    childDetail.push(`${key}: ${n}/${target}`);
+  }
+
+  const conf = CONF_WEIGHT[b.confidence] ?? 0;
+  const score = Math.round((fill * 0.45 + child * 0.35 + conf * 0.20) * 100);
+
+  b._score = {
+    score,
+    fill: Math.round(fill * 100),
+    child: Math.round(child * 100),
+    conf: Math.round(conf * 100),
+    filled, totalFields: B1_KEY_FIELDS.length,
+    tip: `Độ đầy đủ ${score}% — trường B1 ${filled}/${B1_KEY_FIELDS.length}`
+       + ` · bảng con ${Math.round(child * 100)}% (${childDetail.join(", ")})`
+       + ` · ${lbl(L_CONF, b.confidence)}`,
+  };
+  return b._score;
+}
+
+const scoreTier = (s) => (s >= 70 ? "t3" : s >= 40 ? "t2" : "t1");
+
+function scoreBar(b) {
+  const s = completeness(b);
+  return `<div class="score" title="${esc(s.tip)}">
+    <span class="score-bar ${scoreTier(s.score)}"><i style="width:${s.score}%"></i></span>
+    <span class="score-pct">${s.score}%</span>
+  </div>`;
+}
+
+/* ------------------------------------------------------------------ sorting */
+const SORTS = [
+  ["complete", "Đầy đủ nhất", (a, b) => completeness(b).score - completeness(a).score],
+  ["name", "Tên A→Z", (a, b) => name(a).localeCompare(name(b), "vi")],
+  ["units", "Số căn nhiều nhất", (a, b) => (b.num_units_total || 0) - (a.num_units_total || 0)],
+  ["floors", "Cao nhất", (a, b) => (b.num_floors_above || 0) - (a.num_floors_above || 0)],
+  ["handover", "Bàn giao mới nhất", (a, b) => (b.year_handover || 0) - (a.year_handover || 0)],
+  ["amenities", "Nhiều tiện ích nhất", (a, b) => (b.amenities || []).length - (a.amenities || []).length],
+];
+
+/* ------------------------------------------------------------------ countries */
+const NO_COUNTRY = "__none__";
+const countryOf = (b) => (has(b.country) ? String(b.country).trim() : NO_COUNTRY);
+
+function countryOptions() {
+  const counts = new Map();
+  for (const b of BUILDINGS) {
+    const c = countryOf(b);
+    counts.set(c, (counts.get(c) || 0) + 1);
+  }
+  const named = [...counts.entries()]
+    .filter(([c]) => c !== NO_COUNTRY)
+    .sort((a, b) => a[0].localeCompare(b[0], "vi"));
+  if (counts.has(NO_COUNTRY)) named.push([NO_COUNTRY, counts.get(NO_COUNTRY)]);
+  return [["", BUILDINGS.length], ...named];
+}
+
+const countryLabel = (c) => (c === "" ? "Tất cả" : c === NO_COUNTRY ? "Chưa rõ" : c);
+
+/* ------------------------------------------------------------------ pagination */
+/** Cắt `list` theo trang; `per <= 0` nghĩa là hiện tất cả. */
+function paginate(list, page, per) {
+  const total = list.length;
+  if (!per || per <= 0) return { slice: list, page: 1, pages: 1, from: total ? 1 : 0, to: total, total };
+  const pages = Math.max(1, Math.ceil(total / per));
+  const cur = Math.min(Math.max(1, page), pages);
+  const start = (cur - 1) * per;
+  return {
+    slice: list.slice(start, start + per),
+    page: cur, pages, total,
+    from: total ? start + 1 : 0,
+    to: Math.min(start + per, total),
+  };
+}
+
+/** Dãy số trang rút gọn: 1 … 4 5 6 … 12 */
+function pageWindow(cur, pages) {
+  if (pages <= 7) return Array.from({ length: pages }, (_, i) => i + 1);
+  const out = new Set([1, pages, cur, cur - 1, cur + 1]);
+  const nums = [...out].filter((n) => n >= 1 && n <= pages).sort((a, b) => a - b);
+  const withGaps = [];
+  nums.forEach((n, i) => {
+    if (i && n - nums[i - 1] > 1) withGaps.push("…");
+    withGaps.push(n);
+  });
+  return withGaps;
+}
+
+/**
+ * Thanh phân trang. `act` là tên hành động, gắn vào data-act để bắt sự kiện.
+ * `noun` dùng cho nhãn "3–8 / 42 toà".
+ */
+function pager(p, act, noun, opts) {
+  const o = opts || {};
+  const nums = p.pages > 1
+    ? pageWindow(p.page, p.pages).map((n) =>
+        n === "…"
+          ? `<button class="pg gap" disabled>…</button>`
+          : `<button class="pg${n === p.page ? " on" : ""}" data-act="${act}" data-page="${n}">${n}</button>`)
+      .join("")
+    : "";
+
+  const perSel = o.perOptions
+    ? `<select class="per" data-act="${act}-per" title="Số mục mỗi trang">${o.perOptions
+        .map((v) => `<option value="${v}"${v === o.per ? " selected" : ""}>${v > 0 ? v + "/trang" : "Tất cả"}</option>`)
+        .join("")}</select>`
+    : "";
+
+  // Không có gì để phân trang và cũng không có bộ chọn → khỏi render thanh.
+  if (p.pages <= 1 && !perSel) return "";
+
+  return `<div class="pager${o.inline ? " inline" : ""}">
+    <span class="rng">${p.total ? `${p.from}–${p.to}` : 0} / ${p.total} ${esc(noun)}</span>
+    <span class="grow"></span>
+    ${p.pages > 1 ? `<button class="pg" data-act="${act}" data-page="${p.page - 1}" ${p.page <= 1 ? "disabled" : ""}>‹</button>` : ""}
+    ${nums}
+    ${p.pages > 1 ? `<button class="pg" data-act="${act}" data-page="${p.page + 1}" ${p.page >= p.pages ? "disabled" : ""}>›</button>` : ""}
+    ${perSel}
+  </div>`;
+}
+
+function groupBy(list, keyFn) {
+  const map = new Map();
+  for (const item of list) {
+    const k = keyFn(item) || "khac";
+    if (!map.has(k)) map.set(k, []);
+    map.get(k).push(item);
+  }
+  return [...map.entries()];
+}
+
+/* ------------------------------------------------------------------ render: hero */
+function renderHero(b) {
+  const badges = [];
+  if (b.is_target) badges.push(badge("Sản phẩm GBAC", "accent"));
+  if (b.building_type) badges.push(badge(lbl(L_BUILDING_TYPE, b.building_type)));
+  if (b.segment) badges.push(badge(lbl(L_SEGMENT, b.segment)));
+  if (b.status) badges.push(badge(lbl(L_STATUS, b.status)));
+  if (b.handover_standard) badges.push(badge(lbl(L_HANDOVER_STD, b.handover_standard)));
+  if (b.confidence) badges.push(badge(lbl(L_CONF, b.confidence), CONF_CLASS[b.confidence]));
+  const sc = completeness(b);
+  badges.push(`<span class="badge ${scoreTier(sc.score) === "t3" ? "good" : scoreTier(sc.score) === "t2" ? "warn" : "bad"}"
+    title="${esc(sc.tip)}">Đầy đủ ${sc.score}%</span>`);
+  if (b.linked_case_id) badges.push(badge("WS1: " + b.linked_case_id));
+
+  const place = [b.district, b.city, b.country].filter(has).join(", ");
+
+  // [nhãn, giá trị đã format, đơn vị, có dữ liệu?] — ô rỗng bị loại bỏ.
+  const stats = [
+    ["Tầng nổi", num(b.num_floors_above), "tầng", has(b.num_floors_above)],
+    ["Tầng hầm", num(b.num_basements), "tầng", has(b.num_basements)],
+    ["Chiều cao", num(b.height_m), "m", has(b.height_m)],
+    ["Tổng số căn", num(b.num_units_total), "căn", has(b.num_units_total)],
+    ["Số tháp", num(b.num_towers), "", has(b.num_towers)],
+    ["Diện tích đất", compact(b.land_area_m2), "m²", has(b.land_area_m2)],
+    ["GFA", compact(b.gfa_m2), "m²", has(b.gfa_m2)],
+    ["NFA thương phẩm", compact(b.nfa_sale_m2), "m²", has(b.nfa_sale_m2)],
+    ["Hệ số sử dụng", num(b.efficiency_ratio_pct), "%", has(b.efficiency_ratio_pct)],
+    ["Mật độ XD", num(b.building_density_pct), "%", has(b.building_density_pct)],
+    ["Cây xanh", num(b.green_area_pct), "%", has(b.green_area_pct)],
+    ["Hệ số đỗ xe", num(b.parking_ratio), "chỗ/căn", has(b.parking_ratio)],
+    ["Năm mở bán", String(b.year_launch), "", has(b.year_launch)],
+    ["Năm bàn giao", String(b.year_handover), "", has(b.year_handover)],
+    ["Thông thuỷ trần", num(b.floor_to_ceiling_m), "m", has(b.floor_to_ceiling_m)],
+    ["DT căn", `${num(b.unit_area_min_m2)}–${num(b.unit_area_max_m2)}`, "m²",
+      has(b.unit_area_min_m2) || has(b.unit_area_max_m2)],
+  ].filter((s) => s[3]).map((s) => statBox(s[0], s[1], s[2]));
+
+  const links = [];
+  if (b.official_website) links.push(`<a href="${esc(b.official_website)}" target="_blank" rel="noopener">Trang chính thức ↗</a>`);
+  if (b.brochure_url) links.push(`<a href="${esc(b.brochure_url)}" target="_blank" rel="noopener">Brochure ↗</a>`);
+
+  return `<div class="card">
+    <div class="hero">
+      <h1>${esc(name(b))}</h1>
+      ${b.building_name_local ? `<div class="local">${esc(b.building_name_local)}</div>` : ""}
+      <div class="badges">${badges.join("")}</div>
+      ${place || b.address ? `<div class="addr">📍 ${esc(b.address || place)}${b.address && place ? ` · ${esc(place)}` : ""}</div>` : ""}
+      ${b.developer ? `<div class="addr">🏢 ${esc(b.developer)}</div>` : ""}
+      ${links.length ? `<div class="addr">${links.join(" · ")}</div>` : ""}
+    </div>
+    <div class="stats">${stats.join("")}</div>
+  </div>`;
+}
+
+/* ------------------------------------------------------------------ render: architecture */
+function renderArchitecture(b) {
+  const body = kvRows([
+    ["Đơn vị thiết kế", esc(b.architect_firm || "")],
+    ["Quốc gia KTS", esc(b.architect_country || "")],
+    ["Thiết kế nội thất", esc(b.interior_designer || "")],
+    ["Cảnh quan", esc(b.landscape_architect || "")],
+    ["Phong cách", esc(b.architectural_style || "")],
+    ["Hình khối", esc(b.massing_form || "")],
+    ["Vật liệu mặt đứng", bulletsOf(b.facade_material)],
+    ["Hệ mặt đứng", esc(b.facade_system || "")],
+    ["Tỷ lệ kính/tường", has(b.window_wall_ratio_pct) ? num(b.window_wall_ratio_pct) + "%" : ""],
+    ["Loại ban công", esc(b.balcony_type || "")],
+    ["Ý tưởng thiết kế", esc(b.design_concept || "")],
+    ["Từ khoá concept", chipsOf(b.design_concept_keywords)],
+    ["Điểm nhấn kiến trúc", bulletsOf(b.signature_features)],
+    ["Hướng / tầm nhìn", esc(b.orientation_note || "")],
+    ["Chứng chỉ xanh", [b.green_cert, b.green_cert_level].filter(has).map(esc).join(" · ")],
+    ["Giải thưởng", bulletsOf(b.awards)],
+  ]);
+  return section("Kiến trúc & thiết kế", null, "B1 §2.2", body);
+}
+
+/* ------------------------------------------------------------------ render: unit types */
+function renderUnitTypes(b) {
+  const list = b.unit_types || [];
+  const rooms = b.rooms || [];
+  if (!list.length) return section("Loại căn hộ", 0, "B2", `<div class="empty">Chưa thu thập được loại căn.</div>`);
+
+  const rows = list.map((u) => {
+    const myRooms = rooms.filter((r) => r.unit_type_id === u.unit_type_id);
+    const tags = [];
+    if (u.is_corner) tags.push("căn góc");
+    if (u.has_multipurpose_room) tags.push("phòng đa năng");
+    if (u.facing) tags.push("hướng " + u.facing);
+    if (u.view_type) tags.push("view " + u.view_type);
+    return `<tr>
+      <td class="mono">${esc(u.type_code || u.unit_type_id || "—")}</td>
+      <td>${esc(u.type_name || "")}${tags.length ? `<div class="jp" style="color:var(--faint);font-size:11.5px">${esc(tags.join(" · "))}</div>` : ""}</td>
+      <td>${esc(lbl(L_LAYOUT, u.layout_class))}</td>
+      <td class="num">${num(u.bedrooms)}</td>
+      <td class="num">${num(u.bathrooms)}</td>
+      <td class="num">${num(u.area_net_m2)}</td>
+      <td class="num">${num(u.area_gross_m2)}</td>
+      <td class="num">${num(u.area_balcony_m2)}</td>
+      <td>${esc(lbl(L_AREA_BASIS, u.area_basis_reported))}</td>
+      <td class="num">${num(u.num_units_of_type)}</td>
+      <td class="num">${has(u.share_of_total_pct) ? num(u.share_of_total_pct) + "%" : "—"}</td>
+      <td class="num">${myRooms.length || "—"}</td>
+      <td>${u.floorplan_url ? `<a href="${esc(u.floorplan_url)}" target="_blank" rel="noopener">MB ↗</a>` : "—"}</td>
+    </tr>`;
+  }).join("");
+
+  const summary = [];
+  if (b.unit_types_summary) summary.push(`<div style="margin-bottom:12px">${chipsOf(b.unit_types_summary)}</div>`);
+  if (b.mix_by_bedroom_pct) summary.push(`<div style="margin-bottom:12px"><span style="color:var(--muted)">Cơ cấu theo số PN:</span> ${chipsOf(b.mix_by_bedroom_pct)}</div>`);
+
+  const table = `<div class="tbl-wrap"><table>
+    <thead><tr>
+      <th>Mã</th><th>Tên</th><th>Layout</th><th>PN</th><th>WC</th>
+      <th>DT thông thuỷ m²</th><th>DT tim tường m²</th><th>Ban công m²</th>
+      <th>Cơ sở đo</th><th>Số căn</th><th>Tỷ trọng</th><th>Phòng</th><th>MB</th>
+    </tr></thead><tbody>${rows}</tbody></table></div>`;
+
+  return section("Loại căn hộ", list.length, "B2", summary.join("") + table);
+}
+
+/* ------------------------------------------------------------------ render: rooms */
+function renderRooms(b) {
+  const rooms = b.rooms || [];
+  if (!rooms.length) return "";
+  const byUnit = groupBy(rooms, (r) => r.unit_type_id);
+  const codeOf = (id) => {
+    const u = (b.unit_types || []).find((x) => x.unit_type_id === id);
+    return u ? u.type_code || u.unit_type_id : id || "Không rõ loại căn";
+  };
+  const body = byUnit.map(([unitId, list]) => `
+    <div class="group">
+      <div class="group-title">${esc(codeOf(unitId))} — ${list.length} phòng</div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Phòng</th><th>Loại</th><th>DT m²</th><th>Rộng m</th><th>Dài m</th><th>Cửa sổ</th><th>Ghi chú</th></tr></thead>
+        <tbody>${list.map((r) => `<tr>
+          <td>${esc(r.room_label_raw || r.room_code || "—")}</td>
+          <td>${esc(pretty(r.room_type || "—"))}</td>
+          <td class="num">${num(r.area_m2)}</td>
+          <td class="num">${num(r.width_m)}</td>
+          <td class="num">${num(r.length_m)}</td>
+          <td>${r.has_window === true ? "Có" : r.has_window === false ? "Không" : "—"}</td>
+          <td>${esc(r.position_note || "")}${r.is_ensuite ? " (ensuite)" : ""}</td>
+        </tr>`).join("")}</tbody>
+      </table></div>
+    </div>`).join("");
+  return section("Layout phòng", rooms.length, "B3", body);
+}
+
+/* ------------------------------------------------------------------ render: floor plates */
+function renderFloorPlates(b) {
+  const list = b.floor_plates || [];
+  if (!list.length) return "";
+  const rows = list.map((f) => `<tr>
+    <td class="mono">${esc(f.tower_code || "—")}</td>
+    <td>${esc(f.floor_label || f.floor_range || "—")}</td>
+    <td class="num">${num(f.units_per_floor)}</td>
+    <td>${esc(f.unit_type_mix || "—")}</td>
+    <td class="num">${num(f.gfa_per_floor_m2)}</td>
+    <td class="num">${num(f.nfa_per_floor_m2)}</td>
+    <td class="num">${has(f.efficiency_per_floor_pct) ? num(f.efficiency_per_floor_pct) + "%" : "—"}</td>
+    <td>${esc(pretty(f.corridor_type || "—"))}</td>
+    <td class="num">${num(f.num_elevators)}</td>
+    <td class="num">${num(f.units_per_elevator)}</td>
+    <td>${esc(pretty(f.core_position || "—"))}</td>
+  </tr>`).join("");
+  return section("Mặt bằng tầng điển hình", list.length, "B4",
+    `<div class="tbl-wrap"><table><thead><tr>
+      <th>Tháp</th><th>Dải tầng</th><th>Căn/sàn</th><th>Cơ cấu</th>
+      <th>GFA/sàn</th><th>NFA/sàn</th><th>Hiệu quả</th><th>Hành lang</th>
+      <th>Thang máy</th><th>Căn/thang</th><th>Vị trí lõi</th>
+    </tr></thead><tbody>${rows}</tbody></table></div>`);
+}
+
+/* ------------------------------------------------------------------ render: handover */
+function renderHandover(b) {
+  const list = b.handover_items || [];
+  const head = kvRows([
+    ["Tiêu chuẩn bàn giao", esc(lbl(L_HANDOVER_STD, b.handover_standard))],
+    ["Thương hiệu thiết bị", chipsOf(b.handover_brands)],
+  ]);
+  if (!list.length) {
+    return section("Tiêu chuẩn bàn giao", 0, "B5", head + `<div class="empty" style="margin-top:10px">Chưa thu thập được hạng mục bàn giao.</div>`);
+  }
+  const groups = groupBy(list, (i) => i.item_category).map(([cat, items]) => `
+    <div class="group">
+      <div class="group-title">${esc(lbl(L_ITEM_CAT, cat))} · ${items.length}</div>
+      <div class="items">${items.map((i) => `
+        <div class="item">
+          <div class="t">${esc(i.item_name || i.item_code || "—")}${i.is_included === false ? ' <span class="badge bad" style="font-size:10.5px">tuỳ chọn</span>' : ""}</div>
+          ${i.item_spec ? `<div class="s">${esc(i.item_spec)}</div>` : ""}
+          ${i.brand ? `<div class="meta">Thương hiệu: ${esc(i.brand)}${i.brand_origin ? ` (${esc(i.brand_origin)})` : ""}</div>` : ""}
+          ${i.note ? `<div class="meta">${esc(i.note)}</div>` : ""}
+        </div>`).join("")}</div>
+    </div>`).join("");
+  return section("Tiêu chuẩn bàn giao", list.length, "B5", head + `<div style="margin-top:14px">${groups}</div>`);
+}
+
+/* ------------------------------------------------------------------ render: amenities */
+function renderAmenities(b) {
+  const list = b.amenities || [];
+  if (!list.length) {
+    return section("Tiện ích nội khu", 0, "B6",
+      b.amenity_highlights ? bulletsOf(b.amenity_highlights) : `<div class="empty">Chưa thu thập được tiện ích.</div>`);
+  }
+  const groups = groupBy(list, (a) => a.amenity_category).map(([cat, items]) => `
+    <div class="group">
+      <div class="group-title">${esc(lbl(L_AMENITY_CAT, cat))} · ${items.length}</div>
+      <div class="items">${items.map((a) => {
+        const meta = [];
+        if (a.floor_level != null) meta.push("Tầng " + a.floor_level);
+        if (a.location) meta.push(a.location);
+        if (a.is_indoor === true) meta.push("trong nhà");
+        if (a.is_indoor === false) meta.push("ngoài trời");
+        if (a.is_resident_free === true) meta.push("miễn phí cư dân");
+        if (a.is_resident_free === false) meta.push("có phí");
+        if (a.operator_brand) meta.push("vận hành: " + a.operator_brand);
+        return `<div class="item${a.is_highlight ? " hl" : ""}">
+          <div class="t">${a.is_highlight ? '<span class="star">★</span> ' : ""}${esc(a.amenity_name || "—")}</div>
+          ${a.amenity_name_local ? `<div class="jp">${esc(a.amenity_name_local)}</div>` : ""}
+          ${meta.length ? `<div class="meta">${esc(meta.join(" · "))}</div>` : ""}
+        </div>`;
+      }).join("")}</div>
+    </div>`).join("");
+  return section("Tiện ích nội khu", list.length, "B6", groups);
+}
+
+/* ------------------------------------------------------------------ render: prices */
+function renderPrices(b) {
+  const list = b.prices || [];
+  if (!list.length) return section("Giá", 0, "B7", `<div class="empty">Chưa có quan sát giá.</div>`);
+
+  const codeOf = (id) => {
+    if (!id) return "Toàn toà";
+    const u = (b.unit_types || []).find((x) => x.unit_type_id === id);
+    return u ? u.type_code || u.unit_type_id : id;
+  };
+  const usd = (v, rate) => (has(v) && has(rate) ? "$" + compact(v * rate) : "—");
+
+  const rows = list.map((p) => {
+    const cls = p.market === "so_cap" ? "accent" : p.market === "thu_cap" ? "" : "";
+    return `<tr>
+      <td>${badge(lbl(L_MARKET, p.market), cls)}</td>
+      <td>${esc(codeOf(p.unit_type_id))}</td>
+      <td class="num">${compact(p.price_min)}</td>
+      <td class="num">${compact(p.price_max)}</td>
+      <td class="num">${compact(p.price_avg)}</td>
+      <td>${esc(p.currency || "—")} <span style="color:var(--muted)">${esc(lbl(L_PRICE_UNIT, p.price_unit))}</span></td>
+      <td class="num">${usd(has(p.price_avg) ? p.price_avg : p.price_min, p.fx_rate_to_usd)}</td>
+      <td>${esc(lbl(L_PRICE_BASIS, p.price_basis))}</td>
+      <td>${esc(p.period || "—")}</td>
+      <td class="num">${num(p.sample_size)}</td>
+      <td>${p.listing_url ? `<a href="${esc(p.listing_url)}" target="_blank" rel="noopener">${esc(hostOf(p.listing_url))} ↗</a>` : "—"}</td>
+    </tr>`;
+  }).join("");
+
+  const derived = kvRows([
+    ["USD/m² sơ cấp", has(b.price_usd_per_m2_primary) ? "$" + num(b.price_usd_per_m2_primary) : ""],
+    ["USD/m² thứ cấp", has(b.price_usd_per_m2_secondary) ? "$" + num(b.price_usd_per_m2_secondary) : ""],
+    ["Chênh lệch thứ cấp", has(b.secondary_premium_pct) ? num(b.secondary_premium_pct) + "%" : ""],
+    ["Tăng trưởng YoY", has(b.price_growth_pct_yoy) ? num(b.price_growth_pct_yoy) + "%" : ""],
+  ]);
+  const derivedHtml = derived.includes("empty") ? "" : `<div style="margin-bottom:14px">${derived}</div>`;
+
+  return section("Giá sơ cấp / thứ cấp", list.length, "B7", derivedHtml + `<div class="tbl-wrap"><table>
+    <thead><tr>
+      <th>Thị trường</th><th>Loại căn</th><th>Thấp nhất</th><th>Cao nhất</th><th>Trung bình</th>
+      <th>Đơn vị</th><th>≈ USD</th><th>Cơ sở</th><th>Kỳ</th><th>Mẫu</th><th>Nguồn</th>
+    </tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="empty" style="margin-top:10px">≈ USD quy đổi theo <span class="mono">fx_rate_to_usd</span> ghi tại thời điểm thu thập.</div>`);
+}
+
+/* ------------------------------------------------------------------ render: sources */
+function renderSources(b) {
+  const all = new Set(urls(b.source_urls));
+  for (const key of ["unit_types", "handover_items", "amenities", "prices", "rooms", "floor_plates"]) {
+    for (const rec of b[key] || []) urls(rec.source_urls).forEach((u) => all.add(u));
+  }
+  const list = [...all];
+  const body = `
+    ${kvRows([
+      ["Ngày trích xuất", esc(b.extracted_at || "")],
+      ["Độ tin cậy", b.confidence ? badge(lbl(L_CONF, b.confidence), CONF_CLASS[b.confidence]) : ""],
+      ["Số nguồn OK", num(b.sources_ok)],
+      ["File CSV", `<span class="mono">${esc(b._file || "")}</span>`],
+      ["building_id", `<span class="mono">${esc(b.building_id || "")}</span>`],
+    ])}
+    ${list.length ? `<div class="src-list" style="margin-top:12px">${list
+      .map((u, i) => `<div>${i + 1}. <a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a></div>`)
+      .join("")}</div>` : ""}`;
+  return section("Nguồn dữ liệu", list.length, "", body);
+}
+
+/* ------------------------------------------------------------------ render: compare */
+const CMP_ROWS = [
+  ["Tên bản địa", (b) => esc(b.building_name_local || "—")],
+  ["Quốc gia", (b) => esc(has(b.country) ? b.country : "—")],
+  ["Vị trí", (b) => esc([b.district, b.city].filter(has).join(", ") || "—")],
+  ["Chủ đầu tư", (b) => esc(b.developer || "—")],
+  ["Loại hình", (b) => esc(lbl(L_BUILDING_TYPE, b.building_type))],
+  ["Năm bàn giao", (b) => (has(b.year_handover) ? String(b.year_handover) : "—")],
+  ["Tầng nổi", (b) => num(b.num_floors_above)],
+  ["Tầng hầm", (b) => num(b.num_basements)],
+  ["Chiều cao (m)", (b) => num(b.height_m)],
+  ["Tổng số căn", (b) => num(b.num_units_total)],
+  ["Diện tích đất (m²)", (b) => compact(b.land_area_m2)],
+  ["GFA (m²)", (b) => compact(b.gfa_m2)],
+  ["Hệ số sử dụng (%)", (b) => num(b.efficiency_ratio_pct)],
+  ["DT căn (m²)", (b) => (has(b.unit_area_min_m2) ? `${num(b.unit_area_min_m2)}–${num(b.unit_area_max_m2)}` : "—")],
+  ["Layout chủ đạo", (b) => esc(lbl(L_LAYOUT, b.dominant_layout_class))],
+  ["Thông thuỷ trần (m)", (b) => num(b.floor_to_ceiling_m)],
+  ["Tiêu chuẩn bàn giao", (b) => esc(lbl(L_HANDOVER_STD, b.handover_standard))],
+  ["Đơn vị thiết kế", (b) => esc(b.architect_firm || "—")],
+  ["Số loại căn", (b) => String((b.unit_types || []).length || "—")],
+  ["Số hạng mục BG", (b) => String((b.handover_items || []).length || "—")],
+  ["Số tiện ích", (b) => String((b.amenities || []).length || "—")],
+  ["Quan sát giá", (b) => String((b.prices || []).length || "—")],
+  ["Giá sơ cấp", (b) => {
+    const p = (b.prices || []).find((x) => x.market === "so_cap");
+    if (!p) return "—";
+    const lo = compact(p.price_min), hi = compact(p.price_max);
+    return `${lo}${hi !== "—" && hi !== lo ? "–" + hi : ""} ${esc(p.currency || "")}${esc(lbl(L_PRICE_UNIT, p.price_unit))}`;
+  }],
+  ["Độ tin cậy", (b) => (b.confidence ? badge(lbl(L_CONF, b.confidence), CONF_CLASS[b.confidence]) : "—")],
+  ["Độ đầy đủ dữ liệu", (b) => scoreBar(b)],
+];
+
+function renderCompare(list) {
+  if (!list.length) return `<div class="card"><div class="sec-body empty">Không có toà nào khớp bộ lọc.</div></div>`;
+
+  // Phân trang theo cột: bảng quá nhiều toà thì cuộn ngang mãi không đọc được.
+  const p = paginate(list, state.cmpPage, state.cmpPer);
+  const cols = p.slice;
+  const head = `<tr><th>Tiêu chí</th>${cols.map((b) => `<th>${esc(name(b))}</th>`).join("")}</tr>`;
+  const body = CMP_ROWS.map(([label, fn]) =>
+    `<tr><td>${esc(label)}</td>${cols.map((b) => `<td>${fn(b)}</td>`).join("")}</tr>`).join("");
+
+  return `<section class="card">
+    <div class="sec-head"><h2>So sánh toà nhà</h2><span class="cnt">${list.length}</span><span class="tbl">B1–B7</span></div>
+    ${pager(p, "cmp", "toà", { inline: true, per: state.cmpPer, perOptions: [4, 6, 10, 0] })}
+    <div class="tbl-wrap"><table class="cmp"><thead>${head}</thead><tbody>${body}</tbody></table></div>
+  </section>`;
+}
+
+/* ------------------------------------------------------------------ search */
+function haystack(b) {
+  if (b._hay) return b._hay;
+  const parts = [
+    name(b), b.building_name_local, b.developer, b.district, b.city, b.country,
+    b.address, b.architect_firm, b.design_concept, b.signature_features,
+    b.amenity_highlights, b.unit_types_summary,
+  ];
+  for (const a of b.amenities || []) parts.push(a.amenity_name, a.amenity_name_local);
+  for (const i of b.handover_items || []) parts.push(i.item_name, i.item_spec, i.brand);
+  for (const u of b.unit_types || []) parts.push(u.type_code, u.type_name);
+  b._hay = parts.filter(has).join(" ").toLowerCase();
+  return b._hay;
+}
+
+/* ------------------------------------------------------------------ app */
+const state = {
+  view: "detail",
+  selected: BUILDINGS[0] ? BUILDINGS[0].building_id : null,
+  q: "",
+  country: "",            // "" = tất cả, NO_COUNTRY = chưa rõ
+  sort: "complete",       // mặc định: đầy đủ + tin cậy nhất lên đầu
+  page: 1, per: 8,        // danh sách toà ở sidebar
+  cmpPage: 1, cmpPer: 6,  // số cột mỗi trang ở tab So sánh
+};
+
+function filtered() {
+  const q = state.q.trim().toLowerCase();
+  let list = BUILDINGS;
+  if (state.country) list = list.filter((b) => countryOf(b) === state.country);
+  if (q) list = list.filter((b) => haystack(b).includes(q));
+
+  const sorter = (SORTS.find((s) => s[0] === state.sort) || SORTS[0])[2];
+  // Điểm đầy đủ luôn là tiêu chí phá hoà, rồi mới đến tên.
+  return [...list].sort((a, b) =>
+    sorter(a, b) || completeness(b).score - completeness(a).score || name(a).localeCompare(name(b), "vi"));
+}
+
+function renderSidebar(list) {
+  const p = paginate(list, state.page, state.per);
+  const items = p.slice.map((b) => {
+    const meta = [
+      has(b.num_floors_above) ? b.num_floors_above + " tầng" : null,
+      has(b.num_units_total) ? nf.format(b.num_units_total) + " căn" : null,
+      has(b.year_handover) ? "BG " + b.year_handover : null,
+    ].filter(Boolean);
+    return `<button class="tower-item${b.building_id === state.selected ? " on" : ""}" data-id="${esc(b.building_id)}">
+      <div class="n">${esc(name(b))}</div>
+      ${b.building_name_local ? `<div class="l">${esc(b.building_name_local)}</div>` : ""}
+      <div class="m">${meta.map((m) => `<span>${esc(m)}</span>`).join("")}</div>
+      ${scoreBar(b)}
+    </button>`;
+  }).join("");
+
+  return `<div class="sidebar">
+    <div class="tower-list">${items || `<div class="card empty" style="padding:14px">Không có kết quả.</div>`}</div>
+    ${pager(p, "list", "toà", { per: state.per, perOptions: [8, 16, 32, 0] })}
+  </div>`;
+}
+
+function renderDetail(b) {
+  if (!b) return `<div class="card"><div class="sec-body empty">Không có toà nào khớp tìm kiếm.</div></div>`;
+  return [
+    renderHero(b),
+    renderArchitecture(b),
+    renderUnitTypes(b),
+    renderRooms(b),
+    renderFloorPlates(b),
+    renderHandover(b),
+    renderAmenities(b),
+    renderPrices(b),
+    renderSources(b),
+  ].join("");
+}
+
+function render() {
+  const list = filtered();
+  const app = document.getElementById("app");
+
+  if (state.view === "compare") {
+    app.innerHTML = `<div class="wrap" style="grid-template-columns:1fr">${renderCompare(list)}</div>`;
+  } else {
+    // Toà đang chọn bị lọc mất → nhảy về mục đầu của trang hiện tại.
+    let sel = list.find((b) => b.building_id === state.selected)
+      || paginate(list, state.page, state.per).slice[0] || null;
+    if (sel) state.selected = sel.building_id;
+    app.innerHTML = `<div class="wrap">${renderSidebar(list)}<div>${renderDetail(sel)}</div></div>`;
+    app.querySelectorAll(".tower-item").forEach((el) =>
+      el.addEventListener("click", () => {
+        state.selected = el.dataset.id;
+        render();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }));
+  }
+
+  // Thanh phân trang được render lại mỗi lần → bắt sự kiện sau khi gắn DOM.
+  app.querySelectorAll("[data-act]").forEach((el) => {
+    const act = el.dataset.act;
+    if (act === "list") el.addEventListener("click", () => { state.page = +el.dataset.page; render(); });
+    else if (act === "cmp") el.addEventListener("click", () => { state.cmpPage = +el.dataset.page; render(); });
+    else if (act === "list-per") el.addEventListener("change", () => { state.per = +el.value; state.page = 1; render(); });
+    else if (act === "cmp-per") el.addEventListener("change", () => { state.cmpPer = +el.value; state.cmpPage = 1; render(); });
+  });
+
+  const totals = BUILDINGS.reduce((acc, b) => {
+    acc.u += (b.unit_types || []).length;
+    acc.h += (b.handover_items || []).length;
+    acc.a += (b.amenities || []).length;
+    acc.p += (b.prices || []).length;
+    return acc;
+  }, { u: 0, h: 0, a: 0, p: 0 });
+
+  document.getElementById("sub").textContent =
+    `${list.length}/${BUILDINGS.length} toà · ${totals.u} loại căn · ${totals.h} hạng mục BG · ${totals.a} tiện ích · ${totals.p} quan sát giá`;
+  document.getElementById("foot").textContent =
+    `Nguồn: ${DATA.source_dir || "output_csv"} · cập nhật ${DATA.generated_at || "—"} · dựng bởi code_ui/build_html.py`;
+}
+
+/* ------------------------------------------------------------------ controls */
+const elCountry = document.getElementById("country");
+const elSort = document.getElementById("sort");
+const elReset = document.getElementById("reset");
+
+elCountry.innerHTML = countryOptions()
+  .map(([c, n]) => `<option value="${esc(c)}">${esc(countryLabel(c))} (${n})</option>`).join("");
+elSort.innerHTML = SORTS.map(([k, label]) => `<option value="${k}">${esc(label)}</option>`).join("");
+elSort.value = state.sort;
+
+// Cột `country` trống ở nhiều bản ghi thì nói thẳng, đừng để bộ lọc trông như hỏng.
+const missingCountry = BUILDINGS.filter((b) => countryOf(b) === NO_COUNTRY).length;
+document.getElementById("note").textContent = missingCountry
+  ? `⚠ ${missingCountry}/${BUILDINGS.length} toà chưa có trường country trong CSV — gom vào nhóm “Chưa rõ”.`
+  : "";
+
+function onFilterChange() {
+  state.page = 1; state.cmpPage = 1; // đổi bộ lọc thì về trang đầu
+  elReset.hidden = !(state.q || state.country || state.sort !== "complete");
+  render();
+}
+
+document.getElementById("q").addEventListener("input", (e) => {
+  state.q = e.target.value;
+  onFilterChange();
+});
+elCountry.addEventListener("change", () => { state.country = elCountry.value; onFilterChange(); });
+elSort.addEventListener("change", () => { state.sort = elSort.value; onFilterChange(); });
+elReset.addEventListener("click", () => {
+  state.q = ""; state.country = ""; state.sort = "complete";
+  document.getElementById("q").value = "";
+  elCountry.value = ""; elSort.value = "complete";
+  onFilterChange();
+});
+document.querySelectorAll(".tab").forEach((t) =>
+  t.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach((x) => x.classList.toggle("on", x === t));
+    state.view = t.dataset.view;
+    render();
+  }));
+document.getElementById("theme").addEventListener("click", () => {
+  const cur = document.documentElement.getAttribute("data-theme");
+  const next = cur === "dark" ? "light" : cur === "light" ? "" : "dark";
+  if (next) document.documentElement.setAttribute("data-theme", next);
+  else document.documentElement.removeAttribute("data-theme");
+});
+
+render();
+</script>
+</body>
+</html>

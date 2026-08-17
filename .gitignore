@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Proxy runtime
+code_proxy/runtime/
+code_proxy/proxy.log
+*.log
+.proxy-token
+
+# Đầu ra pipeline (raw append-only, sinh lại được)
+output_raw/
+output_csv/
+
+# Trang HTML dựng lại được từ output_csv
+code_ui/dist/
+
+# Cấu hình cục bộ
+.env
+.env.*
+!.env.example
+
+# Editor / OS
+.idea/
+.vscode/
+.DS_Store

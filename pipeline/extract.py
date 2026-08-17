@@ -117,7 +117,14 @@ feature_spec đính kèm và corpus raw đính kèm. Quy tắc bắt buộc:
        Trung. Vd 住友不動産株式会社 → `Sumitomo Realty & Development`;
        中央区 → `Quận Chuo`; 鳴海製陶 → `Narumi`. Phần chức danh chung trong địa
        chỉ thì dịch (丁目 → `chome`, 区 → `Quận`).
-   8c. GIỮ NGUYÊN VĂN, tuyệt đối không dịch: mọi trường `*_local`
+   8b'. "NGUYÊN VĂN" TRONG feature_spec KHÔNG CÓ NGHĨA LÀ GIỮ NGUYÊN NGÔN NGỮ.
+       Vài trường được spec mô tả là "nguyên văn" (`item_spec` §6, `design_concept`
+       §2) — đó là yêu cầu KHÔNG diễn giải lại, KHÔNG thêm bớt, KHÔNG tóm tắt.
+       Vẫn phải dịch sang tiếng Việt theo 8a, giữ nguyên con số, đơn vị, mã hiệu
+       và tên thương hiệu. Vd `食器洗い乾燥機全住戸標準採用` →
+       `Máy rửa & sấy bát, trang bị tiêu chuẩn cho toàn bộ căn hộ` (KHÔNG để
+       nguyên tiếng Nhật). Chỉ 8c dưới đây mới thực sự giữ nguyên ngôn ngữ.
+   8c. GIỮ NGUYÊN VĂN VỀ NGÔN NGỮ, tuyệt đối không dịch: mọi trường `*_local`
        (building_name_local, amenity_name_local), `snippet` trong provenance, và
        `type_code` — type_code phải khớp ký tự với nguồn để B3/B7 nối được.
    Mã danh mục (layout_class, handover_standard, market, area_basis_reported…)
