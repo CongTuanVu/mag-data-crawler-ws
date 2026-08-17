@@ -7,6 +7,7 @@ thứ hai trở đi corpus đọc từ cache nên chi phí ~0.1x.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -14,6 +15,65 @@ from . import config, llm, schema
 
 MAX_CHARS_PER_FILE = 80_000
 MAX_CHARS_TOTAL = 900_000
+
+# ── Chuẩn hoá ngôn ngữ (hậu kiểm quy tắc 8) ─────────────────────────────────
+# Quy tắc 8 là hướng dẫn cho model nên tuân thủ ~96%: mỗi lần chạy còn sót vài ô
+# dạng `Kết cấu cách chấn (免震)`. Bước dưới đây cắt phần thuật ngữ gốc đó một
+# cách tất định — bản gốc vẫn tra được ở `snippet` / `*_local`.
+CJK = re.compile(r"[぀-ヿ㐀-䶿一-鿿가-힯]")
+# Ngoặc chỉ chứa chữ CJK và dấu câu — không có chữ La-tinh nào — là thuật ngữ gốc.
+SOURCE_TERM_PAREN = re.compile(r"\s*[（(][^（()）]*[)）]")
+
+# Không đụng vào: provenance (snippet phải nguyên văn), tên bản địa, và mọi mã
+# định danh (type_code/item_code…) vì chúng phải khớp ký tự với nguồn.
+VERBATIM_KEYS = {"provenance", "snippet"}
+VERBATIM_SUFFIXES = ("_local", "_code")
+# `note`/`notes` là bình luận của extractor về nguồn — trích thuật ngữ gốc ở đó
+# là chính đáng (vd giải thích mâu thuẫn 専有面積 vs 壁芯面積), nên giữ nguyên.
+COMMENTARY_KEYS = {"note", "notes"}
+
+
+def _is_source_term(fragment: str) -> bool:
+    return bool(CJK.search(fragment)) and not re.search(r"[A-Za-zÀ-ỹ]", fragment)
+
+
+def _strip_source_terms(text: str) -> str:
+    if not CJK.search(text):
+        return text
+    cleaned = SOURCE_TERM_PAREN.sub(
+        lambda m: "" if _is_source_term(m.group(0)) else m.group(0), text
+    )
+    return cleaned.strip() or text          # cắt sạch trơn thì giữ bản gốc
+
+
+def normalize_language(value: Any, key: str | None = None) -> Any:
+    """Bỏ thuật ngữ gốc còn kẹp trong ngoặc ở các trường dữ liệu."""
+    if key is not None and (
+        key in VERBATIM_KEYS
+        or key in COMMENTARY_KEYS
+        or key.endswith(VERBATIM_SUFFIXES)
+    ):
+        return value
+    if isinstance(value, str):
+        return _strip_source_terms(value)
+    if isinstance(value, list):
+        return [normalize_language(v, key) for v in value]
+    if isinstance(value, dict):
+        return {k: normalize_language(v, k) for k, v in value.items()}
+    return value
+
+
+def residual_cjk(payload: Any, key: str | None = None) -> int:
+    """Đếm ô còn chữ CJK sau chuẩn hoá, để cảnh báo thay vì im lặng bỏ qua."""
+    if key is not None and (key in VERBATIM_KEYS or key.endswith(VERBATIM_SUFFIXES)):
+        return 0
+    if isinstance(payload, str):
+        return 1 if CJK.search(payload) else 0
+    if isinstance(payload, list):
+        return sum(residual_cjk(v, key) for v in payload)
+    if isinstance(payload, dict):
+        return sum(residual_cjk(v, k) for k, v in payload.items())
+    return 0
 
 SYSTEM = """\
 Bạn là extractor cho workstream WS1 Building. Nguồn sự thật duy nhất là
@@ -133,9 +193,13 @@ def run(out_dir: Path, manifest: Dict[str, Any], resolved: Dict[str, Any]) -> Di
                 f"Duyệt TOÀN BỘ corpus trước khi trả lời. Không có dữ liệu → records rỗng.")
         res = llm.call_json(system=system, user_content=user, schema=schema.json_schema(t),
                             label=f"extract:{name}")
+        res = normalize_language(res)
         out[name] = res
         print(f"      {t.label} {name}: {len(res['records'])} record"
               + (f" · {res['notes'][:90]}" if res.get("notes") else ""))
+    leftover = residual_cjk({k: v for k, v in out.items()})
+    if leftover:
+        print(f"      ! {leftover} ô còn chữ CJK sau chuẩn hoá (xem extract_text.json)")
     (out_dir / "extract_text.json").write_text(
         json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
     return out

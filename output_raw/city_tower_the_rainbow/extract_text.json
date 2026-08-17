@@ -5,11 +5,11 @@
         "building_name_local": "シティタワー ザ・レインボー",
         "project_name": null,
         "tower_codes": null,
-        "district": "港区",
-        "address": "東京都港区海岸三丁目14番18（地番）",
+        "district": "Quận Minato",
+        "address": "Kaigan 3-chome 14-18, Quận Minato, Tokyo",
         "latitude": null,
         "longitude": null,
-        "developer": "住友不動産株式会社",
+        "developer": "Sumitomo Realty & Development",
         "brochure_url": null,
         "building_type": "chung_cu",
         "segment": null,
@@ -33,11 +33,11 @@
         "interior_designer": null,
         "landscape_architect": null,
         "architectural_style": null,
-        "design_concept": "港区の湾岸エリアの一角を成す海岸三丁目。都心の穏やかなシーサイドに、かけがえのない風景と暮らす天空のオアシスを。",
+        "design_concept": "Kaigan 3-chome, một phần của khu vực vịnh thuộc quận Minato. Tại vùng bờ biển êm đềm giữa trung tâm đô thị, mang đến một ốc đảo trên không sống cùng khung cảnh không gì thay thế được.",
         "design_concept_keywords": [
-          "シーサイド",
-          "天空のオアシス",
-          "かけがえのない風景"
+          "ốc đảo trên không",
+          "bờ biển yên bình giữa trung tâm",
+          "khu vực vịnh quận Minato"
         ],
         "massing_form": null,
         "facade_material": [
@@ -48,7 +48,8 @@
         "balcony_type": null,
         "floor_to_ceiling_m": null,
         "signature_features": [
-          "免震構造 (kết cấu cách chấn, gối cao su nhiều lớp + gối trượt đàn hồi của Oiles工業)"
+          "Kết cấu cách chấn (miễn chấn) dùng gối cao su nhiều lớp và gối trượt đàn hồi",
+          "Móng đóng 28 cọc xuống tầng chịu lực"
         ],
         "green_cert": null,
         "green_cert_level": null,
@@ -82,14 +83,14 @@
           {
             "field": "building_type",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "この物件のこだわり … タワーマンション\n大規模マンション",
+            "snippet": "この物件のこだわり\nタワーマンション\n大規模マンション",
             "confidence": "high"
           },
           {
             "field": "status",
             "source_file": "02_ngu_n_3.txt",
             "snippet": "完成時期\n2027年9月中旬予定",
-            "confidence": "medium"
+            "confidence": "high"
           },
           {
             "field": "year_launch",
@@ -136,7 +137,7 @@
           {
             "field": "design_concept_keywords",
             "source_file": "03_ngu_n_4.txt",
-            "snippet": "都心の穏やかなシーサイドに、かけがえのない風景と暮らす天空のオアシスを。",
+            "snippet": "港区の湾岸エリアの一角を成す海岸三丁目。都心の穏やかなシーサイドに、かけがえのない風景と暮らす天空のオアシスを。",
             "confidence": "medium"
           },
           {
@@ -148,13 +149,13 @@
           {
             "field": "signature_features",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "免震構造\nオイレス工業（株）の製作による積層ゴム支承および弾性すべり支承を使用した免震工法を採用。",
+            "snippet": "免震構造\nオイレス工業（株）の製作による積層ゴム支承および弾性すべり支承を使用した免震工法を採用。／28本の杭を打設",
             "confidence": "high"
           }
         ]
       }
     ],
-    "notes": "1) Mâu thuẫn nguồn: phần tóm tắt đầu trang 02_ngu_n_3.txt ghi「専有面積 2,368.30㎡」trùng đúng với「敷地面積 2,368.30㎡」ở mục 物件概要 — đây rõ ràng là lỗi hiển thị của trang, nên chỉ lấy 2.368,30 m² cho land_area_m2, để nfa_sale_m2 = null (diện tích 専有面積 thực tế công bố theo căn là 57.82㎡～72.53㎡, thuộc B2, không phải tổng NFA toàn toà). 2) 施工会社 西松建設株式会社 là nhà thầu thi công, không phải đơn vị thiết kế kiến trúc → architect_firm để null (corpus không nêu kiến trúc sư). 3) Chứng chỉ xanh: corpus nêu「ZEH-M Oriented …取得予定」và「東京都マンション環境性能表示」— cả hai không thuộc danh mục §8.9 (LEED/EDGE/Green Mark/LOTUS/BREEAM/WELL/CASBEE/G-SEED) và mới ở mức 取得予定 → green_cert = null. 4) handover_standard: corpus liệt kê nhiều thiết bị (食器洗い乾燥機, ディスポーザー, ミストサウナ, 天然石カウンター…) nhưng không có mục 'tiêu chuẩn bàn giao' công bố mức bàn giao → để null, chi tiết thiết bị thuộc B5. 5) num_towers, height_m, gfa_m2, parking_ratio, massing_form, balcony_type (chỉ có バルコニー面積 17.38㎡～28.07㎡, không nêu loại logia/ban công), floor_to_ceiling_m, segment, latitude/longitude, brochure_url (trang chỉ có nút「物件公式ホームページへ」không kèm URL) đều không có trong corpus → null. 6) Hai nguồn lệch nhau về thời điểm hoàn thành: 02_ngu_n_3.txt (Major7, 情報提供元 住友不動産) ghi 完成時期 2027年9月中旬予定 / 引き渡し 2028年9月下旬; 03_ngu_n_4.txt (湾岸マンション価格ナビ, bên thứ ba) ghi 建築年月 2027年8月 — lấy theo nguồn chính thức của CĐT cho year_handover."
+    "notes": "1) Mâu thuẫn nguồn: phần tóm tắt đầu trang 02 ghi '専有面積 2,368.30㎡' nhưng mục 物件概要 cùng file ghi '敷地面積 2,368.30㎡'; 専有面積 thực tế của căn là 57.82㎡～72.53㎡ → gán 2.368,30㎡ cho land_area_m2 theo mục 物件概要 (chính thức, chi tiết hơn). 2) Thời điểm hoàn thành: 02 ghi 完成時期 2027年9月中旬予定 và 引き渡し可能年月 2028年9月下旬; 03 (bên thứ ba) ghi 建築年月 2027年8月 → year_handover lấy theo mốc bàn giao chính thức 2028. 3) green_cert = null vì nguồn chỉ nêu 'ZEH-M Oriented (取得予定)' và '東京都マンション環境性能表示' — không thuộc enum §8.9. 4) architect_firm = null: nguồn chỉ nêu nhà thầu thi công (Nishimatsu Construction), không nêu đơn vị thiết kế kiến trúc. 5) handover_standard = null: corpus liệt kê thiết bị (máy rửa bát, máy nghiền rác, bếp mặt đá tự nhiên…) nhưng không nêu mức bàn giao → không suy diễn. 6) num_towers, height_m, gfa, nfa, mật độ, cây xanh, hệ số đỗ xe, massing_form, balcony_type, hướng nhìn: nguồn không nêu."
   },
   "unit_type": {
     "records": [
@@ -179,25 +180,25 @@
           {
             "field": "type_code",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ\nB-2\n間取り\n2LDK+N+WIC\n価格\n-\n専有面積\n72.53\nバルコニー面積\n17.38",
+            "snippet": "タイプ\nB-2\n間取り\n2LDK+N+WIC",
             "confidence": "high"
           },
           {
             "field": "layout_class",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ B-2 / 間取り 2LDK+N+WIC",
+            "snippet": "タイプ\nB-2\n間取り\n2LDK+N+WIC",
             "confidence": "high"
           },
           {
             "field": "bedrooms",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ B-2 / 間取り 2LDK+N+WIC",
+            "snippet": "タイプ\nB-2\n間取り\n2LDK+N+WIC",
             "confidence": "high"
           },
           {
             "field": "area_net_m2",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ B-2 … 専有面積 72.53",
+            "snippet": "タイプ\nB-2\n…\n専有面積\n72.53",
             "confidence": "high"
           },
           {
@@ -209,7 +210,7 @@
           {
             "field": "area_balcony_m2",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ B-2 … バルコニー面積 17.38",
+            "snippet": "タイプ\nB-2\n…\nバルコニー面積\n17.38",
             "confidence": "high"
           }
         ]
@@ -235,25 +236,25 @@
           {
             "field": "type_code",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ\nB-3\n間取り\n3LDK+N+WIC\n価格\n-\n専有面積\n72.53\nバルコニー面積\n17.38",
+            "snippet": "タイプ\nB-3\n間取り\n3LDK+N+WIC",
             "confidence": "high"
           },
           {
             "field": "layout_class",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ B-3 / 間取り 3LDK+N+WIC",
+            "snippet": "タイプ\nB-3\n間取り\n3LDK+N+WIC",
             "confidence": "high"
           },
           {
             "field": "bedrooms",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ B-3 / 間取り 3LDK+N+WIC",
+            "snippet": "タイプ\nB-3\n間取り\n3LDK+N+WIC",
             "confidence": "high"
           },
           {
             "field": "area_net_m2",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ B-3 … 専有面積 72.53",
+            "snippet": "タイプ\nB-3\n…\n専有面積\n72.53",
             "confidence": "high"
           },
           {
@@ -265,7 +266,7 @@
           {
             "field": "area_balcony_m2",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ B-3 … バルコニー面積 17.38",
+            "snippet": "タイプ\nB-3\n…\nバルコニー面積\n17.38",
             "confidence": "high"
           }
         ]
@@ -291,25 +292,25 @@
           {
             "field": "type_code",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ\nD-1\n間取り\n1LDK+N+SIC\n価格\n-\n専有面積\n42.77\nバルコニー面積\n10.80",
+            "snippet": "タイプ\nD-1\n間取り\n1LDK+N+SIC",
             "confidence": "high"
           },
           {
             "field": "layout_class",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ D-1 / 間取り 1LDK+N+SIC",
+            "snippet": "タイプ\nD-1\n間取り\n1LDK+N+SIC",
             "confidence": "high"
           },
           {
             "field": "bedrooms",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ D-1 / 間取り 1LDK+N+SIC",
+            "snippet": "タイプ\nD-1\n間取り\n1LDK+N+SIC",
             "confidence": "high"
           },
           {
             "field": "area_net_m2",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ D-1 … 専有面積 42.77",
+            "snippet": "タイプ\nD-1\n…\n専有面積\n42.77",
             "confidence": "high"
           },
           {
@@ -321,7 +322,7 @@
           {
             "field": "area_balcony_m2",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ D-1 … バルコニー面積 10.80",
+            "snippet": "タイプ\nD-1\n…\nバルコニー面積\n10.80",
             "confidence": "high"
           }
         ]
@@ -347,25 +348,25 @@
           {
             "field": "type_code",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ\nG-2\n間取り\n2LDK+N+WIC\n価格\n-\n専有面積\n57.82\nバルコニー面積\n28.11",
+            "snippet": "タイプ\nG-2\n間取り\n2LDK+N+WIC",
             "confidence": "high"
           },
           {
             "field": "layout_class",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ G-2 / 間取り 2LDK+N+WIC",
+            "snippet": "タイプ\nG-2\n間取り\n2LDK+N+WIC",
             "confidence": "high"
           },
           {
             "field": "bedrooms",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ G-2 / 間取り 2LDK+N+WIC",
+            "snippet": "タイプ\nG-2\n間取り\n2LDK+N+WIC",
             "confidence": "high"
           },
           {
             "field": "area_net_m2",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ G-2 … 専有面積 57.82",
+            "snippet": "タイプ\nG-2\n…\n専有面積\n57.82",
             "confidence": "high"
           },
           {
@@ -377,8 +378,8 @@
           {
             "field": "area_balcony_m2",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ G-2 … バルコニー面積 28.11",
-            "confidence": "medium"
+            "snippet": "タイプ\nG-2\n…\nバルコニー面積\n28.11",
+            "confidence": "high"
           }
         ]
       },
@@ -403,25 +404,25 @@
           {
             "field": "type_code",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ\nH-1\n間取り\n1LDK+N+WIC+SIC\n価格\n-\n専有面積\n43.37\nバルコニー面積\n11.55",
+            "snippet": "タイプ\nH-1\n間取り\n1LDK+N+WIC+SIC",
             "confidence": "high"
           },
           {
             "field": "layout_class",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ H-1 / 間取り 1LDK+N+WIC+SIC",
+            "snippet": "タイプ\nH-1\n間取り\n1LDK+N+WIC+SIC",
             "confidence": "high"
           },
           {
             "field": "bedrooms",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ H-1 / 間取り 1LDK+N+WIC+SIC",
+            "snippet": "タイプ\nH-1\n間取り\n1LDK+N+WIC+SIC",
             "confidence": "high"
           },
           {
             "field": "area_net_m2",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ H-1 … 専有面積 43.37",
+            "snippet": "タイプ\nH-1\n…\n専有面積\n43.37",
             "confidence": "high"
           },
           {
@@ -433,7 +434,7 @@
           {
             "field": "area_balcony_m2",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ H-1 … バルコニー面積 11.55",
+            "snippet": "タイプ\nH-1\n…\nバルコニー面積\n11.55",
             "confidence": "high"
           }
         ]
@@ -459,25 +460,25 @@
           {
             "field": "type_code",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ\nK-2\n間取り\n2LDK+N+WIC\n価格\n-\n専有面積\n68.14\nバルコニー面積\n16.50",
+            "snippet": "タイプ\nK-2\n間取り\n2LDK+N+WIC",
             "confidence": "high"
           },
           {
             "field": "layout_class",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ K-2 / 間取り 2LDK+N+WIC",
+            "snippet": "タイプ\nK-2\n間取り\n2LDK+N+WIC",
             "confidence": "high"
           },
           {
             "field": "bedrooms",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ K-2 / 間取り 2LDK+N+WIC",
+            "snippet": "タイプ\nK-2\n間取り\n2LDK+N+WIC",
             "confidence": "high"
           },
           {
             "field": "area_net_m2",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ K-2 … 専有面積 68.14",
+            "snippet": "タイプ\nK-2\n…\n専有面積\n68.14",
             "confidence": "high"
           },
           {
@@ -489,17 +490,17 @@
           {
             "field": "area_balcony_m2",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "タイプ K-2 … バルコニー面積 16.50",
+            "snippet": "タイプ\nK-2\n…\nバルコニー面積\n16.50",
             "confidence": "high"
           }
         ]
       }
     ],
-    "notes": "Nguồn: 02_ngu_n_3.txt (major7.net, 情報提供元 住友不動産株式会社 — trang thông tin chính thức của CĐT) liệt kê đúng 6 loại căn (間取り一覧 6間取り中): B-2, B-3, D-1, G-2, H-1, K-2. File 03_ngu_n_4.txt (wangan-mansion.jp) không có bảng loại căn nào → không sinh thêm record.\n\n(1) 専有面積 → area_net_m2 với area_basis_reported = thong_thuy (spec §10). Nguồn KHÔNG công bố 壁芯面積 → area_gross_m2 = null, không quy đổi.\n(2) Hậu tố 間取り là '+N' (納戸), không phải '+S' (サービスルーム) mà spec §4b định nghĩa; do đó giữ layout_class gốc (2LDK→2pn, 3LDK→3pn, 1LDK→1pn) và để has_multipurpose_room = null thay vì suy đoán biến thể _plus. Chú thích trong nguồn: 'S サービスルーム(納戸)' và 'N 納戸' được liệt kê tách biệt.\n(3) Mâu thuẫn số liệu ban công: bảng loại căn ghi G-2 バルコニー面積 28.11㎡, trong khi 販売概要 ghi dải 'バルコニー面積: 17.38㎡～28.07㎡' (28.07 < 28.11). Giữ 28.11 theo dòng loại căn chi tiết, hạ confidence trường này xuống medium.\n(4) Cột 価格 của cả 6 loại đều là '-' → không có giá theo loại căn (giá toàn dự án 13,000万円台～19,000万円台 thuộc B7, không nhập ở đây).\n(5) Các trường bathrooms, num_units_of_type, share_of_total_pct, facing (向き để trống trong nguồn), view_type, is_corner, floorplan_url, type_name: nguồn không nêu → null. Lưu ý 総戸数 264戸 và ghi chú '予定販売住戸全体（108戸）' không cho phép suy num_units_of_type theo từng loại."
+    "notes": "Nguồn: bảng 間取り一覧 (6/6 loại căn) tại 02_ngu_n_3.txt (major7.net, thông tin do chủ đầu tư Sumitomo Realty & Development cung cấp). Diện tích công bố là 専有面積 → area_basis_reported = thong_thuy, area_net_m2 điền theo nguyên văn; nguồn không nêu 壁芯面積 nên area_gross_m2 = null, không quy đổi. Hậu tố '+N' (納戸 - kho/nhà kho) khác với '+S' (サービスルーム) nên theo quy tắc §10 chỉ '+S' mới tạo biến thể _plus và has_multipurpose_room = true; do đó layout_class giữ nguyên 1pn/2pn/3pn và has_multipurpose_room = null (nguồn không xác nhận phòng đa năng theo định nghĩa spec). Bảng loại căn không công bố giá theo từng type (cột 価格 để trống '-'), không nêu số WC, hướng, tầm nhìn, căn góc, số căn/tỷ trọng theo loại → null. Ghi chú nguồn: tổng 264 căn, phạm vi công bố diện tích 57.82㎡～72.53㎡ áp dụng cho toàn bộ 108 căn dự kiến bán, không phân bổ được cho từng loại. File 03_ngu_n_4.txt không có bảng loại căn."
   },
   "floor_plate": {
     "records": [],
-    "notes": "Corpus (02_ngu_n_3.txt — major7.net, 03_ngu_n_4.txt — wangan-mansion.jp) chỉ có thông tin cấp toà: 鉄筋コンクリート造・地下1階地上34階建, 総戸数264戸（その他住戸10戸含む）, 敷地面積2,368.30㎡, 6 kiểu 間取り (B-2, B-3, D-1, G-2, H-1, K-2) và ghi chú '今後の予定販売住戸全体（108戸）'. Không có bất kỳ mặt bằng tầng dạng text nào: không nêu số căn trên 1 sàn (units_per_floor), không nêu dải tầng điển hình (floor_range), cơ cấu loại căn theo sàn, diện tích sàn/tầng, kiểu hành lang, số thang máy/thang bộ hay vị trí lõi. Theo quy tắc cấm nội suy (không chia 264 戸 / 34 tầng), toàn bộ B4 để rỗng. Ghi chú thêm: thông tin 34 tầng nổi/1 hầm và cấu trúc miễn chấn (免震構造) thuộc B1, không phải B4; 2 nguồn thống nhất về số tầng và tổng số căn, chỉ khác cách ghi thời điểm hoàn thành (完成時期 2027年9月中旬予定 vs 建築年月 2027年8月)."
+    "notes": "Corpus (02_ngu_n_3.txt, 03_ngu_n_4.txt) không có bất kỳ dữ liệu mặt bằng tầng dạng text nào: không nêu số căn trên 1 sàn, cơ cấu loại căn theo sàn, dải tầng điển hình, số thang máy/thang bộ, kiểu hành lang hay vị trí lõi. Chỉ có thông tin cấp toà (34 tầng nổi, 1 tầng hầm, 264 căn tổng, kết cấu bê tông cốt thép, cách chấn) và danh sách 6 loại căn với diện tích chuyên hữu — không đủ để suy ra floor_plate. Theo quy tắc cấm chia đều num_units_total / num_floors, không tạo record nào. Ghi chú thêm: có mâu thuẫn nhỏ giữa hai nguồn về thời điểm hoàn thành (02: 完成時期 2027年9月中旬予定; 03: 建築年月 2027年8月) nhưng không ảnh hưởng bảng B4."
   },
   "handover_item": {
     "records": [
@@ -507,17 +508,17 @@
         "applies_to_type_code": null,
         "item_code": "dau_bao_chay",
         "item_category": "an_ninh_pccc",
-        "item_name": "Đầu báo cháy (火災感知器)",
-        "item_spec": "万一火災などが発生した場合は、火災感知器が作動。住戸内インターホン（親機、副親機（34階住戸のみ））と玄関前インターホン(子機)より警報が鳴り、室内外に異常をお知らせするとともに、警備会社、住友不動産建物サービス設備管理センターへ自動通報されます。",
+        "item_name": "Đầu báo cháy",
+        "item_spec": "Khi xảy ra hỏa hoạn, đầu báo cháy sẽ kích hoạt; chuông báo động vang lên từ chuông cửa trong căn hộ (máy chính, máy phụ – chỉ căn tầng 34) và máy con trước cửa, đồng thời tự động báo về công ty bảo vệ và Trung tâm quản lý thiết bị Sumitomo Realty Building Service. Từ tầng 10 trở lên dùng chung với đầu phun sprinkler.",
         "brand": null,
         "brand_origin": null,
         "is_included": true,
-        "note": null,
+        "note": "Máy phụ trong căn hộ chỉ có ở các căn tầng 34; từ tầng 10 trở lên dùng chung với sprinkler",
         "provenance": [
           {
             "field": "item_code",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "設備・構造\n火災感知器",
+            "snippet": "火災感知器",
             "confidence": "high"
           },
           {
@@ -535,7 +536,7 @@
           {
             "field": "item_spec",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "万一火災などが発生した場合は、火災感知器が作動。住戸内インターホン（親機、副親機（34階住戸のみ））と玄関前インターホン(子機)より警報が鳴り、室内外に異常をお知らせするとともに、警備会社、住友不動産建物サービス設備管理センターへ自動通報されます。",
+            "snippet": "万一火災などが発生した場合は、火災感知器が作動。住戸内インターホン（親機、副親機（34階住戸のみ））と玄関前インターホン(子機)より警報が鳴り、室内外に異常をお知らせするとともに、警備会社、住友不動産建物サービス設備管理センターへ自動通報されます。※10階以上はスプリンクラーと兼用となります。",
             "confidence": "high"
           },
           {
@@ -543,68 +544,25 @@
             "source_file": "02_ngu_n_3.txt",
             "snippet": "設備・構造\n火災感知器",
             "confidence": "high"
-          }
-        ]
-      },
-      {
-        "applies_to_type_code": null,
-        "item_code": "sprinkler",
-        "item_category": "an_ninh_pccc",
-        "item_name": "Đầu phun sprinkler (スプリンクラー)",
-        "item_spec": "※10階以上はスプリンクラーと兼用となります。",
-        "brand": null,
-        "brand_origin": null,
-        "is_included": true,
-        "note": "Chỉ nêu áp dụng cho các tầng từ 10 trở lên (10階以上)",
-        "provenance": [
-          {
-            "field": "item_code",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "※10階以上はスプリンクラーと兼用となります。",
-            "confidence": "medium"
-          },
-          {
-            "field": "item_category",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "※10階以上はスプリンクラーと兼用となります。",
-            "confidence": "medium"
-          },
-          {
-            "field": "item_name",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "※10階以上はスプリンクラーと兼用となります。",
-            "confidence": "medium"
-          },
-          {
-            "field": "item_spec",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "※10階以上はスプリンクラーと兼用となります。",
-            "confidence": "medium"
-          },
-          {
-            "field": "is_included",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "設備・構造 … ※10階以上はスプリンクラーと兼用となります。",
-            "confidence": "medium"
           },
           {
             "field": "note",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "※10階以上はスプリンクラーと兼用となります。",
-            "confidence": "medium"
+            "snippet": "（親機、副親機（34階住戸のみ））…※10階以上はスプリンクラーと兼用となります。",
+            "confidence": "high"
           }
         ]
       },
       {
         "applies_to_type_code": null,
-        "item_code": "disposer_rac_thuc_pham",
+        "item_code": "may_nghien_rac_thuc_pham",
         "item_category": "bep",
-        "item_name": "Máy nghiền rác thực phẩm (生ゴミディスポーザー)",
-        "item_spec": "生ゴミを、キッチンですばやく粉砕処理できるシステムです。各住戸のディスポーザーで破砕された生ゴミは、専用の排水処理装置で浄化してから排水することができます。",
+        "item_name": "Máy nghiền rác thực phẩm",
+        "item_spec": "Hệ thống nghiền nhanh rác thực phẩm ngay tại bếp. Rác đã nghiền tại máy của từng căn hộ được xử lý làm sạch bằng thiết bị xử lý nước thải chuyên dụng trước khi thoát ra ngoài. Một số loại rác không xử lý được.",
         "brand": null,
         "brand_origin": null,
         "is_included": true,
-        "note": "※一部処理できないものもあります。",
+        "note": null,
         "provenance": [
           {
             "field": "item_code",
@@ -627,7 +585,7 @@
           {
             "field": "item_spec",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "生ゴミを、キッチンですばやく粉砕処理できるシステムです。各住戸のディスポーザーで破砕された生ゴミは、専用の排水処理装置で浄化してから排水することができます。",
+            "snippet": "生ゴミを、キッチンですばやく粉砕処理できるシステムです。各住戸のディスポーザーで破砕された生ゴミは、専用の排水処理装置で浄化してから排水することができます。※一部処理できないものもあります。",
             "confidence": "high"
           },
           {
@@ -635,21 +593,15 @@
             "source_file": "02_ngu_n_3.txt",
             "snippet": "設備・構造\n…\n生ゴミディスポーザー",
             "confidence": "high"
-          },
-          {
-            "field": "note",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "※一部処理できないものもあります。※概念図",
-            "confidence": "high"
           }
         ]
       },
       {
         "applies_to_type_code": null,
-        "item_code": "mist_sauna_phong_tam",
+        "item_code": "phong_xong_hoi_mist",
         "item_category": "thiet_bi_ve_sinh",
-        "item_name": "Mist sauna phòng tắm (ミストサウナ)",
-        "item_spec": "一般のドライサウナと比べ、低温・高湿度で息苦しくなくリラックスして楽しめます。さらに、衣類のリフレッシュや浴室のカビ抑制により、家事の負担を軽減します。",
+        "item_name": "Xông hơi ướt (mist sauna)",
+        "item_spec": "So với phòng xông hơi khô thông thường, chế độ nhiệt độ thấp – độ ẩm cao giúp không bị ngột ngạt, thư giãn dễ chịu. Ngoài ra còn giúp làm mới quần áo và hạn chế nấm mốc trong phòng tắm, giảm gánh nặng việc nhà.",
         "brand": null,
         "brand_origin": null,
         "is_included": true,
@@ -676,7 +628,7 @@
           {
             "field": "item_spec",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "一般のドライサウナと比べ、低温・高湿度で息苦しくなくリラックスして楽しめます。さらに、衣類のリフレッシュや浴室のカビ抑制により、家事の負担を軽減します。",
+            "snippet": "一般のドライサウナと比べ、低温・高湿度で息苦しくなくリラックスして楽しめます。気分をリフレッシュしたいとき、お肌をやさしくいたわりたいとき、ミストサウナ入浴で素敵なバスタイムを。さらに、衣類のリフレッシュや浴室のカビ抑制により、家事の負担を軽減します。",
             "confidence": "high"
           },
           {
@@ -689,10 +641,10 @@
       },
       {
         "applies_to_type_code": null,
-        "item_code": "remote_binh_nuoc_nong_wifi",
+        "item_code": "dieu_khien_binh_nuoc_nong_wifi",
         "item_category": "smart_home",
-        "item_name": "Điều khiển bình nước nóng qua Wi-Fi (無線LAN給湯リモコン)",
-        "item_spec": "専用アプリケーションを使ってお手元のスマートフォンから給湯器・床暖房などの操作や機器の状態をどこからでも確認することができます。",
+        "item_name": "Bộ điều khiển bình nước nóng không dây (Wi-Fi)",
+        "item_spec": "Dùng ứng dụng riêng trên điện thoại thông minh để điều khiển bình nước nóng, sàn sưởi… và kiểm tra trạng thái thiết bị từ bất cứ đâu. Trên đường về có thể xả nước nóng/hâm lại bồn tắm, hoặc bật sàn sưởi để nhà ấm khi về tới.",
         "brand": null,
         "brand_origin": null,
         "is_included": true,
@@ -719,7 +671,7 @@
           {
             "field": "item_spec",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "専用アプリケーションを使ってお手元のスマートフォンから給湯器・床暖房などの操作や機器の状態をどこからでも確認することができます。",
+            "snippet": "専用アプリケーションを使ってお手元のスマートフォンから給湯器・床暖房などの操作や機器の状態をどこからでも確認することができます。※1 帰宅途中にスマートフォンからお湯はり・追い焚きをしておけば、帰ってすぐお風呂に入れます。また、寒い冬の日は床暖房を運転ONにしておけば、家に帰るころにはお部屋あたたか。",
             "confidence": "high"
           },
           {
@@ -732,12 +684,12 @@
       },
       {
         "applies_to_type_code": null,
-        "item_code": "binh_nuoc_nong_gas_eco_jozu",
-        "item_category": "dieu_hoa_thong_gio",
-        "item_name": "Bình nước nóng gas hiệu suất cao Eco Jozu (エコジョーズ)",
-        "item_spec": "環境と家計の両方に優しい東京ガスの高効率ガス給湯器「エコジョーズ」を採用。キッチン、バスルーム、パウダールームへのスムーズな給湯はもちろん、床暖房や浴室暖房乾燥機までをトータルにサポートします。",
-        "brand": "東京ガス",
-        "brand_origin": null,
+        "item_code": "binh_nuoc_nong_gas_hieu_suat_cao",
+        "item_category": "thiet_bi_dien",
+        "item_name": "Bình nước nóng gas hiệu suất cao Eco Jozu",
+        "item_spec": "Sử dụng bình nước nóng gas hiệu suất cao \"Eco Jozu\" của Tokyo Gas, thân thiện với môi trường và chi phí gia đình. Cấp nước nóng cho bếp, phòng tắm, phòng trang điểm, đồng thời hỗ trợ cả sàn sưởi và máy sưởi – sấy phòng tắm.",
+        "brand": "Tokyo Gas",
+        "brand_origin": "Nhật Bản",
         "is_included": true,
         "note": null,
         "provenance": [
@@ -750,7 +702,7 @@
           {
             "field": "item_category",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "床暖房や浴室暖房乾燥機までをトータルにサポートします。",
+            "snippet": "環境と家計の両方に優しい東京ガスの高効率ガス給湯器「エコジョーズ」を採用。",
             "confidence": "high"
           },
           {
@@ -768,7 +720,13 @@
           {
             "field": "brand",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "環境と家計の両方に優しい東京ガスの高効率ガス給湯器「エコジョーズ」を採用。",
+            "snippet": "東京ガスの高効率ガス給湯器「エコジョーズ」を採用",
+            "confidence": "high"
+          },
+          {
+            "field": "brand_origin",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "東京ガスの高効率ガス給湯器「エコジョーズ」を採用",
             "confidence": "high"
           },
           {
@@ -781,63 +739,14 @@
       },
       {
         "applies_to_type_code": null,
-        "item_code": "san_suoi_va_may_say_suoi_phong_tam",
+        "item_code": "thong_gio_24h",
         "item_category": "dieu_hoa_thong_gio",
-        "item_name": "Sàn sưởi & máy sưởi/sấy phòng tắm (床暖房・浴室暖房乾燥機)",
-        "item_spec": "キッチン、バスルーム、パウダールームへのスムーズな給湯はもちろん、床暖房や浴室暖房乾燥機までをトータルにサポートします。",
+        "item_name": "Hệ thống cấp khí cưỡng bức 24 giờ (có màng lọc phấn hoa)",
+        "item_spec": "Hệ thống thông gió 24 giờ giúp luôn thông thoáng dù đóng kín cửa sổ. Khí tươi được cấp cưỡng bức vào từng phòng, khí trong nhà được hút thải bằng máy. Màng lọc trong quạt cấp khí giúp giảm một phần phấn hoa, bụi bẩn.",
         "brand": null,
         "brand_origin": null,
         "is_included": true,
-        "note": "Chỉ được nêu gián tiếp trong mô tả エコジョーズ và 無線LAN給湯リモコン; nguồn không có mục riêng nên không rõ quy cách",
-        "provenance": [
-          {
-            "field": "item_code",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "床暖房や浴室暖房乾燥機までをトータルにサポートします。",
-            "confidence": "medium"
-          },
-          {
-            "field": "item_category",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "床暖房や浴室暖房乾燥機までをトータルにサポートします。",
-            "confidence": "medium"
-          },
-          {
-            "field": "item_name",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "床暖房や浴室暖房乾燥機までをトータルにサポートします。",
-            "confidence": "medium"
-          },
-          {
-            "field": "item_spec",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "キッチン、バスルーム、パウダールームへのスムーズな給湯はもちろん、床暖房や浴室暖房乾燥機までをトータルにサポートします。",
-            "confidence": "medium"
-          },
-          {
-            "field": "is_included",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "専用アプリケーションを使ってお手元のスマートフォンから給湯器・床暖房などの操作や機器の状態をどこからでも確認することができます。",
-            "confidence": "medium"
-          },
-          {
-            "field": "note",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "寒い冬の日は床暖房を運転ONにしておけば、家に帰るころにはお部屋あたたか。",
-            "confidence": "medium"
-          }
-        ]
-      },
-      {
-        "applies_to_type_code": null,
-        "item_code": "thong_gio_24h_loc_phan_hoa",
-        "item_category": "dieu_hoa_thong_gio",
-        "item_name": "Hệ thống cấp khí cơ khí 24h có lọc phấn hoa (24時間機械給気システム・花粉フィルター付)",
-        "item_spec": "窓を閉めたままでも常に換気ができる、24時間換気システムを採用しています。機械給気により外気を各室に取入れ、室内の空気は機械で排気します。給気ファン内のフィルターで一定の花粉・ホコリ・ちりを低減します。",
-        "brand": null,
-        "brand_origin": null,
-        "is_included": true,
-        "note": "※使用するフィルターによって低減できる物質の量は異なります。",
+        "note": "Lượng chất được lọc giảm khác nhau tùy loại màng lọc sử dụng",
         "provenance": [
           {
             "field": "item_code",
@@ -872,21 +781,21 @@
           {
             "field": "note",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "※使用するフィルターによって低減できる物質の量は異なります。※概念図",
+            "snippet": "※使用するフィルターによって低減できる物質の量は異なります。",
             "confidence": "high"
           }
         ]
       },
       {
         "applies_to_type_code": null,
-        "item_code": "khoa_hands_free",
+        "item_code": "chia_khoa_hands_free",
         "item_category": "an_ninh_pccc",
-        "item_name": "Chìa khoá hands-free cho cửa auto-lock (ハンズフリーキー)",
-        "item_spec": "主なオートロックドアには、鍵をカバンやポケットに入れたままで解錠可能な、ハンズフリーキーを採用。",
+        "item_name": "Chìa khoá rảnh tay (hands-free)",
+        "item_spec": "Các cửa auto-lock chính áp dụng chìa khoá rảnh tay, có thể mở khoá khi vẫn để chìa trong túi xách hoặc túi áo. Tuỳ vị trí lắp đặt mà phương thức nhận diện và phạm vi phát hiện khác nhau nhằm tránh mở khoá ngoài ý muốn khi có người đi ngang.",
         "brand": null,
         "brand_origin": null,
         "is_included": true,
-        "note": "※周辺通行時の意図しない解錠・誤作動防止のため、設置箇所により認証方法・検知範囲が異なります。",
+        "note": null,
         "provenance": [
           {
             "field": "item_code",
@@ -909,7 +818,7 @@
           {
             "field": "item_spec",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "主なオートロックドアには、鍵をカバンやポケットに入れたままで解錠可能な、ハンズフリーキーを採用。",
+            "snippet": "主なオートロックドアには、鍵をカバンやポケットに入れたままで解錠可能な、ハンズフリーキーを採用。※周辺通行時の意図しない解錠・誤作動防止のため、設置箇所により認証方法・検知範囲が異なります。",
             "confidence": "high"
           },
           {
@@ -917,11 +826,97 @@
             "source_file": "02_ngu_n_3.txt",
             "snippet": "設備・構造\n…\nハンズフリーキー",
             "confidence": "high"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "phong_rac_tung_tang",
+        "item_category": "an_ninh_pccc",
+        "item_name": "Trạm đổ rác từng tầng (Clean Station)",
+        "item_spec": "Mỗi tầng đều bố trí trạm đổ rác (trừ rác cồng kềnh). Có thể đổ rác 24 giờ ngay tại tầng đang ở, rất tiện lợi.",
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "クリーンステーション",
+            "confidence": "high"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "各階フロアにクリーンステーション（粗大ゴミを除く）を設けています。",
+            "confidence": "high"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "クリーンステーション",
+            "confidence": "high"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "各階フロアにクリーンステーション（粗大ゴミを除く）を設けています。お住まいのフロアで24時間ゴミ出しができるので大変便利です。",
+            "confidence": "high"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "設備・構造\n…\nクリーンステーション",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "goi_chuyen_nha_mien_phi",
+        "item_category": "an_ninh_pccc",
+        "item_name": "Gói hỗ trợ chuyển nhà miễn phí",
+        "item_spec": "Hỗ trợ miễn phí việc chuyển nhà gồm cung cấp vật tư đóng gói, chuyển đồ ra – vận chuyển – đưa đồ vào. Ngoài ra, các dịch vụ như lắp đặt đồ điện gia dụng hay bố trí kho gửi đồ được thực hiện dưới dạng tuỳ chọn (có phí) nếu cần.",
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": "Bản thân gói chuyển nhà là miễn phí; các dịch vụ đi kèm như lắp đặt đồ điện, thuê kho là tuỳ chọn có phí. Việc sử dụng dịch vụ có giới hạn.",
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "お引越し無料パック",
+            "confidence": "high"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "梱包資材の提供や荷物の搬出・運搬・搬入など、お引越しを無料でサポートします。",
+            "confidence": "high"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "お引越し無料パック",
+            "confidence": "high"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "梱包資材の提供や荷物の搬出・運搬・搬入など、お引越しを無料でサポートします。また、必要に応じて家電の取付けやトランクルームの手配などの各種サービスもオプション（有料）で行います。",
+            "confidence": "high"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "お引越しを無料でサポートします。",
+            "confidence": "medium"
           },
           {
             "field": "note",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "※周辺通行時の意図しない解錠・誤作動防止のため、設置箇所により認証方法・検知範囲が異なります。また、検知範囲には限度があり、構造上、動線がカバーされていない箇所もあります。",
+            "snippet": "また、必要に応じて家電の取付けやトランクルームの手配などの各種サービスもオプション（有料）で行います。※サービスのご利用には制限がございます。",
             "confidence": "high"
           }
         ]
@@ -930,8 +925,8 @@
         "applies_to_type_code": null,
         "item_code": "kinh_low_e",
         "item_category": "cua",
-        "item_name": "Kính Low-E cho ô cửa căn hộ (Low-Eガラス)",
-        "item_spec": "住戸の開口部には省エネ効果に優れたLow-Eガラスを採用。ガラスの表面にコーティングされた日射熱の反射性を高める特殊金属膜（Low-E膜）と断熱性を高める空気層により、冷暖房両方の負荷を軽減します。",
+        "item_name": "Kính Low-E",
+        "item_spec": "Phần cửa mở của căn hộ dùng kính Low-E hiệu quả tiết kiệm năng lượng cao. Màng kim loại đặc biệt phủ trên bề mặt kính (màng Low-E) tăng khả năng phản xạ nhiệt bức xạ mặt trời cùng lớp không khí tăng cách nhiệt, giúp giảm tải cho cả sưởi và điều hoà.",
         "brand": null,
         "brand_origin": null,
         "is_included": true,
@@ -971,10 +966,163 @@
       },
       {
         "applies_to_type_code": null,
-        "item_code": "trang_thiet_bi_phong_chong_thien_tai",
+        "item_code": "goi_bao_hanh_12_nam",
         "item_category": "an_ninh_pccc",
-        "item_name": "Trang thiết bị phòng chống thiên tai (防災備品)",
-        "item_spec": "地震などの非常時に備え、防災備品をご用意しました。初期共助に使用する救助用工具セット、救助用ロープ、スコップ、防塵マスクなどを備えています。また、災害時のライフサポート備品として救急箱、手回し充電ラジオ、カセットガス発電機、非常用ロウソク、折りたたみ式給水ポリタンク、災害保存用飲料水、災害用簡易トイレなども備えています。",
+        "item_name": "Gói hỗ trợ nhà ở 12 PREMIUM (tuỳ chọn, có phí)",
+        "item_spec": "Sau khi kết thúc thời hạn dịch vụ hậu mãi thông thường 2 năm kể từ khi bàn giao, gói này hỗ trợ xử lý sự cố nhà ở, sửa chữa và bảo trì thiết bị nhà ở… vốn thuộc trách nhiệm chủ nhà, trong 12 năm kể từ khi bàn giao.",
+        "brand": null,
+        "brand_origin": null,
+        "is_included": false,
+        "note": "Ghi rõ là tuỳ chọn có phí (オプション・有料)",
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "住まいサポート12 PREMIUM（オプション・有料）",
+            "confidence": "high"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "住まいのトラブル対応、住宅設備機器等のリペアやメンテナンス等を、お引渡しより12年間サポートします。",
+            "confidence": "high"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "住まいサポート12 PREMIUM（オプション・有料）",
+            "confidence": "high"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "お引き渡しより、通常2年のアフターサービス期間終了後、本来ご自身で対応されることとなる住まいのトラブル対応、住宅設備機器等のリペアやメンテナンス等を、お引渡しより12年間サポートします。",
+            "confidence": "high"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "住まいサポート12 PREMIUM（オプション・有料）",
+            "confidence": "high"
+          },
+          {
+            "field": "note",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "（オプション・有料）",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "dich_vu_hau_mai",
+        "item_category": "an_ninh_pccc",
+        "item_name": "Dịch vụ hậu mãi của Sumitomo Realty & Development",
+        "item_spec": "Mở \"Trung tâm khách hàng\" và \"Trung tâm dịch vụ hậu mãi\"; về nguyên tắc trong 2 năm sau bàn giao, trung tâm khách hàng vận hành 24/7 (thứ Tư, Chủ nhật, ngày lễ, dịp Tết, kỳ nghỉ Obon và sau 17h40 chỉ tiếp nhận) để xử lý hậu mãi theo quy chuẩn nghiệp vụ. Sau bàn giao căn hộ, kiểm tra định kỳ vào khoảng mốc 3 tháng, 1 năm, 2 năm và sửa chữa các điểm phản ánh, hạng mục lỗi.",
+        "brand": "Sumitomo Realty & Development",
+        "brand_origin": "Nhật Bản",
+        "is_included": true,
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "住友不動産のアフターサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「お客様センター」・「アフターサービスセンター」を開設し、原則お引渡し後2年間にわたり",
+            "confidence": "high"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "住友不動産のアフターサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「お客様センター」・「アフターサービスセンター」を開設し、原則お引渡し後2年間にわたり、お客様センターにて24時間365日体制（水曜・日曜・祝日・年末年始・お盆休暇および17時40分以降は受付のみ）で、アフターサービス業務規準に基づき、お客様へのアフターサービスに対応しています。お部屋のお引渡し後、3か月・1年・2年・を目途に定期点検を実施し、ご指摘事項および不具合箇所の補修をします。",
+            "confidence": "high"
+          },
+          {
+            "field": "brand",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "住友不動産のアフターサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "brand_origin",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "売主／住友不動産株式会社",
+            "confidence": "high"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "設備・構造\n…\n住友不動産のアフターサービス",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "zeh_m_oriented",
+        "item_category": "dieu_hoa_thong_gio",
+        "item_name": "Chứng nhận ZEH-M Oriented",
+        "item_spec": "Công trình nâng cao hiệu năng cách nhiệt lớp vỏ và áp dụng hệ thống thiết bị hiệu suất cao, vừa giữ chất lượng môi trường trong nhà vừa tiết kiệm năng lượng. Dự kiến đạt tiêu chuẩn \"ZEH-M Oriented\" – hướng tới cắt giảm trên 20% tiêu thụ năng lượng sơ cấp năm cho toàn khối nhà (gồm cả phần chung) so với mức tiêu chuẩn tiết kiệm năng lượng hiện hành.",
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": "Mới ở trạng thái \"dự kiến đạt\" (取得予定)",
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "ZEH-M Oriented （ゼッチ・マンション オリエンテッド）",
+            "confidence": "high"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "外皮の断熱性能などの向上と共に、高効率な設備システムを導入することで、室内環境の質を保ちつつ省エネルギーを実現。",
+            "confidence": "high"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "ZEH-M Oriented （ゼッチ・マンション オリエンテッド）",
+            "confidence": "high"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "本物件は、外皮の断熱性能などの向上と共に、高効率な設備システムを導入することで、室内環境の質を保ちつつ省エネルギーを実現。共用部を含む住棟全体で年間の一次エネルギー消費量を現行の省エネ基準値から20％以上削減することを目指した基準「ZEH-M Oriented」を取得予定です。",
+            "confidence": "high"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "設備・構造\n…\nZEH-M Oriented",
+            "confidence": "high"
+          },
+          {
+            "field": "note",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「ZEH-M Oriented」を取得予定です。",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "vat_tu_phong_chong_thien_tai",
+        "item_category": "an_ninh_pccc",
+        "item_name": "Vật tư phòng chống thiên tai",
+        "item_spec": "Chuẩn bị sẵn vật tư phòng chống thiên tai cho tình huống khẩn cấp như động đất: bộ dụng cụ cứu hộ, dây cứu hộ, xẻng, khẩu trang chống bụi… dùng cho tương trợ ban đầu. Ngoài ra còn có hộp cứu thương, radio quay tay có chức năng sạc điện thoại và đèn pin, máy phát điện dùng bình gas mini, nến khẩn cấp, can nhựa gấp gọn đựng nước, nước uống dự trữ và nhà vệ sinh đơn giản dùng khi thảm hoạ.",
         "brand": null,
         "brand_origin": null,
         "is_included": true,
@@ -1016,8 +1164,8 @@
         "applies_to_type_code": null,
         "item_code": "ghe_bang_kiem_bep_nau_khan_cap",
         "item_category": "an_ninh_pccc",
-        "item_name": "Ghế băng kiêm bếp nấu khẩn cấp (ベンチ兼用非常用炊き出しかまど)",
-        "item_spec": "災害時には腰掛け板を外すと、非常用の「炊き出しかまど」となるベンチを設置しています。普段は敷地内にベンチとして設置しているため、置き場所にも困らないスマートな災害対策備品です。",
+        "item_name": "Ghế băng kiêm bếp nấu ăn khẩn cấp",
+        "item_spec": "Khi có thảm hoạ, tháo tấm ngồi ra là ghế băng trở thành \"bếp nấu ăn\" khẩn cấp. Ngày thường được đặt trong khuôn viên như ghế băng nên không tốn chỗ chứa – một thiết bị ứng phó thảm hoạ thông minh.",
         "brand": null,
         "brand_origin": null,
         "is_included": true,
@@ -1032,7 +1180,7 @@
           {
             "field": "item_category",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "スマートな災害対策備品です。",
+            "snippet": "災害時には腰掛け板を外すと、非常用の「炊き出しかまど」となるベンチを設置しています。",
             "confidence": "high"
           },
           {
@@ -1059,8 +1207,8 @@
         "applies_to_type_code": null,
         "item_code": "khung_cua_chong_dong_dat",
         "item_category": "cua",
-        "item_name": "Khung cửa chính chống động đất (対震ドア枠)",
-        "item_spec": "万一の地震時に、玄関扉の枠が歪んでも、枠と扉の隙間を大きく設けることにより、扉の開放を容易にできるように配慮した耐震ドア枠を採用しました。",
+        "item_name": "Khung cửa chống động đất",
+        "item_spec": "Áp dụng khung cửa chịu động đất, tạo khe hở lớn giữa khung và cánh cửa để khi động đất khiến khung cửa ra vào bị biến dạng thì vẫn dễ mở được cánh cửa.",
         "brand": null,
         "brand_origin": null,
         "is_included": true,
@@ -1075,7 +1223,7 @@
           {
             "field": "item_category",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "万一の地震時に、玄関扉の枠が歪んでも、枠と扉の隙間を大きく設けることにより…耐震ドア枠を採用しました。",
+            "snippet": "万一の地震時に、玄関扉の枠が歪んでも、枠と扉の隙間を大きく設けることにより、扉の開放を容易にできるように配慮した耐震ドア枠を採用しました。",
             "confidence": "high"
           },
           {
@@ -1100,14 +1248,14 @@
       },
       {
         "applies_to_type_code": null,
-        "item_code": "ket_cau_cach_chan_mien_chan",
+        "item_code": "ket_cau_cach_chan",
         "item_category": "an_ninh_pccc",
-        "item_name": "Kết cấu cách chấn (免震構造)",
-        "item_spec": "オイレス工業（株）の製作による積層ゴム支承および弾性すべり支承を使用した免震工法を採用。積層ゴムを用いた免震装置が地震のエネルギーを吸収するため、建物の変形、揺れを抑制します。",
-        "brand": "オイレス工業（株）",
-        "brand_origin": null,
+        "item_name": "Kết cấu cách chấn (免震)",
+        "item_spec": "Áp dụng phương pháp cách chấn dùng gối cao su nhiều lớp và gối trượt đàn hồi do Oiles Corporation chế tạo. Thiết bị cách chấn bằng cao su nhiều lớp hấp thụ năng lượng động đất nên hạn chế biến dạng và rung lắc của công trình. Với các rung động lớn như địa chấn chu kỳ dài, nội thất và đèn có thể đổ, rơi, dịch chuyển; khuyến nghị người mua thực hiện các biện pháp gia cố.",
+        "brand": "Oiles Corporation",
+        "brand_origin": "Nhật Bản",
         "is_included": true,
-        "note": "長周期地震動などの大きな揺れにより、家具や照明器具などが転倒、落下、移動する恐れがあると言われております。ご購入者様には、補強などの措置を講じていただくことを推奨いたします。",
+        "note": null,
         "provenance": [
           {
             "field": "item_code",
@@ -1118,7 +1266,7 @@
           {
             "field": "item_category",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "積層ゴムを用いた免震装置が地震のエネルギーを吸収するため、建物の変形、揺れを抑制します。",
+            "snippet": "オイレス工業（株）の製作による積層ゴム支承および弾性すべり支承を使用した免震工法を採用。",
             "confidence": "high"
           },
           {
@@ -1130,7 +1278,7 @@
           {
             "field": "item_spec",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "オイレス工業（株）の製作による積層ゴム支承および弾性すべり支承を使用した免震工法を採用。積層ゴムを用いた免震装置が地震のエネルギーを吸収するため、建物の変形、揺れを抑制します。",
+            "snippet": "オイレス工業（株）の製作による積層ゴム支承および弾性すべり支承を使用した免震工法を採用。積層ゴムを用いた免震装置が地震のエネルギーを吸収するため、建物の変形、揺れを抑制します。長周期地震動などの大きな揺れにより、家具や照明器具などが転倒、落下、移動する恐れがあると言われております。ご購入者様には、補強などの措置を講じていただくことを推奨いたします。",
             "confidence": "high"
           },
           {
@@ -1140,15 +1288,15 @@
             "confidence": "high"
           },
           {
-            "field": "is_included",
+            "field": "brand_origin",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "設備・構造\n…\n免震構造",
+            "snippet": "オイレス工業（株）の製作による積層ゴム支承",
             "confidence": "high"
           },
           {
-            "field": "note",
+            "field": "is_included",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "長周期地震動などの大きな揺れにより、家具や照明器具などが転倒、落下、移動する恐れがあると言われております。ご購入者様には、補強などの措置を講じていただくことを推奨いたします。",
+            "snippet": "設備・構造\n…\n免震構造",
             "confidence": "high"
           }
         ]
@@ -1157,8 +1305,8 @@
         "applies_to_type_code": null,
         "item_code": "mat_ban_bep_da_tu_nhien",
         "item_category": "bep",
-        "item_name": "Mặt bàn bếp đá tự nhiên (天然石カウンタートップ)",
-        "item_spec": "キッチンのカウンタートップには、美しく、高級感あふれる天然石を採用しました。",
+        "item_name": "Mặt bàn bếp bằng đá tự nhiên",
+        "item_spec": "Mặt bàn bếp sử dụng đá tự nhiên đẹp, toát lên vẻ sang trọng.",
         "brand": null,
         "brand_origin": null,
         "is_included": true,
@@ -1198,10 +1346,10 @@
       },
       {
         "applies_to_type_code": null,
-        "item_code": "may_rua_bat_say_dang_truot",
+        "item_code": "may_rua_bat_kieu_truot",
         "item_category": "bep",
-        "item_name": "Máy rửa bát sấy khô dạng trượt (スライド式食器洗い乾燥機)",
-        "item_spec": "手間をかけず効率よく食器類が洗浄でき、節水効果にも優れた食器洗い乾燥機をご用意しました。スライド式なので、楽な姿勢で食器の出し入れができます。",
+        "item_name": "Máy rửa & sấy bát kiểu trượt",
+        "item_spec": "Máy rửa và sấy bát rửa hiệu quả, không tốn công sức, tiết kiệm nước. Kiểu trượt nên có thể lấy – cất bát đĩa ở tư thế thoải mái.",
         "brand": null,
         "brand_origin": null,
         "is_included": true,
@@ -1216,7 +1364,7 @@
           {
             "field": "item_category",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "食器洗い乾燥機をご用意しました。スライド式なので、楽な姿勢で食器の出し入れができます。",
+            "snippet": "手間をかけず効率よく食器類が洗浄でき、節水効果にも優れた食器洗い乾燥機をご用意しました。",
             "confidence": "high"
           },
           {
@@ -1241,14 +1389,14 @@
       },
       {
         "applies_to_type_code": null,
-        "item_code": "voi_sen_bep_tich_hop_loc_nuoc",
+        "item_code": "voi_sen_bep_am_tich_hop",
         "item_category": "bep",
-        "item_name": "Vòi sen bếp tích hợp lọc nước dạng âm bàn (ビルトインタイプ複合シャワー水栓)",
-        "item_spec": "湯水の開閉・調整レバーと浄水開閉レバーのダブルレバー操作で泡沫吐水とスプレーシャワーの2パターン吐水ができ浄水も原水と同様に吐水できます。アンダーシンクタイプの大容量浄水カートリッジ…シャワーヘッドを引き出せるので、シンクの掃除などにも便利です。",
+        "item_name": "Vòi sen hỗn hợp kiểu âm bàn tích hợp lọc nước",
+        "item_spec": "Thao tác hai cần gạt (cần đóng mở – điều chỉnh nước nóng lạnh và cần mở nước lọc) cho hai kiểu ra nước là tia sủi bọt và tia phun sương, nước lọc cũng ra được như nước thường. Lõi lọc dung tích lớn kiểu đặt dưới bồn rửa nên dùng được lượng nước lọc nhiều và lâu hơn so với loại gắn trong vòi. Đầu sen rút ra được, tiện cho việc vệ sinh bồn rửa.",
         "brand": null,
         "brand_origin": null,
         "is_included": true,
-        "note": "※カートリッジ交換費用は別途お客様のご負担となります。",
+        "note": "Chi phí thay lõi lọc do khách hàng tự chi trả",
         "provenance": [
           {
             "field": "item_code",
@@ -1259,7 +1407,7 @@
           {
             "field": "item_category",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "シャワーヘッドを引き出せるので、シンクの掃除などにも便利です。",
+            "snippet": "ビルトインタイプ複合シャワー水栓…シンクの掃除などにも便利です。",
             "confidence": "high"
           },
           {
@@ -1271,7 +1419,7 @@
           {
             "field": "item_spec",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "湯水の開閉・調整レバーと浄水開閉レバーのダブルレバー操作で泡沫吐水とスプレーシャワーの2パターン吐水ができ浄水も原水と同様に吐水できます。アンダーシンクタイプの大容量浄水カートリッジでスパウトインタイプに比べたっぷり長期間浄水が使用できます。",
+            "snippet": "湯水の開閉・調整レバーと浄水開閉レバーのダブルレバー操作で泡沫吐水とスプレーシャワーの2パターン吐水ができ浄水も原水と同様に吐水できます。アンダーシンクタイプの大容量浄水カートリッジでスパウトインタイプに比べたっぷり長期間浄水が使用できます。また、シャワーヘッドを引き出せるので、シンクの掃除などにも便利です。",
             "confidence": "high"
           },
           {
@@ -1290,10 +1438,10 @@
       },
       {
         "applies_to_type_code": null,
-        "item_code": "mat_ban_lavabo_da_tu_nhien",
+        "item_code": "ban_lavabo_da_tu_nhien",
         "item_category": "thiet_bi_ve_sinh",
-        "item_name": "Mặt bàn lavabo đá tự nhiên (天然石洗面カウンター)",
-        "item_spec": "洗面化粧台のカウンターには美しく、高級感あふれる天然石を採用しました。",
+        "item_name": "Bàn lavabo bằng đá tự nhiên",
+        "item_spec": "Mặt bàn của bồn rửa mặt sử dụng đá tự nhiên đẹp, toát lên vẻ sang trọng.",
         "brand": null,
         "brand_origin": null,
         "is_included": true,
@@ -1333,14 +1481,14 @@
       },
       {
         "applies_to_type_code": null,
-        "item_code": "wc_co_ban_rua_tay_da_tu_nhien",
+        "item_code": "wc_co_ban_rua_tay",
         "item_category": "thiet_bi_ve_sinh",
-        "item_name": "WC có bàn rửa tay hoàn thiện đá tự nhiên (手洗いカウンター付トイレ)",
-        "item_spec": "トイレには、高級感あふれる天然石仕上げの手洗いカウンターを設けています。",
+        "item_name": "Nhà vệ sinh có bàn rửa tay",
+        "item_spec": "Trong nhà vệ sinh bố trí bàn rửa tay hoàn thiện bằng đá tự nhiên sang trọng. Không áp dụng cho nhà vệ sinh (2) của căn loại P.",
         "brand": null,
         "brand_origin": null,
         "is_included": true,
-        "note": "※Pタイプのトイレ（2）を除く。",
+        "note": "Không áp dụng cho nhà vệ sinh (2) của căn loại P",
         "provenance": [
           {
             "field": "item_code",
@@ -1363,7 +1511,7 @@
           {
             "field": "item_spec",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "トイレには、高級感あふれる天然石仕上げの手洗いカウンターを設けています。",
+            "snippet": "トイレには、高級感あふれる天然石仕上げの手洗いカウンターを設けています。※Pタイプのトイレ（2）を除く。",
             "confidence": "high"
           },
           {
@@ -1384,12 +1532,12 @@
         "applies_to_type_code": null,
         "item_code": "bat_sen_tiet_kiem_nuoc",
         "item_category": "thiet_bi_ve_sinh",
-        "item_name": "Bát sen tiết kiệm nước (節水シャワーヘッド)",
-        "item_spec": "シャワーヘッドに付いたボタンを押すだけで、吐水・止水を繰り返すことができ大変便利です。また、従来のシャワーと比較すると最大約35％＜パナソニック（株）比＞節水となります。",
-        "brand": null,
-        "brand_origin": null,
+        "item_name": "Bát sen tiết kiệm nước",
+        "item_spec": "Chỉ cần nhấn nút trên bát sen là có thể bật – tắt nước liên tục, rất tiện lợi. So với vòi sen thông thường, tiết kiệm tối đa khoảng 35% nước (theo so sánh của Panasonic). Không áp dụng cho các căn tầng trên cùng.",
+        "brand": "Panasonic",
+        "brand_origin": "Nhật Bản",
         "is_included": true,
-        "note": "※最上階住戸を除く。",
+        "note": "Không áp dụng cho căn tầng trên cùng",
         "provenance": [
           {
             "field": "item_code",
@@ -1412,8 +1560,20 @@
           {
             "field": "item_spec",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "シャワーヘッドに付いたボタンを押すだけで、吐水・止水を繰り返すことができ大変便利です。また、従来のシャワーと比較すると最大約35％＜パナソニック（株）比＞節水となります。",
+            "snippet": "シャワーヘッドに付いたボタンを押すだけで、吐水・止水を繰り返すことができ大変便利です。また、従来のシャワーと比較すると最大約35％＜パナソニック（株）比＞節水となります。※最上階住戸を除く。",
             "confidence": "high"
+          },
+          {
+            "field": "brand",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "最大約35％＜パナソニック（株）比＞節水となります。",
+            "confidence": "medium"
+          },
+          {
+            "field": "brand_origin",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "＜パナソニック（株）比＞",
+            "confidence": "medium"
           },
           {
             "field": "is_included",
@@ -1433,12 +1593,12 @@
         "applies_to_type_code": null,
         "item_code": "tram_sac_xe_dien",
         "item_category": "thiet_bi_dien",
-        "item_name": "Thiết bị sạc xe điện trong hầm đỗ xe (電気自動車充電設備)",
-        "item_spec": "駐車場内には、電気自動車・プラグインハイブリッド車の充電に対応した設備を設置し、エコカーをより身近なものとする環境を整えました。",
+        "item_name": "Thiết bị sạc xe điện",
+        "item_spec": "Trong bãi đỗ xe lắp đặt thiết bị đáp ứng việc sạc cho xe điện và xe hybrid cắm sạc, tạo môi trường đưa xe thân thiện môi trường đến gần hơn với cư dân. Cùng mục này còn nêu dịch vụ nhận hàng 24 giờ khi vắng nhà, gửi bưu kiện và đặt dịch vụ giặt là, có thể thanh toán bằng thẻ tín dụng.",
         "brand": null,
         "brand_origin": null,
         "is_included": true,
-        "note": "※本設備のご利用は有料となります。 (thiết bị được lắp sẵn nhưng sử dụng có thu phí)",
+        "note": "Việc sử dụng thiết bị sạc là có thu phí",
         "provenance": [
           {
             "field": "item_code",
@@ -1461,7 +1621,7 @@
           {
             "field": "item_spec",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "駐車場内には、電気自動車・プラグインハイブリッド車の充電に対応した設備を設置し、エコカーをより身近なものとする環境を整えました。",
+            "snippet": "留守中に届いた荷物を、24時間いつでも受け取ることができる他、宅配物の発送やクリーニングの依頼が行えます。宅配物発送料金・クリーニング料金はクレジットカードで決済することも可能。 また、留守中に届いた荷物は住戸内のインターホン親機駐車場内には、電気自動車・プラグインハイブリッド車の充電に対応した設備を設置し、エコカーをより身近なものとする環境を整えました。",
             "confidence": "high"
           },
           {
@@ -1480,14 +1640,57 @@
       },
       {
         "applies_to_type_code": null,
-        "item_code": "an_ninh_online_24h_s_guard",
+        "item_code": "dich_vu_ho_tro_doi_song",
         "item_category": "an_ninh_pccc",
-        "item_name": "Hệ thống an ninh trực tuyến 24h S-GUARD",
-        "item_spec": "24時間オンライン体制で、セコム（株）セコム・コントロールセンターにつながっています。各住戸、共用部で警報が発信されると、セコム（株）の警備員が現場に急行し、必要な通報などの対応を致します。",
-        "brand": "セコム（株）",
+        "item_name": "Dịch vụ hỗ trợ đời sống",
+        "item_spec": "Chuẩn bị nhiều dịch vụ khác nhau nhằm hỗ trợ sự \"an tâm\", \"thoải mái\", \"tiện lợi\" cho cư dân.",
+        "brand": null,
         "brand_origin": null,
         "is_included": true,
-        "note": "警備業務明細書の規定に従い、事前にお預かりした専有部の鍵を使用した住戸内での対応、共用部設備の異常信号を受信した場合の現地確認等を行う",
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "ライフサポートサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "ご入居された皆様の「安心」「快適」「便利」をお手伝いさせていただくため、様々なサービスをご用意しました。",
+            "confidence": "high"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "ライフサポートサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "ご入居された皆様の「安心」「快適」「便利」をお手伝いさせていただくため、様々なサービスをご用意しました。",
+            "confidence": "high"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "設備・構造\n…\nライフサポートサービス",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "he_thong_bao_ve_s_guard",
+        "item_category": "an_ninh_pccc",
+        "item_name": "Hệ thống an ninh S-GUARD",
+        "item_spec": "Kết nối trực tuyến 24 giờ với Trung tâm điều khiển SECOM của SECOM. Khi có tín hiệu báo động phát đi từ từng căn hộ hay khu vực chung, nhân viên bảo vệ của SECOM sẽ đến hiện trường và thực hiện các báo cáo, xử lý cần thiết. Theo quy định trong bản chi tiết nghiệp vụ bảo vệ, còn có thể dùng chìa khoá phần sở hữu riêng đã gửi trước để xử lý bên trong căn hộ, kiểm tra hiện trường khi nhận tín hiệu bất thường của thiết bị khu vực chung, góp phần xử lý nhanh và phù hợp.",
+        "brand": "SECOM",
+        "brand_origin": "Nhật Bản",
+        "is_included": true,
+        "note": null,
         "provenance": [
           {
             "field": "item_code",
@@ -1498,7 +1701,7 @@
           {
             "field": "item_category",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "各住戸、共用部で警報が発信されると、セコム（株）の警備員が現場に急行し、必要な通報などの対応を致します。",
+            "snippet": "24時間オンライン体制で、セコム（株）セコム・コントロールセンターにつながっています。",
             "confidence": "high"
           },
           {
@@ -1510,25 +1713,25 @@
           {
             "field": "item_spec",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "24時間オンライン体制で、セコム（株）セコム・コントロールセンターにつながっています。各住戸、共用部で警報が発信されると、セコム（株）の警備員が現場に急行し、必要な通報などの対応を致します。",
+            "snippet": "24時間オンライン体制で、セコム（株）セコム・コントロールセンターにつながっています。各住戸、共用部で警報が発信されると、セコム（株）の警備員が現場に急行し、必要な通報などの対応を致します。また、警備業務明細書の規定に従い、事前にお預かりした専有部の鍵を使用した住戸内での対応、共用部設備の異常信号を受信した場合の現地確認等、迅速かつ適切な対処に貢献します。",
             "confidence": "high"
           },
           {
             "field": "brand",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "24時間オンライン体制で、セコム（株）セコム・コントロールセンターにつながっています。",
+            "snippet": "セコム（株）セコム・コントロールセンターにつながっています。",
+            "confidence": "high"
+          },
+          {
+            "field": "brand_origin",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "セコム（株）",
             "confidence": "high"
           },
           {
             "field": "is_included",
             "source_file": "02_ngu_n_3.txt",
             "snippet": "設備・構造\n…\nS-GUARD（エスガード）",
-            "confidence": "high"
-          },
-          {
-            "field": "note",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "警備業務明細書の規定に従い、事前にお預かりした専有部の鍵を使用した住戸内での対応、共用部設備の異常信号を受信した場合の現地確認等、迅速かつ適切な対処に貢献します。",
             "confidence": "high"
           }
         ]
@@ -1537,12 +1740,12 @@
         "applies_to_type_code": null,
         "item_code": "camera_an_ninh",
         "item_category": "an_ninh_pccc",
-        "item_name": "Camera an ninh khu vực chung (防犯カメラ)",
-        "item_spec": "エントランスやエレベーター内、外構等の共用部に防犯カメラを設置。不審者の侵入や犯罪を抑制するとともに、24時間録画される画像は一定期間保管されます。",
+        "item_name": "Camera an ninh",
+        "item_spec": "Lắp camera an ninh tại các khu vực chung như sảnh, trong thang máy, sân vườn ngoại thất. Giúp ngăn ngừa người lạ xâm nhập và tội phạm, hình ảnh được ghi 24 giờ và lưu trữ trong một khoảng thời gian nhất định. Ngoài thang máy, các camera còn lại là thiết bị thuê, chi phí đã tính trong phí quản lý.",
         "brand": null,
         "brand_origin": null,
         "is_included": true,
-        "note": "※エレベーター以外はレンタルとなり、費用等は管理費に含まれます。",
+        "note": "Ngoài thang máy, camera là thiết bị thuê, chi phí nằm trong phí quản lý",
         "provenance": [
           {
             "field": "item_code",
@@ -1553,7 +1756,7 @@
           {
             "field": "item_category",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "エントランスやエレベーター内、外構等の共用部に防犯カメラを設置。不審者の侵入や犯罪を抑制する",
+            "snippet": "エントランスやエレベーター内、外構等の共用部に防犯カメラを設置。",
             "confidence": "high"
           },
           {
@@ -1565,7 +1768,7 @@
           {
             "field": "item_spec",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "エントランスやエレベーター内、外構等の共用部に防犯カメラを設置。不審者の侵入や犯罪を抑制するとともに、24時間録画される画像は一定期間保管されます。",
+            "snippet": "エントランスやエレベーター内、外構等の共用部に防犯カメラを設置。不審者の侵入や犯罪を抑制するとともに、24時間録画される画像は一定期間保管されます。※エレベーター以外はレンタルとなり、費用等は管理費に含まれます。",
             "confidence": "high"
           },
           {
@@ -1581,45 +1784,131 @@
             "confidence": "high"
           }
         ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "coc_mong",
+        "item_category": "an_ninh_pccc",
+        "item_name": "Thi công 28 cọc móng",
+        "item_spec": "Để tạo nên công trình có cường độ cao, việc dùng cọc chạm tới tầng chịu lực vững chắc để đỡ công trình là rất quan trọng.",
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "28本の杭を打設",
+            "confidence": "high"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "強度の高い建物づくりには、強固な支持層まで達する杭で建物をしっかりと支えることが重要です。",
+            "confidence": "high"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "28本の杭を打設",
+            "confidence": "high"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "強度の高い建物づくりには、強固な支持層まで達する杭で建物をしっかりと支えることが重要です。",
+            "confidence": "high"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "設備・構造\n…\n28本の杭を打設",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "nhan_moi_truong_toa_nha_tokyo",
+        "item_category": "dieu_hoa_thong_gio",
+        "item_name": "Nhãn công bố hiệu năng môi trường chung cư của Tokyo",
+        "item_spec": null,
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": "Nguồn chỉ nêu tên hạng mục, không có nội dung mô tả chi tiết",
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "東京都マンション環境性能表示",
+            "confidence": "high"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "東京都マンション環境性能表示",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "東京都マンション環境性能表示",
+            "confidence": "high"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "設備・構造\n…\n東京都マンション環境性能表示",
+            "confidence": "medium"
+          },
+          {
+            "field": "note",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "東京都マンション環境性能表示",
+            "confidence": "high"
+          }
+        ]
       }
     ],
-    "notes": "Nguồn duy nhất có dữ liệu bàn giao là 02_ngu_n_3.txt, mục 「設備・構造」 trên major7.net (thông tin do 住友不動産株式会社 cung cấp, 情報更新日 2026/08/12) → confidence high cho các hạng mục nằm trực tiếp dưới tiêu đề này. File 03_ngu_n_4.txt (wangan-mansion.jp) không có nội dung tiêu chuẩn bàn giao nào.\n\nCác mục trong 設備・構造 KHÔNG đưa vào B5 vì không thuộc bất kỳ item_category §8.15 hoặc thuộc bảng khác: (1) 「クリーンステーション」(phòng rác từng tầng), 「キッズルーム」「フロントサービス」 → tiện ích/khu vực chung, thuộc B6; (2) 「ZEH-M Oriented」取得予定 và 「東京都マンション環境性能表示」 → chứng chỉ/nhãn năng lượng, thuộc B1 (green_cert); (3) 「住まいサポート12 PREMIUM（オプション・有料）」 và 「お引越し無料パック」, 「ライフサポートサービス」, 「住友不動産のアフターサービス」 → dịch vụ hậu mãi (mục có ghi オプション・有料 → không phải hạng mục bàn giao chuẩn); (4) 「28本の杭を打設」 và 「鉄筋コンクリート造・地下1階地上34階建」 → thông tin kết cấu/móng, thuộc B1.\n\nGhi chú độ tin cậy thấp hơn: 「スプリンクラー」 chỉ xuất hiện dưới dạng chú thích của 火災感知器 (※10階以上はスプリンクラーと兼用) nên confidence = medium và giới hạn tầng ≥10; 「床暖房・浴室暖房乾燥機」 chỉ được nêu gián tiếp trong mô tả エコジョーズ và 無線LAN給湯リモコン, nguồn không có mục riêng → confidence = medium, không có quy cách chi tiết.\n\n「電気自動車充電設備」 được liệt kê trong 設備・構造 (thiết bị lắp sẵn tại bãi đỗ) nên is_included = true, nhưng ghi rõ trong note rằng việc sử dụng có thu phí (※本設備のご利用は有料となります).\n\nKhông có nguồn nào nêu brand_origin (xuất xứ) của thiết bị, cũng không có hạng mục sàn/tường-trần/điều hoà treo tường/thang máy dạng quy cách bàn giao → để null / không tạo dòng. Không có hạng mục riêng theo loại căn (B-2, B-3, D-1, G-2, H-1, K-2) ngoài chú thích 「Pタイプのトイレ（2）を除く」 và 「最上階住戸を除く」, 「34階住戸のみ」 — các chú thích này đưa vào note vì mã loại căn nêu trong chú thích không khớp danh sách 6 間取り đã công bố."
+    "notes": "Toàn bộ hạng mục lấy từ mục 設備・構造 (thiết bị & kết cấu) của trang Major7 (file 02_ngu_n_3.txt) — trang tổng hợp chính thức của chủ đầu tư Sumitomo Realty & Development, confidence high. File 03_ngu_n_4.txt (wangan-mansion.jp) không có mục tiêu chuẩn bàn giao nên không phát sinh dòng nào. Lưu ý phân loại: corpus không có mục bàn giao theo cấu trúc sàn/tường/trần nên các trường item_category phải ánh xạ gần đúng vào enum §8.15; các hạng mục dịch vụ/kết cấu/chứng nhận (dịch vụ hậu mãi, chuyển nhà, phòng chống thiên tai, kết cấu cách chấn, cọc móng, ZEH-M, nhãn môi trường) được xếp tạm vào an_ninh_pccc hoặc dieu_hoa_thong_gio vì enum không có nhóm phù hợp. \"住まいサポート12 PREMIUM（オプション・有料）\" ghi rõ là tuỳ chọn có phí → is_included = false. \"お引越し無料パック\" bản thân miễn phí (is_included = true) nhưng các dịch vụ đi kèm là option có phí — đã ghi ở note. Không có thông tin về vật liệu sàn, tường, trần, cửa nội thất, điều hoà từng phòng → không tạo dòng, tránh bịa.\"防犯カメラ\" xuất hiện hai lần (mục こだわり và 設備・構造), lấy bản mô tả đầy đủ ở 設備・構造."
   },
   "amenity": {
     "records": [
       {
         "slug": "sky_lounge",
         "amenity_category": "cong_dong_su_kien",
-        "amenity_name": "Sky lounge (sảnh ngắm cảnh tầng cao)",
+        "amenity_name": "Sảnh sinh hoạt trên cao",
         "amenity_name_local": "スカイラウンジ",
         "location": null,
         "floor_level": null,
         "area_m2": null,
-        "is_indoor": null,
+        "is_indoor": true,
         "is_resident_free": null,
         "operator_brand": null,
         "is_highlight": true,
         "provenance": [
           {
-            "field": "slug",
+            "field": "amenity_name",
             "source_file": "02_ngu_n_3.txt",
             "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
-            "confidence": "medium"
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
+            "confidence": "high"
           },
           {
             "field": "amenity_category",
             "source_file": "02_ngu_n_3.txt",
             "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
-            "confidence": "medium"
+            "confidence": "high"
           },
           {
-            "field": "amenity_name",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
-            "confidence": "medium"
-          },
-          {
-            "field": "amenity_name_local",
+            "field": "is_indoor",
             "source_file": "02_ngu_n_3.txt",
             "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
             "confidence": "medium"
@@ -1627,8 +1916,8 @@
           {
             "field": "is_highlight",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "物件のポイント … ≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
-            "confidence": "medium"
+            "snippet": "物件のポイント ≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
+            "confidence": "high"
           }
         ]
       },
@@ -1640,31 +1929,31 @@
         "location": null,
         "floor_level": null,
         "area_m2": null,
-        "is_indoor": null,
+        "is_indoor": true,
         "is_resident_free": null,
         "operator_brand": null,
         "is_highlight": true,
         "provenance": [
           {
-            "field": "slug",
+            "field": "amenity_name",
             "source_file": "02_ngu_n_3.txt",
             "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
-            "confidence": "medium"
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
+            "confidence": "high"
           },
           {
             "field": "amenity_category",
             "source_file": "02_ngu_n_3.txt",
             "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
-            "confidence": "medium"
+            "confidence": "high"
           },
           {
-            "field": "amenity_name",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
-            "confidence": "medium"
-          },
-          {
-            "field": "amenity_name_local",
+            "field": "is_indoor",
             "source_file": "02_ngu_n_3.txt",
             "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
             "confidence": "medium"
@@ -1672,44 +1961,44 @@
           {
             "field": "is_highlight",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "物件のポイント … ≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
-            "confidence": "medium"
+            "snippet": "物件のポイント ≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
+            "confidence": "high"
           }
         ]
       },
       {
         "slug": "fitness_room",
         "amenity_category": "the_thao_gym",
-        "amenity_name": "Phòng tập fitness",
+        "amenity_name": "Phòng tập thể hình",
         "amenity_name_local": "フィットネスルーム",
         "location": null,
         "floor_level": null,
         "area_m2": null,
-        "is_indoor": null,
+        "is_indoor": true,
         "is_resident_free": null,
         "operator_brand": null,
         "is_highlight": true,
         "provenance": [
           {
-            "field": "slug",
+            "field": "amenity_name",
             "source_file": "02_ngu_n_3.txt",
             "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
-            "confidence": "medium"
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
+            "confidence": "high"
           },
           {
             "field": "amenity_category",
             "source_file": "02_ngu_n_3.txt",
             "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
-            "confidence": "medium"
+            "confidence": "high"
           },
           {
-            "field": "amenity_name",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
-            "confidence": "medium"
-          },
-          {
-            "field": "amenity_name_local",
+            "field": "is_indoor",
             "source_file": "02_ngu_n_3.txt",
             "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
             "confidence": "medium"
@@ -1717,44 +2006,44 @@
           {
             "field": "is_highlight",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "物件のポイント … ≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
-            "confidence": "medium"
+            "snippet": "物件のポイント ≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
+            "confidence": "high"
           }
         ]
       },
       {
         "slug": "telework_lounge",
         "amenity_category": "khong_gian_lam_viec",
-        "amenity_name": "Lounge làm việc từ xa (co-working)",
+        "amenity_name": "Sảnh làm việc từ xa",
         "amenity_name_local": "テレワークラウンジ",
         "location": null,
         "floor_level": null,
         "area_m2": null,
-        "is_indoor": null,
+        "is_indoor": true,
         "is_resident_free": null,
         "operator_brand": null,
         "is_highlight": true,
         "provenance": [
           {
-            "field": "slug",
+            "field": "amenity_name",
             "source_file": "02_ngu_n_3.txt",
             "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
-            "confidence": "medium"
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
+            "confidence": "high"
           },
           {
             "field": "amenity_category",
             "source_file": "02_ngu_n_3.txt",
             "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
-            "confidence": "medium"
+            "confidence": "high"
           },
           {
-            "field": "amenity_name",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
-            "confidence": "medium"
-          },
-          {
-            "field": "amenity_name_local",
+            "field": "is_indoor",
             "source_file": "02_ngu_n_3.txt",
             "snippet": "≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
             "confidence": "medium"
@@ -1762,8 +2051,8 @@
           {
             "field": "is_highlight",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "物件のポイント … ≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
-            "confidence": "medium"
+            "snippet": "物件のポイント ≪充実の共用施設≫スカイラウンジ、ゲストルーム、フィットネスルーム、テレワークラウンジ",
+            "confidence": "high"
           }
         ]
       },
@@ -1775,33 +2064,39 @@
         "location": null,
         "floor_level": null,
         "area_m2": null,
-        "is_indoor": null,
+        "is_indoor": true,
         "is_resident_free": null,
         "operator_brand": null,
-        "is_highlight": null,
+        "is_highlight": true,
         "provenance": [
-          {
-            "field": "slug",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "この物件のこだわり … タワーマンション／大規模マンション／フロントサービス／食器洗い乾燥機／ディスポーザー／キッズルーム／ごみ出し24時間OK／防犯カメラ",
-            "confidence": "medium"
-          },
-          {
-            "field": "amenity_category",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "この物件のこだわり … キッズルーム",
-            "confidence": "medium"
-          },
           {
             "field": "amenity_name",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "この物件のこだわり … キッズルーム",
-            "confidence": "medium"
+            "snippet": "この物件のこだわり … ディスポーザー キッズルーム ごみ出し24時間OK 防犯カメラ",
+            "confidence": "high"
           },
           {
             "field": "amenity_name_local",
             "source_file": "02_ngu_n_3.txt",
+            "snippet": "この物件のこだわり … ディスポーザー キッズルーム ごみ出し24時間OK 防犯カメラ",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "この物件のこだわり … ディスポーザー キッズルーム ごみ出し24時間OK 防犯カメラ",
+            "confidence": "high"
+          },
+          {
+            "field": "is_indoor",
+            "source_file": "02_ngu_n_3.txt",
             "snippet": "この物件のこだわり … キッズルーム",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "この物件のこだわり … タワーマンション 大規模マンション フロントサービス … キッズルーム",
             "confidence": "medium"
           }
         ]
@@ -1809,36 +2104,36 @@
       {
         "slug": "front_service",
         "amenity_category": "dich_vu_le_tan",
-        "amenity_name": "Dịch vụ lễ tân (front service)",
+        "amenity_name": "Dịch vụ lễ tân sảnh",
         "amenity_name_local": "フロントサービス",
         "location": null,
         "floor_level": null,
         "area_m2": null,
-        "is_indoor": null,
+        "is_indoor": true,
         "is_resident_free": null,
         "operator_brand": null,
         "is_highlight": null,
         "provenance": [
           {
-            "field": "slug",
+            "field": "amenity_name",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "この物件のこだわり … フロントサービス",
-            "confidence": "medium"
+            "snippet": "この物件のこだわり … タワーマンション 大規模マンション フロントサービス 食器洗い乾燥機",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "この物件のこだわり … タワーマンション 大規模マンション フロントサービス 食器洗い乾燥機",
+            "confidence": "high"
           },
           {
             "field": "amenity_category",
             "source_file": "02_ngu_n_3.txt",
             "snippet": "この物件のこだわり … フロントサービス",
-            "confidence": "medium"
+            "confidence": "high"
           },
           {
-            "field": "amenity_name",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "この物件のこだわり … フロントサービス",
-            "confidence": "medium"
-          },
-          {
-            "field": "amenity_name_local",
+            "field": "is_indoor",
             "source_file": "02_ngu_n_3.txt",
             "snippet": "この物件のこだわり … フロントサービス",
             "confidence": "medium"
@@ -1846,181 +2141,40 @@
         ]
       },
       {
-        "slug": "clean_station_24h",
+        "slug": "delivery_service_24h",
         "amenity_category": "dich_vu_le_tan",
-        "amenity_name": "Phòng đổ rác 24/24 tại mỗi tầng (clean station)",
-        "amenity_name_local": "クリーンステーション",
+        "amenity_name": "Dịch vụ nhận và gửi bưu kiện 24 giờ (kèm nhận đồ giặt là)",
+        "amenity_name_local": "留守中に届いた荷物を、24時間いつでも受け取ることができる他、宅配物の発送やクリーニングの依頼が行えます",
         "location": null,
-        "floor_level": "各階（mỗi tầng）",
+        "floor_level": null,
         "area_m2": null,
-        "is_indoor": null,
+        "is_indoor": true,
         "is_resident_free": null,
         "operator_brand": null,
         "is_highlight": null,
         "provenance": [
           {
-            "field": "slug",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "クリーンステーション：各階フロアにクリーンステーション（粗大ゴミを除く）を設けています。お住まいのフロアで24時間ゴミ出しができるので大変便利です。",
-            "confidence": "medium"
-          },
-          {
-            "field": "amenity_category",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "クリーンステーション：各階フロアにクリーンステーション（粗大ゴミを除く）を設けています。",
-            "confidence": "low"
-          },
-          {
             "field": "amenity_name",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "クリーンステーション：各階フロアにクリーンステーション（粗大ゴミを除く）を設けています。お住まいのフロアで24時間ゴミ出しができるので大変便利です。",
-            "confidence": "medium"
+            "snippet": "留守中に届いた荷物を、24時間いつでも受け取ることができる他、宅配物の発送やクリーニングの依頼が行えます。宅配物発送料金・クリーニング料金はクレジットカードで決済することも可能。",
+            "confidence": "high"
           },
           {
             "field": "amenity_name_local",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "クリーンステーション",
-            "confidence": "medium"
-          },
-          {
-            "field": "floor_level",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "各階フロアにクリーンステーション（粗大ゴミを除く）を設けています。",
-            "confidence": "medium"
-          }
-        ]
-      },
-      {
-        "slug": "parking_lot",
-        "amenity_category": "do_xe",
-        "amenity_name": "Bãi đỗ ô tô",
-        "amenity_name_local": "駐車場",
-        "location": null,
-        "floor_level": null,
-        "area_m2": null,
-        "is_indoor": null,
-        "is_resident_free": false,
-        "operator_brand": null,
-        "is_highlight": null,
-        "provenance": [
-          {
-            "field": "slug",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "その他 施設費用、償却費 駐車場使用料：55,000円～60,000円 駐輪場使用料：500円～4,000円",
-            "confidence": "medium"
+            "snippet": "留守中に届いた荷物を、24時間いつでも受け取ることができる他、宅配物の発送やクリーニングの依頼が行えます。",
+            "confidence": "high"
           },
           {
             "field": "amenity_category",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "駐車場使用料：55,000円～60,000円",
-            "confidence": "medium"
+            "snippet": "留守中に届いた荷物を、24時間いつでも受け取ることができる他、宅配物の発送やクリーニングの依頼が行えます。",
+            "confidence": "high"
           },
           {
-            "field": "amenity_name",
+            "field": "is_indoor",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "駐車場使用料：55,000円～60,000円",
-            "confidence": "medium"
-          },
-          {
-            "field": "amenity_name_local",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "駐車場使用料：55,000円～60,000円",
-            "confidence": "medium"
-          },
-          {
-            "field": "is_resident_free",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "駐車場使用料：55,000円～60,000円",
-            "confidence": "medium"
-          }
-        ]
-      },
-      {
-        "slug": "bicycle_parking",
-        "amenity_category": "do_xe",
-        "amenity_name": "Bãi để xe đạp",
-        "amenity_name_local": "駐輪場",
-        "location": null,
-        "floor_level": null,
-        "area_m2": null,
-        "is_indoor": null,
-        "is_resident_free": false,
-        "operator_brand": null,
-        "is_highlight": null,
-        "provenance": [
-          {
-            "field": "slug",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "駐輪場使用料：500円～4,000円",
-            "confidence": "medium"
-          },
-          {
-            "field": "amenity_category",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "駐輪場使用料：500円～4,000円",
-            "confidence": "medium"
-          },
-          {
-            "field": "amenity_name",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "駐輪場使用料：500円～4,000円",
-            "confidence": "medium"
-          },
-          {
-            "field": "amenity_name_local",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "駐輪場使用料：500円～4,000円",
-            "confidence": "medium"
-          },
-          {
-            "field": "is_resident_free",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "駐輪場使用料：500円～4,000円",
-            "confidence": "medium"
-          }
-        ]
-      },
-      {
-        "slug": "ev_charging",
-        "amenity_category": "do_xe",
-        "amenity_name": "Trạm sạc xe điện / plug-in hybrid",
-        "amenity_name_local": "電気自動車充電設備",
-        "location": null,
-        "floor_level": null,
-        "area_m2": null,
-        "is_indoor": null,
-        "is_resident_free": false,
-        "operator_brand": null,
-        "is_highlight": null,
-        "provenance": [
-          {
-            "field": "slug",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "電気自動車充電設備 … 駐車場内には、電気自動車・プラグインハイブリッド車の充電に対応した設備を設置し、エコカーをより身近なものとする環境を整えました。 ※本設備のご利用は有料となります。",
-            "confidence": "medium"
-          },
-          {
-            "field": "amenity_category",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "駐車場内には、電気自動車・プラグインハイブリッド車の充電に対応した設備を設置し",
-            "confidence": "medium"
-          },
-          {
-            "field": "amenity_name",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "電気自動車充電設備",
-            "confidence": "medium"
-          },
-          {
-            "field": "amenity_name_local",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "電気自動車充電設備",
-            "confidence": "medium"
-          },
-          {
-            "field": "is_resident_free",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "※本設備のご利用は有料となります。",
+            "snippet": "留守中に届いた荷物を、24時間いつでも受け取ることができる他、宅配物の発送やクリーニングの依頼が行えます。",
             "confidence": "medium"
           }
         ]
@@ -2039,41 +2193,242 @@
         "is_highlight": null,
         "provenance": [
           {
-            "field": "slug",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "ライフサポートサービス：ご入居された皆様の「安心」「快適」「便利」をお手伝いさせていただくため、様々なサービスをご用意しました。",
-            "confidence": "medium"
-          },
-          {
-            "field": "amenity_category",
-            "source_file": "02_ngu_n_3.txt",
-            "snippet": "ライフサポートサービス：ご入居された皆様の「安心」「快適」「便利」をお手伝いさせていただくため、様々なサービスをご用意しました。",
-            "confidence": "medium"
-          },
-          {
             "field": "amenity_name",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "ライフサポートサービス",
-            "confidence": "medium"
+            "snippet": "ライフサポートサービス ご入居された皆様の「安心」「快適」「便利」をお手伝いさせていただくため、様々なサービスをご用意しました。",
+            "confidence": "high"
           },
           {
             "field": "amenity_name_local",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "ライフサポートサービス",
+            "snippet": "ライフサポートサービス ご入居された皆様の「安心」「快適」「便利」をお手伝いさせていただくため、様々なサービスをご用意しました。",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "ライフサポートサービス ご入居された皆様の「安心」「快適」「便利」をお手伝いさせていただくため、様々なサービスをご用意しました。",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "slug": "clean_station",
+        "amenity_category": "dich_vu_le_tan",
+        "amenity_name": "Điểm đổ rác 24 giờ bố trí ở từng tầng",
+        "amenity_name_local": "クリーンステーション",
+        "location": null,
+        "floor_level": "mỗi tầng",
+        "area_m2": null,
+        "is_indoor": true,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": null,
+        "provenance": [
+          {
+            "field": "amenity_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "クリーンステーション 各階フロアにクリーンステーション（粗大ゴミを除く）を設けています。お住まいのフロアで24時間ゴミ出しができるので大変便利です。",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "クリーンステーション 各階フロアにクリーンステーション（粗大ゴミを除く）を設けています。",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "クリーンステーション 各階フロアにクリーンステーション（粗大ゴミを除く）を設けています。お住まいのフロアで24時間ゴミ出しができるので大変便利です。",
+            "confidence": "high"
+          },
+          {
+            "field": "floor_level",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "各階フロアにクリーンステーション（粗大ゴミを除く）を設けています。",
+            "confidence": "high"
+          },
+          {
+            "field": "is_indoor",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "各階フロアにクリーンステーション（粗大ゴミを除く）を設けています。",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "slug": "parking_car",
+        "amenity_category": "do_xe",
+        "amenity_name": "Bãi đỗ ô tô",
+        "amenity_name_local": "駐車場",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": null,
+        "is_resident_free": false,
+        "operator_brand": null,
+        "is_highlight": null,
+        "provenance": [
+          {
+            "field": "amenity_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "駐車場使用料：55,000円～60,000円 駐輪場使用料：500円～4,000円",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "駐車場使用料：55,000円～60,000円",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "駐車場使用料：55,000円～60,000円",
+            "confidence": "high"
+          },
+          {
+            "field": "is_resident_free",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "駐車場使用料：55,000円～60,000円",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "slug": "bicycle_parking",
+        "amenity_category": "do_xe",
+        "amenity_name": "Bãi để xe đạp",
+        "amenity_name_local": "駐輪場",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": null,
+        "is_resident_free": false,
+        "operator_brand": null,
+        "is_highlight": null,
+        "provenance": [
+          {
+            "field": "amenity_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "駐車場使用料：55,000円～60,000円 駐輪場使用料：500円～4,000円",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "駐輪場使用料：500円～4,000円",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "駐輪場使用料：500円～4,000円",
+            "confidence": "high"
+          },
+          {
+            "field": "is_resident_free",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "駐輪場使用料：500円～4,000円",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "slug": "ev_charging",
+        "amenity_category": "do_xe",
+        "amenity_name": "Trạm sạc xe điện và xe hybrid cắm sạc trong bãi đỗ xe",
+        "amenity_name_local": "電気自動車充電設備",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": null,
+        "is_resident_free": false,
+        "operator_brand": null,
+        "is_highlight": null,
+        "provenance": [
+          {
+            "field": "amenity_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "駐車場内には、電気自動車・プラグインハイブリッド車の充電に対応した設備を設置し、エコカーをより身近なものとする環境を整えました。 ※本設備のご利用は有料となります。",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "電気自動車充電設備",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "駐車場内には、電気自動車・プラグインハイブリッド車の充電に対応した設備を設置し",
+            "confidence": "high"
+          },
+          {
+            "field": "is_resident_free",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "※本設備のご利用は有料となります。",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "slug": "emergency_cooking_bench",
+        "amenity_category": "canh_quan_vuon",
+        "amenity_name": "Ghế băng ngoài trời kiêm bếp nấu ăn khẩn cấp khi thảm hoạ",
+        "amenity_name_local": "ベンチ兼用非常用炊き出しかまど",
+        "location": "ngoai_troi",
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": false,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": null,
+        "provenance": [
+          {
+            "field": "amenity_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "ベンチ兼用非常用炊き出しかまど 災害時には腰掛け板を外すと、非常用の「炊き出しかまど」となるベンチを設置しています。",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "ベンチ兼用非常用炊き出しかまど",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "普段は敷地内にベンチとして設置しているため、置き場所にも困らないスマートな災害対策備品です。",
+            "confidence": "high"
+          },
+          {
+            "field": "location",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "普段は敷地内にベンチとして設置しているため、置き場所にも困らないスマートな災害対策備品です。",
+            "confidence": "high"
+          },
+          {
+            "field": "is_indoor",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "普段は敷地内にベンチとして設置しているため、置き場所にも困らないスマートな災害対策備品です。",
             "confidence": "medium"
           }
         ]
       }
     ],
-    "notes": "Corpus chỉ có 2 file (02_ngu_n_3.txt — Major7, thông tin do 住友不動産 cung cấp, cập nhật 2026/08/12; 03_ngu_n_4.txt — portal 湾岸マンション価格ナビ, không liệt kê tiện ích). Mục 共用施設 trên trang không có nội dung text (chỉ là ảnh 外観完成予想図/敷地配置イラスト), nên danh sách tiện ích chủ yếu lấy từ 物件のポイント và この物件のこだわり. Không có nguồn nào nêu tầng, diện tích, đơn vị vận hành hay trong nhà/ngoài trời của từng tiện ích → để null (không suy từ tên hay từ ảnh phối cảnh). Các mục thuộc THIẾT BỊ TRONG CĂN (ミストサウナ, ディスポーザー, 食器洗い乾燥機, Low-Eガラス, 無線LAN給湯リモコン, エコジョーズ, 24時間機械給気, 天然石カウンター…) đã loại khỏi B6 vì thuộc tiêu chuẩn bàn giao (B5). Các hạng mục an ninh/kết cấu/phòng chống thiên tai (防犯カメラ, S-GUARD セコム, ハンズフリーキー, 免震構造, 防災備品, ベンチ兼用非常用炊き出しかまど, 対震ドア枠) không có nhóm tương ứng trong §8.16 nên không tạo dòng B6. 「クリーンステーション」và「ライフサポートサービス」không có nhóm chính xác trong §8.16, tạm xếp `dich_vu_le_tan` (đánh dấu confidence thấp cho trường category của クリーンステーション). Các tiện ích ngoài ranh giới toà (trường học, bệnh viện, công viên, siêu thị trong mục 周辺環境) thuộc WS1, không nhập. Không phát hiện mâu thuẫn giữa hai nguồn về tiện ích."
+    "notes": "Nguồn duy nhất có dữ liệu tiện ích là 02_ngu_n_3.txt (major7.net, 情報提供元: Sumitomo Realty & Development) — mục 物件のポイント, この物件のこだわり và 設備・構造; file 03_ngu_n_4.txt không liệt kê tiện ích nội khu. Mục 共用施設 trên trang chỉ có ảnh phối cảnh (外観完成予想図/敷地配置イラスト), không có text nên không suy diện tích, tầng bố trí, đơn vị vận hành → các trường area_m2, location, floor_level, operator_brand để null. ĐÃ LOẠI: (a) tiện ích ngoài ranh giới toà thuộc cấp khu vực (trường học, bệnh viện, công viên, siêu thị, bưu điện… trong mục 周辺環境) — thuộc WS1; (b) thiết bị trong căn hộ (ミストサウナ, ディスポーザー, 食器洗い乾燥機, エコジョーズ, Low-E ガラス, 24時間機械給気…) — thuộc B5 bàn giao; (c) hệ thống an ninh/kết cấu (防犯カメラ, S-GUARD, 火災感知器, 免震構造, 対震ドア枠, 28本の杭, ハンズフリーキー) và dịch vụ hậu mãi (お引越し無料パック, 住まいサポート12 PREMIUM, アフターサービス) vì không khớp danh mục §8.16. 防災備品 (bộ trang bị phòng chống thiên tai) cũng không khớp enum nên không tạo dòng. Không có nguồn mâu thuẫn."
   },
   "price_obs": {
     "records": [
       {
         "unit_type_code": null,
         "market": "so_cap",
-        "price_min": 130000000.0,
-        "price_max": 190000000.0,
+        "price_min": 130000000,
+        "price_max": 190000000,
         "price_avg": null,
         "currency": "JPY",
         "price_unit": "per_unit",
@@ -2106,7 +2461,7 @@
           {
             "field": "currency",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "販売価格\n13,000万円台～19,000万円台(予定)",
+            "snippet": "13,000万円台～19,000万円台(予定)",
             "confidence": "high"
           },
           {
@@ -2118,7 +2473,7 @@
           {
             "field": "price_basis",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "専有面積\n57.82㎡～72.53㎡\n販売価格\n13,000万円台～19,000万円台(予定)",
+            "snippet": "販売価格\n13,000万円台～19,000万円台(予定)\n専有面積\n57.82㎡～72.53㎡",
             "confidence": "medium"
           },
           {
@@ -2130,7 +2485,7 @@
           {
             "field": "period",
             "source_file": "02_ngu_n_3.txt",
-            "snippet": "情報更新日\n2026/08/12",
+            "snippet": "情報更新日：2026/08/12",
             "confidence": "high"
           },
           {
@@ -2148,6 +2503,6 @@
         ]
       }
     ],
-    "notes": "Chỉ có 1 quan sát giá trong corpus: giá sơ cấp công bố dạng khoảng cho toàn dự án (13,000万円台～19,000万円台, 予定 = dự kiến), quy đổi 万円 ×1e4 → 130,000,000–190,000,000 JPY/căn. Đây là giá 予告広告 (quảng cáo báo trước), chưa mở bán chính thức (dự kiến 2026/09 hạ tuần); ghi nhận là so_cap theo nguồn CĐT 住友不動産.\n\nGiá theo từng loại căn (B-2, B-3, D-1, G-2, H-1, K-2) trong bảng 間取り一覧 đều ghi '価格 -' → không có dữ liệu, không tạo record theo unit_type; tuyệt đối không chia giá khoảng cho từng loại căn.\n\nprice_unit = per_unit theo quy tắc §10 (Nhật công bố theo căn, 代金総額); không tự chia ra đơn giá/m². Do đó price_basis không áp dụng cho đơn giá/m² → đặt khong_ro (nguồn công bố diện tích theo 専有面積 = thông thuỷ, nhưng giá không tính trên m²).\n\nincludes_vat = true vì nguồn ghi rõ '消費税が課税される場合は税込み価格'. includes_maintenance_fee = null: nguồn liệt kê 修繕積立基金 1,082,100円～1,357,400円 và 修繕積立金 15,930円～19,980円 ở mục riêng, nhưng không nêu rõ đã gồm/chưa gồm trong giá bán → không suy đoán.\n\nFile 03_ngu_n_4.txt (湾岸マンション価格ナビ) không có giá cho toà này (坪単価 '―', các mức đánh giá đều '―'); các mức giá xuất hiện trong file là tin PR của toà nhà khác (Brillia 有明 SkyTower, ブランズタワー豊洲…) → không trích. Không có quan sát thu_cap hay cho_thue trong corpus."
+    "notes": "Chỉ có duy nhất một quan sát giá trong corpus: dải giá dự kiến toàn rổ hàng (13,000万円台～19,000万円台) do chủ đầu tư Sumitomo Realty & Development cung cấp trên major7.net, cập nhật 2026/08/12 → market = so_cap, price_unit = per_unit (Nhật công bố theo căn), quy đổi 万円 ×1e4. Giá là (予定) — dự kiến, chưa mở bán (dự kiến bán từ cuối tháng 9/2026); hậu tố 台 nghĩa là 'khoảng/mức', nên biên trên lấy đúng 19,000万円 chưa cộng thêm. price_basis = khong_ro vì giá công bố theo căn, nguồn không nêu cơ sở tính giá/m². includes_vat = true theo ghi chú '価格は物件の代金総額…消費税が課税される場合は税込み価格'. includes_maintenance_fee = null: nguồn liệt kê 修繕積立基金 1,082,100円～1,357,400円 và 修繕積立金 riêng nhưng không nói rõ có nằm trong giá bán hay không → không suy diễn. Bảng 間取り一覧 của 6 loại căn (B-2, B-3, D-1, G-2, H-1, K-2) đều ghi 価格 '-' → không tạo dòng giá theo loại căn. File 03_ngu_n_4.txt (wangan-mansion.jp) không có giá cho toà này (坪単価 hiển thị '―'); các mức giá khác trên trang thuộc dự án khác nên bị loại. Không có dữ liệu giá thứ cấp hay cho thuê."
   }
 }

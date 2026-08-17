@@ -14,12 +14,17 @@ output_raw/<building_id>/ nên có thể bỏ qua bước đã xong bằng --ski
 from __future__ import annotations
 
 import argparse
+import contextlib
+import io
 import json
 import re
 import sys
+import threading
+import time
 import traceback
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 import anthropic
 
@@ -83,6 +88,165 @@ def parse_buildings(path: Path) -> List[str]:
     return out
 
 
+class TaggedStdout(io.TextIOBase):
+    """Một stdout duy nhất, gắn nhãn theo LUỒNG đang ghi.
+
+    `redirect_stdout` thay `sys.stdout` ở phạm vi tiến trình chứ không theo luồng,
+    nên không thể cho mỗi worker một wrapper riêng — chúng sẽ lồng vào nhau và
+    kẹt khoá. Thay vào đó cài đúng một proxy, mỗi luồng tự khai nhãn của mình;
+    luồng không khai (luồng chính) ghi thẳng không nhãn.
+
+    Đệm theo luồng để dòng của hai toà không bị cắt vào giữa nhau, và chỉ ghi ra
+    khi đã đủ một dòng, dưới một khoá chung.
+    """
+
+    def __init__(self, target):
+        self._target = target
+        self._lock = threading.Lock()
+        self._state = threading.local()
+
+    def set_tag(self, tag: str) -> None:
+        self._state.tag = tag
+        self._state.buffer = ""
+
+    def _emit(self, line: str, tag: str | None) -> None:
+        with self._lock:
+            self._target.write(f"{tag} │ {line}\n" if tag else f"{line}\n")
+            self._target.flush()
+
+    def write(self, text: str) -> int:
+        tag = getattr(self._state, "tag", None)
+        if tag is None:                      # luồng chính: giữ nguyên hành vi cũ
+            with self._lock:
+                self._target.write(text)
+            return len(text)
+        buffer = getattr(self._state, "buffer", "") + text
+        while "\n" in buffer:
+            line, buffer = buffer.split("\n", 1)
+            self._emit(line, tag)
+        self._state.buffer = buffer
+        return len(text)
+
+    def flush(self) -> None:
+        tag = getattr(self._state, "tag", None)
+        leftover = getattr(self._state, "buffer", "")
+        if tag is not None and leftover:
+            self._emit(leftover, tag)
+            self._state.buffer = ""
+        else:
+            with self._lock:
+                self._target.flush()
+
+
+def sources_path_for(query: str, directory: Path) -> Path:
+    """Đường dẫn file nguồn của riêng một toà: <thư mục>/<building_id>.txt.
+
+    Đặt tên theo cùng slug với `output_csv/<building_id>.csv` để nhìn là biết
+    file nào ứng với toà nào.
+    """
+    return directory / f"{config.slugify(query, 'building')}.txt"
+
+
+def resolve_sources_file(query: str, args) -> Path | None:
+    """Chọn file nguồn cho một toà, hoặc None nếu để agent tự tìm."""
+    if getattr(args, "sources_dir", None):
+        path = sources_path_for(query, args.sources_dir)
+        if not path.exists():
+            raise SystemExit(
+                f"thiếu file nguồn {path}\n"
+                f"      Tạo file đó (mỗi dòng: URL [| purpose]), hoặc dùng --sources <file> dùng chung."
+            )
+        return path
+    return args.sources
+
+
+def predicted_building_id(query: str, args) -> str:
+    """Đoán building_id TRƯỚC khi chạy, để bỏ qua toà đã có CSV mà không tốn gì.
+
+    Khớp với `discover.building_id`: id là slug của --building-id, của gợi ý
+    trong sources.json đã lưu, hoặc của chính tên toà. Đường `discover` sinh gợi ý
+    bằng model nên lần đầu không đoán được — `process()` kiểm lại sau khi có id.
+    """
+    if args.building_id:
+        return config.slugify(args.building_id, "building")
+    for candidate in sorted(config.RAW_DIR.glob("*/sources.json")):
+        try:
+            data = json.loads(candidate.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            continue
+        if data.get("query") != query:
+            continue
+        suggestion = (data.get("resolved") or {}).get("building_id_suggestion")
+        if suggestion:
+            return config.slugify(suggestion, "building")
+    return config.slugify(query, "building")
+
+
+def split_done(queries: List[str], args) -> Tuple[List[str], List[str]]:
+    """Tách danh sách thành (cần chạy, đã có CSV)."""
+    todo, done = [], []
+    for query in queries:
+        csv_path = config.CSV_DIR / f"{predicted_building_id(query, args)}.csv"
+        (done if csv_path.exists() else todo).append(query)
+    return todo, done
+
+
+def _run_one(query: str, args, tag: str | None, stream: TaggedStdout) -> Tuple[str, str | None, bool]:
+    """Chạy một toà nhà. Trả về (query, lỗi hoặc None, có phải lỗi xác thực không)."""
+    if tag is not None:
+        stream.set_tag(tag)
+    try:
+        process(query, args)
+        return query, None, False
+    except anthropic.AuthenticationError:
+        return query, "xác thực không hợp lệ (401)", True
+    except anthropic.RateLimitError as e:
+        return query, f"chạm rate limit — {str(e)[:120]}", False
+    except SystemExit as e:
+        return query, str(e), False
+    except Exception:
+        return query, traceback.format_exc(limit=4), False
+    finally:
+        stream.flush()
+
+
+def run_batches(queries: List[str], args) -> Tuple[List[str], bool]:
+    """Chạy theo lô: mỗi lô `batch_size` toà song song, xong lô thì nghỉ.
+
+    Nghỉ giữa các lô để giãn tải lên hạn mức sử dụng; không nghỉ sau lô cuối.
+    """
+    size = max(1, args.batch_size)
+    batches = [queries[i:i + size] for i in range(0, len(queries), size)]
+    width = max((len(config.slugify(q)[:16]) for q in queries), default=8)
+    failed: List[str] = []
+    parallel = size > 1 and len(queries) > 1
+
+    stream = TaggedStdout(sys.stdout)
+    with contextlib.redirect_stdout(stream) if parallel else contextlib.nullcontext():
+        for index, batch in enumerate(batches, 1):
+            if parallel:
+                print(f"\n{'═' * 78}\n lô {index}/{len(batches)} — {len(batch)} toà chạy song song\n{'═' * 78}")
+            with ThreadPoolExecutor(max_workers=len(batch)) as pool:
+                futures = [
+                    pool.submit(_run_one, q, args,
+                                config.slugify(q)[:16].ljust(width) if parallel else None, stream)
+                    for q in batch
+                ]
+                for future in as_completed(futures):
+                    query, error, is_auth_error = future.result()
+                    if is_auth_error:
+                        for pending in futures:
+                            pending.cancel()
+                        return failed, True
+                    if error:
+                        print(f"  ✗ {query}: {error}")
+                        failed.append(query)
+            if index < len(batches) and args.batch_sleep > 0:
+                print(f"\n⏸  nghỉ {args.batch_sleep}s trước lô {index + 1}/{len(batches)}…")
+                time.sleep(args.batch_sleep)
+    return failed, False
+
+
 URL_RE = re.compile(r"https?://[^\s|)\]]+")
 
 
@@ -135,8 +299,9 @@ def process(query: str, args: argparse.Namespace) -> None:
                 cached_sources, tmp_dir = data, cand.parent
                 print(f"[1/4] Dùng lại sources.json có sẵn: {cand}")
                 break
-    if args.sources:
-        result = load_sources_file(args.sources, query)
+    sources_file = resolve_sources_file(query, args)
+    if sources_file:
+        result = load_sources_file(sources_file, query)
     else:
         result = cached_sources or discover.run(query, tmp_dir)
     resolved = result["resolved"]
@@ -152,6 +317,12 @@ def process(query: str, args: argparse.Namespace) -> None:
             tmp_dir.rmdir()
     print(f"      building_id = {bid}")
 
+    # Lưới an toàn cho đường discover: id chỉ biết được sau khi agent tìm nguồn,
+    # nên lọc trước ở main() không bắt được trường hợp này.
+    if getattr(args, "skip_done", False) and (config.CSV_DIR / f"{bid}.csv").exists():
+        print(f"      ↷ bỏ qua: đã có output_csv/{bid}.csv")
+        return
+
     # ── [2] crawl ───────────────────────────────────────────────────────────
     man_path = out_dir / "manifest.json"
     if args.skip_crawl and man_path.exists():
@@ -165,7 +336,8 @@ def process(query: str, args: argparse.Namespace) -> None:
     # ── [3] trích ───────────────────────────────────────────────────────────
     ex_path = out_dir / "extract_text.json"
     if args.skip_extract and ex_path.exists():
-        text_out = json.loads(ex_path.read_text(encoding="utf-8"))
+        # Chuẩn hoá lại khi nạp: file cũ có thể được trích trước khi có quy tắc 8.
+        text_out = extract.normalize_language(json.loads(ex_path.read_text(encoding="utf-8")))
         print(f"[3/4] Dùng lại extract_text.json")
     else:
         text_out = extract.run(out_dir, manifest, resolved)
@@ -204,6 +376,12 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="WS1 Building: tên toà nhà → feature CSV")
     ap.add_argument("building", nargs="?", help='Tên toà nhà, vd "Marina One Residences, Singapore"')
     ap.add_argument("--input", type=Path, help="File .txt, mỗi dòng 1 toà nhà")
+    ap.add_argument("--batch-size", type=int, default=4,
+                    help="Số toà chạy SONG SONG trong một lô (mặc định 4). 1 = tuần tự.")
+    ap.add_argument("--batch-sleep", type=int, default=90,
+                    help="Giây nghỉ giữa hai lô, giãn tải lên hạn mức (mặc định 90)")
+    ap.add_argument("--skip-done", action="store_true",
+                    help="Bỏ qua toà đã có output_csv/<building_id>.csv — chạy tiếp lô dài bị đứt")
     ap.add_argument("--building-id", default="", help="Ép building_id thay vì để agent tự sinh")
     ap.add_argument("--linked-case-id", default=None, help="FK sang case_benchmark của WS1 khu đô thị")
     ap.add_argument("--target", action="store_true", help="Đánh dấu is_target = true (sản phẩm GBAC)")
@@ -222,8 +400,11 @@ def main() -> None:
                     help="Đối chiếu feature_spec.md ↔ schema.py rồi dừng, không gọi API")
     ap.add_argument("--offline", action="store_true",
                     help="Giả lập model để test local (crawl vẫn thật, số liệu là RÁC)")
-    ap.add_argument("--sources", type=Path,
-                    help="File bảng nguồn tự cấp (mỗi dòng: URL [| purpose]) — bỏ qua bước tìm nguồn")
+    sources_group = ap.add_mutually_exclusive_group()
+    sources_group.add_argument("--sources", type=Path,
+                               help="MỘT file nguồn dùng chung cho mọi toà (mỗi dòng: URL [| purpose])")
+    sources_group.add_argument("--sources-dir", type=Path,
+                               help="Thư mục nguồn riêng từng toà: <thư mục>/<building_id>.txt")
     args = ap.parse_args()
 
     if args.offline:
@@ -247,10 +428,32 @@ def main() -> None:
     if not queries:
         ap.error("cần tên toà nhà hoặc --input")
 
+    total = len(queries)
+    done: List[str] = []
+    if args.skip_done:
+        queries, done = split_done(queries, args)
+        if done:
+            print(f"↷ Bỏ qua {len(done)}/{total} toà đã có CSV: {', '.join(done)}")
+
     if args.dry_run:
-        print(f"Đọc {len(queries)} toà nhà từ {args.input or 'tham số dòng lệnh'}:")
+        print(f"Đọc {total} toà nhà từ {args.input or 'tham số dòng lệnh'}"
+              + (f", còn {len(queries)} toà cần chạy" if done else "") + ":")
+        missing = []
         for i, q in enumerate(queries, 1):
-            print(f"  {i:>2}. {q}")
+            note = ""
+            if args.sources_dir:
+                path = sources_path_for(q, args.sources_dir)
+                if path.exists():
+                    note = f"  ← {path}"
+                else:
+                    note, _ = f"  ← THIẾU {path}", missing.append(q)
+            print(f"  {i:>2}. {q}{note}")
+        if missing:
+            print(f"\n⚠ {len(missing)}/{len(queries)} toà chưa có file nguồn — sẽ lỗi khi chạy thật.")
+        return
+
+    if not queries:
+        print(f"\n✓ Cả {total} toà nhà đã có CSV → {config.CSV_DIR}")
         return
 
     if config.OFFLINE:
@@ -264,24 +467,12 @@ def main() -> None:
     config.RAW_DIR.mkdir(parents=True, exist_ok=True)
     print(f"{len(queries)} toà nhà")
 
-    failed = []
-    for q in queries:
-        try:
-            process(q, args)
-        except anthropic.AuthenticationError:
-            sys.exit("\n✗ ANTHROPIC_API_KEY không hợp lệ (401) — dừng toàn bộ.\n"
-                     "  Đặt key hợp lệ rồi chạy lại:\n"
-                     "    export ANTHROPIC_API_KEY=sk-ant-...\n"
-                     f"  hoặc ghi vào {config.ROOT / '.env'}")
-        except anthropic.RateLimitError as e:
-            print(f"  ✗ {q}: chạm rate limit — {str(e)[:120]}")
-            failed.append(q)
-        except SystemExit as e:
-            print(f"  ✗ {q}: {e}")
-            failed.append(q)
-        except Exception:
-            traceback.print_exc()
-            failed.append(q)
+    failed, aborted = run_batches(queries, args)
+    if aborted:
+        sys.exit("\n✗ Xác thực không hợp lệ (401) — dừng toàn bộ.\n"
+                 "  Đặt key hợp lệ rồi chạy lại:\n"
+                 "    export ANTHROPIC_API_KEY=sk-ant-...\n"
+                 f"  hoặc ghi vào {config.ROOT / '.env'}")
     if failed:
         print(f"\n✗ {len(failed)}/{len(queries)} toà nhà lỗi: {', '.join(failed)}")
         sys.exit(1)
