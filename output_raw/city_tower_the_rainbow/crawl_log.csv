@@ -1,0 +1,4 @@
+idx,title,purpose,expected_content,url,slug,kind,status,http_status,chars,page_title,raw_file,text_file,shot_file,accessed_at,error
+1,nguồn 2,product_mix,người dùng tự cấp,https://suumo.jp/ms/shinchiku/tokyo/sc_minato/nc_67729384/,01_ngu_n_2,html,http_error,503,289,【SUUMO】 ページを表示できません。,pages/01_ngu_n_2.html,pages/01_ngu_n_2.txt,,2026-08-17T08:23:45+00:00,
+2,nguồn 3,official_overview,người dùng tự cấp,https://www.major7.net/Bukkendetail/00000010001259,02_ngu_n_3,html,ok,200,9554,CITY TOWER THE RAINBOW | マンション情報のメジャーセブン,pages/02_ngu_n_3.html,pages/02_ngu_n_3.txt,,2026-08-17T08:23:56+00:00,
+3,nguồn 4,price_primary,người dùng tự cấp,https://wangan-mansion.jp/property/139,03_ngu_n_4,html,ok,200,2284,CITY TOWER THE RAINBOW | 湾岸マンション価格ナビ,pages/03_ngu_n_4.html,pages/03_ngu_n_4.txt,,2026-08-17T08:24:39+00:00,

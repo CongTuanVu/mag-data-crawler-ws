@@ -1,0 +1,2816 @@
+{
+  "building": {
+    "records": [
+      {
+        "building_name_local": "グランドシティタワー月島",
+        "project_name": null,
+        "tower_codes": null,
+        "district": "Quận Chuo",
+        "address": "Tsukishima 3-chome số 3300 và các thửa khác, Quận Chuo, Tokyo",
+        "latitude": null,
+        "longitude": null,
+        "developer": "Sumitomo Realty & Development; Tokyo Tatemono; Daiwa House Industry; Shutoken Funen Kenchiku Kosha",
+        "brochure_url": null,
+        "building_type": "mixed_use",
+        "segment": null,
+        "status": null,
+        "year_launch": null,
+        "year_handover": 2027,
+        "num_towers": null,
+        "num_floors_above": 58,
+        "num_basements": 2,
+        "height_m": null,
+        "num_units_total": 1284,
+        "land_area_m2": 10076.42,
+        "gfa_m2": 144276.8,
+        "nfa_sale_m2": null,
+        "building_density_pct": null,
+        "green_area_pct": null,
+        "parking_ratio": null,
+        "handover_standard": "noi_that_lien_tuong",
+        "architect_firm": "Penta-Ocean Construction · Daiken Sekkei (liên danh đại diện thực hiện thiết kế)",
+        "architect_country": null,
+        "interior_designer": null,
+        "landscape_architect": null,
+        "architectural_style": null,
+        "design_concept": "Phát huy tài sản là khu phố ven nước; dù là toà nhà ở siêu cao tầng, phần chân đế vẫn kiến tạo khu phố hoà làm một với cộng đồng địa phương.",
+        "design_concept_keywords": [
+          "khu phố ven nước",
+          "toà nhà ở siêu cao tầng",
+          "kiến tạo khu phố hoà nhập cộng đồng"
+        ],
+        "massing_form": null,
+        "facade_material": null,
+        "facade_system": null,
+        "window_wall_ratio_pct": null,
+        "balcony_type": null,
+        "floor_to_ceiling_m": 2.6,
+        "signature_features": [
+          "Sảnh vào lớn thông tầng cao 2 lớp",
+          "Không gian sảnh nghỉ với nội thất thiết kế hiện đại",
+          "Hai vị trí sảnh đón xe (coach entrance)",
+          "Thiết kế hành lang trong nhà",
+          "Sảnh nghỉ trên cao (sky lounge) ở tầng 30 ngắm sông Sumida và trung tâm thành phố"
+        ],
+        "green_cert": null,
+        "green_cert_level": null,
+        "awards": null,
+        "orientation_note": "Tháp siêu cao tầng dựng bên bờ sông Sumida, vị trí ven sông thoáng đãng, tầm nhìn hướng ra khu trung tâm và phía vịnh.",
+        "provenance": [
+          {
+            "field": "building_name_local",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "物件名\nグランドシティタワー月島",
+            "confidence": "high"
+          },
+          {
+            "field": "district",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "所在地\n東京都中央区　月島三丁目3300番他（地番）",
+            "confidence": "high"
+          },
+          {
+            "field": "address",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "所在地\n東京都中央区月島三丁目3300番他（地番）",
+            "confidence": "medium"
+          },
+          {
+            "field": "developer",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "売主\n・住友不動産株式会社…・東京建物株式会社…・大和ハウス工業株式会社　東京本店…・一般財団法人　首都圏不燃建築公社",
+            "confidence": "high"
+          },
+          {
+            "field": "building_type",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "総戸数\n1,284戸（非分譲住戸339戸、その他住戸30戸（※１）含む）その他店舗21区画、保育所、デイサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "year_handover",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "入居（引渡）予定日\n2027年3月下旬",
+            "confidence": "high"
+          },
+          {
+            "field": "num_floors_above",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "構造・規模\n鉄筋コンクリート造、一部鉄骨造　 地上58階建　地下2階建",
+            "confidence": "high"
+          },
+          {
+            "field": "num_basements",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "鉄筋コンクリート造、一部鉄骨造　 地上58階建　地下2階建",
+            "confidence": "high"
+          },
+          {
+            "field": "num_units_total",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "総戸数\n1,284戸（非分譲住戸339戸、その他住戸30戸（※１）含む）…※管理規約上の取扱いは1,285戸",
+            "confidence": "high"
+          },
+          {
+            "field": "land_area_m2",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "敷地面積\n10,076.42m\n2",
+            "confidence": "high"
+          },
+          {
+            "field": "gfa_m2",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "建築延床面積\n144,276.80m\n2",
+            "confidence": "high"
+          },
+          {
+            "field": "handover_standard",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "キッチンの「生ゴミディスポーザー」「スライド式食器洗い乾燥機」「鳴海製陶製ガラストッププレート」「ステンレス製レンジフード」をはじめ、家事効率を高める設備も標準装備されています。",
+            "confidence": "medium"
+          },
+          {
+            "field": "architect_firm",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "設計\n五洋建設・大建設計特定業務代行共同体",
+            "confidence": "high"
+          },
+          {
+            "field": "design_concept",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "水辺の街という財産を活かし、超高層レジデンスでありながら、足元では地域と一体となる街づくりを行います。",
+            "confidence": "medium"
+          },
+          {
+            "field": "design_concept_keywords",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "水辺の街という財産を活かし、超高層レジデンスでありながら、足元では地域と一体となる街づくりを行います。",
+            "confidence": "medium"
+          },
+          {
+            "field": "floor_to_ceiling_m",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "さらにリビング・ダイニングの天井高は、一番高い部分で最大約2.6mを確保。",
+            "confidence": "medium"
+          },
+          {
+            "field": "signature_features",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "2層吹き抜けの「グランドエントランスホール」やモダンデザインの家具を設えた「ラウンジスペース」、2箇所の「コーチエントランス」、「内廊下」をはじめ、ホテルライクな共用空間も魅力的なタワーレジデンス。隅田川や都心の眺望が楽しめる30階の「スカイラウンジ」",
+            "confidence": "medium"
+          },
+          {
+            "field": "orientation_note",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "隅田川のほとりに建つ超高層タワー、開放的なリバーサイドというポジションにより、都心や湾岸方面を見晴らす眺望も魅力。",
+            "confidence": "medium"
+          }
+        ]
+      }
+    ],
+    "notes": "1) Mâu thuẫn số căn: trang chính thức CĐT ghi 総戸数 1,284戸 (gồm 339 căn không phân lô bán, 30 căn khác) nhưng theo quy chế quản lý là 1,285戸; SUUMO/Major7 quảng cáo '全1285邸'. Lấy 1.284 theo con số 総戸数 trên trang CĐT. 2) status để null: nguồn ghi '2026年5月7日完成済' (đã hoàn thành xây dựng) nhưng bàn giao dự kiến 2027年3月下旬 — không khớp chính xác enum §8.3 (chưa bàn giao nên không thể đặt da_ban_giao, cũng không còn dang_xay). 3) nfa_sale_m2 null: Major7 hiển thị '専有面積 10,076.42㎡' là lỗi hiển thị (con số này chính là 敷地面積), không dùng. 4) building_density_pct null: nguồn chỉ nêu 建ぺい率・容積率 80%／400%・80%／500% là giới hạn quy hoạch, không phải mật độ xây dựng thực tế; 建築面積 6,743.49m² và 敷地面積 10,076.42m² có sẵn nhưng không tự chia theo quy tắc không nội suy. 5) parking_ratio null: nguồn nêu 駐車場総台数 371台 (gồm 98 chỗ của thành viên tổ hợp tái phát triển, 2 chỗ người khuyết tật) — không tự chia cho tổng số căn. 6) floor_to_ceiling_m 2.6 là chiều cao trần LD tại điểm cao nhất của loại W-80Atr (nhà mẫu), không phải toàn toà. 7) balcony_type null: nguồn chỉ nêu 'バルコニー面積 8.94m²～17.99m²' và ghi chú một số phòng khách không có ban công, không nêu rõ logia/ban công nhô. 8) 間取り: trang CĐT và Major7 ghi 2LD・K～3LD・K (đang bán 17 căn), trong khi bài mô tả SUUMO nhắc '1LDK～3LDKの多彩なプラン' (toàn dự án) — ưu tiên nguồn chính thức, ghi nhận mâu thuẫn. 9) architect_country null vì nguồn không nêu quốc tịch đơn vị thiết kế. 10) Lưu ý ảnh hưởng tầm nhìn: phía Nam cách khoảng 70m có kế hoạch xây chung cư 48 tầng (nêu trong 01_ngu_n_2.txt)."
+  },
+  "unit_type": {
+    "records": [
+      {
+        "type_code": "S-55E",
+        "type_name": null,
+        "layout_class": "2pn_plus",
+        "bedrooms": 2,
+        "bathrooms": null,
+        "has_multipurpose_room": true,
+        "area_gross_m2": null,
+        "area_net_m2": 58.13,
+        "area_basis_reported": "thong_thuy",
+        "area_balcony_m2": null,
+        "num_units_of_type": null,
+        "share_of_total_pct": null,
+        "facing": null,
+        "view_type": null,
+        "is_corner": null,
+        "floorplan_url": null,
+        "provenance": [
+          {
+            "field": "type_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-55E\n2LDK+N(納戸)+WIC(ウォークインクロゼット)\n専有面積：\n58.13m\n2",
+            "confidence": "medium"
+          },
+          {
+            "field": "layout_class",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-55E\n2LDK+N(納戸)+WIC(ウォークインクロゼット)",
+            "confidence": "medium"
+          },
+          {
+            "field": "bedrooms",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-55E\n2LDK+N(納戸)+WIC(ウォークインクロゼット)",
+            "confidence": "medium"
+          },
+          {
+            "field": "has_multipurpose_room",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-55E\n2LDK+N(納戸)+WIC(ウォークインクロゼット)",
+            "confidence": "medium"
+          },
+          {
+            "field": "area_net_m2",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-55E ... 専有面積：\n58.13m\n2\n価格：\n1億5800万円",
+            "confidence": "medium"
+          },
+          {
+            "field": "area_basis_reported",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "専有面積：\n58.13m\n2",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "type_code": "S-70B",
+        "type_name": null,
+        "layout_class": "3pn",
+        "bedrooms": 3,
+        "bathrooms": null,
+        "has_multipurpose_room": true,
+        "area_gross_m2": null,
+        "area_net_m2": 73.52,
+        "area_basis_reported": "thong_thuy",
+        "area_balcony_m2": null,
+        "num_units_of_type": null,
+        "share_of_total_pct": null,
+        "facing": null,
+        "view_type": null,
+        "is_corner": null,
+        "floorplan_url": null,
+        "provenance": [
+          {
+            "field": "type_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-70B\n3LDK+N(納戸)+WIC(ウォークインクロゼット)+SIC(シューズインクロゼット)\n専有面積：\n73.52m\n2",
+            "confidence": "medium"
+          },
+          {
+            "field": "layout_class",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-70B\n3LDK+N(納戸)+WIC(ウォークインクロゼット)+SIC(シューズインクロゼット)",
+            "confidence": "medium"
+          },
+          {
+            "field": "bedrooms",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-70B\n3LDK+N(納戸)+WIC(ウォークインクロゼット)+SIC(シューズインクロゼット)",
+            "confidence": "medium"
+          },
+          {
+            "field": "has_multipurpose_room",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-70B\n3LDK+N(納戸)+WIC(ウォークインクロゼット)+SIC(シューズインクロゼット)",
+            "confidence": "medium"
+          },
+          {
+            "field": "area_net_m2",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-70B ... 専有面積：\n73.52m\n2\n価格：\n2億2500万円",
+            "confidence": "medium"
+          },
+          {
+            "field": "area_basis_reported",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "専有面積：\n73.52m\n2",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "type_code": "S-80Atr",
+        "type_name": null,
+        "layout_class": "3pn",
+        "bedrooms": 3,
+        "bathrooms": null,
+        "has_multipurpose_room": true,
+        "area_gross_m2": null,
+        "area_net_m2": 80.63,
+        "area_basis_reported": "thong_thuy",
+        "area_balcony_m2": null,
+        "num_units_of_type": null,
+        "share_of_total_pct": null,
+        "facing": null,
+        "view_type": null,
+        "is_corner": null,
+        "floorplan_url": null,
+        "provenance": [
+          {
+            "field": "type_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-80Atr\n3LDK+N(納戸)+2WIC(ウォークインクロゼット)+SIC(シューズインクロゼット)\n専有面積：\n80.63m\n2",
+            "confidence": "medium"
+          },
+          {
+            "field": "layout_class",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-80Atr\n3LDK+N(納戸)+2WIC(ウォークインクロゼット)+SIC(シューズインクロゼット)",
+            "confidence": "medium"
+          },
+          {
+            "field": "bedrooms",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-80Atr\n3LDK+N(納戸)+2WIC(ウォークインクロゼット)+SIC(シューズインクロゼット)",
+            "confidence": "medium"
+          },
+          {
+            "field": "has_multipurpose_room",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-80Atr\n3LDK+N(納戸)+2WIC(ウォークインクロゼット)+SIC(シューズインクロゼット)",
+            "confidence": "medium"
+          },
+          {
+            "field": "area_net_m2",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-80Atr ... 専有面積：\n80.63m\n2\n価格：\n2億2800万円",
+            "confidence": "medium"
+          },
+          {
+            "field": "area_basis_reported",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "専有面積：\n80.63m\n2",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "type_code": "W-80Atr",
+        "type_name": null,
+        "layout_class": "2pn",
+        "bedrooms": 2,
+        "bathrooms": null,
+        "has_multipurpose_room": false,
+        "area_gross_m2": null,
+        "area_net_m2": 83.74,
+        "area_basis_reported": "thong_thuy",
+        "area_balcony_m2": null,
+        "num_units_of_type": null,
+        "share_of_total_pct": null,
+        "facing": [
+          "Tây Nam"
+        ],
+        "view_type": [
+          "tầm nhìn trực diện lên bầu trời"
+        ],
+        "is_corner": true,
+        "floorplan_url": null,
+        "provenance": [
+          {
+            "field": "type_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "モデルルームの見どころポイント（W-80Atrタイプ(LD拡大プラン)）",
+            "confidence": "medium"
+          },
+          {
+            "field": "layout_class",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "間取り：2LDK＋2WIC\n／\n専有面積：83.74m\n2",
+            "confidence": "medium"
+          },
+          {
+            "field": "bedrooms",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "間取り：2LDK＋2WIC",
+            "confidence": "medium"
+          },
+          {
+            "field": "has_multipurpose_room",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "間取り：2LDK＋2WIC\n※WIC＝ウォークインクロゼット",
+            "confidence": "medium"
+          },
+          {
+            "field": "area_net_m2",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "専有面積：83.74m\n2\n※専有面積には専有トランクルーム面積1.39m\n2\nを含みます。",
+            "confidence": "medium"
+          },
+          {
+            "field": "area_basis_reported",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "専有面積：83.74m\n2",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_corner",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "モデルルームのW-80Atrタイプは、地上31階以上の上層階角住戸。",
+            "confidence": "medium"
+          },
+          {
+            "field": "facing",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "建物南西コーナーにあたるリビング・ダイニングには、足元近くから立ち上がる「ダイナミックパノラマウインドウ」も採用。",
+            "confidence": "medium"
+          },
+          {
+            "field": "view_type",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "視界がひときわワイドに広がるダイナミックな眺望（ダイレクトスカイビュー）を座ったままでも楽しむことができます。",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "type_code": "N-75A",
+        "type_name": null,
+        "layout_class": null,
+        "bedrooms": null,
+        "bathrooms": null,
+        "has_multipurpose_room": null,
+        "area_gross_m2": null,
+        "area_net_m2": null,
+        "area_basis_reported": null,
+        "area_balcony_m2": null,
+        "num_units_of_type": null,
+        "share_of_total_pct": null,
+        "facing": null,
+        "view_type": null,
+        "is_corner": null,
+        "floorplan_url": null,
+        "provenance": [
+          {
+            "field": "type_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "※掲載の室内写真は、モデルルーム（N-75Aタイプ）を撮影（2023年4月）したもので、家具・調度品等オプション仕様は販売価格に含まれておりません。",
+            "confidence": "medium"
+          }
+        ]
+      }
+    ],
+    "notes": "1) Cơ sở diện tích: nguồn công bố 専有面積 → area_basis_reported = thong_thuy, ghi vào area_net_m2; nguồn KHÔNG nêu 壁芯面積 nên area_gross_m2 = null (không tự quy đổi). 2) Hậu tố +N (納戸 — phòng kho/không đủ điều kiện gọi là phòng ngủ) được xử lý tương đương サービスルーム: has_multipurpose_room = true; với 2LDK+N → 2pn_plus. Với 3LDK+N, enum §8.5 không có mã 3pn_plus nên giữ layout_class = 3pn và chỉ đánh dấu has_multipurpose_room = true. 3) W-80Atr: 専有面積 83.74 m² đã bao gồm 1.39 m² kho riêng (専有トランクルーム); đây là căn góc tầng cao từ tầng 31 trở lên, góc Tây Nam của toà, phương án 'LD mở rộng'. 4) Các trường bathrooms, area_balcony_m2 theo từng loại căn, num_units_of_type, share_of_total_pct, floorplan_url: nguồn không nêu → null. Diện tích ban công chỉ công bố ở dạng dải toàn dự án (8.94–17.99 m²) nên không gán cho loại căn cụ thể. 5) N-75A: mã loại căn xuất hiện trong ghi chú ảnh nhà mẫu nhưng nguồn không nêu mặt bằng/diện tích → mọi trường khác để null. 6) Mâu thuẫn nguồn: phần mô tả trên SUUMO viết '1LDK～3LDKの多彩なプラン' trong khi mục 間取り chính thức của cả trang CĐT (01) và SUUMO (02) đều ghi 2LD・K～3LD・K cho đợt bán hiện tại; lấy theo mục thông tin chính thức. 7) Trang chính thức CĐT (01) và Major7 (03) chỉ công bố dải 58.13–83.68 m² cho toàn đợt bán, không tách theo loại căn."
+  },
+  "floor_plate": {
+    "records": [],
+    "notes": "Corpus (01_ngu_n_2.txt trang chính thức Sumitomo Realty & Development, 02_ngu_n_3.txt SUUMO, 03_ngu_n_4.txt Major7) không có bất kỳ mặt bằng tầng dạng text nào: không nêu số căn trên 1 sàn (units_per_floor), không nêu dải tầng điển hình, không nêu cơ cấu loại căn trên một sàn, không nêu diện tích sàn từng tầng, số thang máy/thang bộ hay vị trí lõi. Chỉ có thông tin cấp toà (58 tầng nổi, 2 tầng hầm, tổng 1.284/1.285 căn, diện tích khu đất 10.076,42 m², diện tích xây dựng 6.743,49 m², tổng diện tích sàn 144.276,80 m²) — thuộc B1, không đủ để suy ra B4. Theo quy tắc cấm chia đều num_units_total/num_floors và cấm suy số từ ảnh phối cảnh (mục 各階概念図 chỉ là ảnh), trả về records rỗng. Lưu ý: 02_ngu_n_3.txt có nhắc 'テレワークラウンジ', 'スカイラウンジ' ở tầng 30 và 'つきしまFARM' ở sân thượng tầng 3 — dữ liệu tiện ích thuộc B6, không phải B4."
+  },
+  "handover_item": {
+    "records": [
+      {
+        "applies_to_type_code": null,
+        "item_code": "san_hanh_lang_trong_can",
+        "item_category": "san",
+        "item_name": "Sàn hành lang trong căn hộ",
+        "item_spec": "Lát gạch (quy cách tiêu chuẩn); hành lang thiết kế bẻ góc tăng tính riêng tư",
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "廊下の床は美しい「タイル貼り」（標準仕様）。クランクした廊下設計により、住戸のプライバシー性も高めれています",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "廊下の床は美しい「タイル貼り」（標準仕様）。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "廊下の床は美しい「タイル貼り」（標準仕様）。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "廊下の床は美しい「タイル貼り」（標準仕様）。クランクした廊下設計により、住戸のプライバシー性も高めれています",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "廊下の床は美しい「タイル貼り」（標準仕様）。",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "san_powder_room_wc",
+        "item_category": "san",
+        "item_name": "Sàn phòng thay đồ (powder room) và WC",
+        "item_spec": "Lát gạch, tạo cảm giác cao cấp",
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "カウンタートップに天然石を採用したシステムキッチン・洗面化粧台、床タイル貼りの廊下・パウダールーム・トイレなど、高級感漂う仕様により、優雅なタワーライフを演出。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "床タイル貼りの廊下・パウダールーム・トイレなど、高級感漂う仕様",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "床タイル貼りの廊下・パウダールーム・トイレなど、高級感漂う仕様",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "床タイル貼りの廊下・パウダールーム・トイレなど、高級感漂う仕様により、優雅なタワーライフを演出。",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "カウンタートップに天然石を採用したシステムキッチン・洗面化粧台、床タイル貼りの廊下・パウダールーム・トイレなど、高級感漂う仕様",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "mat_ban_bep_da_tu_nhien",
+        "item_category": "bep",
+        "item_name": "Mặt bàn bếp đá tự nhiên",
+        "item_spec": "Mặt bàn đá tự nhiên sang trọng, quầy bếp đối diện dạng phẳng có chiều sâu rộng",
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "キッチンには、高級感あふれる「天然石カウンタートップ」、ワイドな奥行きがある「フラットな対面カウンター」を採用。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "キッチンには、高級感あふれる「天然石カウンタートップ」…を採用。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "キッチンには、高級感あふれる「天然石カウンタートップ」",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "キッチンには、高級感あふれる「天然石カウンタートップ」、ワイドな奥行きがある「フラットな対面カウンター」を採用。",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "カウンタートップに天然石を採用したシステムキッチン・洗面化粧台…高級感漂う仕様",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "may_nghien_rac_thuc_pham",
+        "item_category": "bep",
+        "item_name": "Máy nghiền rác thực phẩm",
+        "item_spec": "Nghiền nhanh rác thực phẩm ngay tại bếp; rác đã nghiền được xử lý làm sạch qua thiết bị xử lý nước thải chuyên dụng trước khi xả, giảm tác động môi trường",
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": "Một số loại rác không xử lý được",
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「生ゴミディスポーザー」「スライド式食器洗い乾燥機」なども標準装備",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "キッチンの「生ゴミディスポーザー」…をはじめ、家事効率を高める設備も標準装備されています。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "【生ゴミディスポーザー】 生ゴミを、キッチンですばやく粉砕処理できるシステムです。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "【生ゴミディスポーザー】 生ゴミを、キッチンですばやく粉砕処理できるシステムです。各住戸のディスポーザーで破砕された生ゴミは専用の排水処理装置で浄化してから、排水するので、環境への負荷も軽減することができます。",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「生ゴミディスポーザー」「スライド式食器洗い乾燥機」なども標準装備",
+            "confidence": "medium"
+          },
+          {
+            "field": "note",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "※一部処理できないものもあります。",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "may_rua_say_bat",
+        "item_category": "bep",
+        "item_name": "Máy rửa & sấy bát kiểu trượt",
+        "item_spec": "Rửa bát hiệu quả, tiết kiệm nước; kiểu ngăn kéo trượt nên dễ lấy và xếp bát đĩa ở tư thế thoải mái",
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「生ゴミディスポーザー」「スライド式食器洗い乾燥機」なども標準装備",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "キッチンの…「スライド式食器洗い乾燥機」…をはじめ、家事効率を高める設備も標準装備されています。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "【スライド式食器洗い乾燥機】",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "【スライド式食器洗い乾燥機】 手間をかけず、効率よく食器類が洗浄でき、節水効果にも優れた食器洗い乾燥機をご用意しました。スライド式なので、楽な姿勢で食器の出し入れができます。",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「生ゴミディスポーザー」「スライド式食器洗い乾燥機」なども標準装備",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "bep_am_mat_kinh",
+        "item_category": "bep",
+        "item_name": "Bếp âm mặt kính",
+        "item_spec": "Bếp âm dạng mặt kính, núm xoay điều chỉnh lửa thu gọn phẳng ở mặt trước; tất cả các mắt bếp có cảm biến nhiệt độ, tự động tắt khi rung chấn từ khoảng cấp độ 4; kèm lò nướng nướng hai mặt",
+        "brand": "Narumi",
+        "brand_origin": null,
+        "is_included": true,
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「鳴海製陶製ガラストッププレート」",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "キッチンの…「鳴海製陶製ガラストッププレート」…をはじめ、家事効率を高める設備も標準装備されています。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "【ガラストップコンロ】",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "【ガラストップコンロ】 ダイヤル式の調節ボタンで火力を自由にコントロール。ボタンをコンロ前面にフラットに収納できるシャープなデザイン。全バーナーに温度センサーを搭載し、震度約4以上の揺れで自動消火。安心・便利機能が充実の両面焼きグリル付きビルトインコンロを採用しました。",
+            "confidence": "medium"
+          },
+          {
+            "field": "brand",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「鳴海製陶製ガラストッププレート」",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "キッチンの「生ゴミディスポーザー」「スライド式食器洗い乾燥機」「鳴海製陶製ガラストッププレート」「ステンレス製レンジフード」をはじめ、家事効率を高める設備も標準装備されています。",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "may_hut_mui_inox",
+        "item_category": "bep",
+        "item_name": "Máy hút mùi bằng thép không gỉ",
+        "item_spec": null,
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「ステンレス製レンジフード」",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "キッチンの…「ステンレス製レンジフード」をはじめ、家事効率を高める設備も標準装備されています。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「ステンレス製レンジフード」",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "キッチンの「生ゴミディスポーザー」「スライド式食器洗い乾燥機」「鳴海製陶製ガラストッププレート」「ステンレス製レンジフード」をはじめ、家事効率を高める設備も標準装備されています。",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "voi_bep_tich_hop_loc_nuoc",
+        "item_category": "bep",
+        "item_name": "Vòi sen bếp âm bàn tích hợp lọc nước",
+        "item_spec": "Hai cần gạt (đóng/mở – điều chỉnh nước nóng lạnh và cần nước lọc), hai chế độ tia bọt và tia phun sương, nước lọc cũng chảy được như nước thường; lõi lọc dung tích lớn lắp dưới chậu nên dùng được lâu hơn loại gắn trong vòi; đầu sen rút ra được, tiện vệ sinh chậu rửa",
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": "Chi phí thay lõi lọc do khách hàng tự chi trả",
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "【ビルトインタイプ複合シャワー水栓】",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "【ビルトインタイプ複合シャワー水栓】…シャワーヘッドを引き出せるので、シンクの掃除などにも便利です。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "【ビルトインタイプ複合シャワー水栓】",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "【ビルトインタイプ複合シャワー水栓】 湯水の開閉・調整レバーと浄水開閉レバーのダブルレバー操作で泡沫吐水とスプレーシャワーの2パターン吐水ができ浄水も原水と同様に吐水できます。アンダーシンクタイプの大容量浄水カートリッジでスパウトインタイプに比べたっぷり長期間浄水が使用できます。",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "室内空間のポイント…【ビルトインタイプ複合シャワー水栓】",
+            "confidence": "medium"
+          },
+          {
+            "field": "note",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "※カートリッジ交換費用は別途お客様のご負担となります。",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "ban_rua_mat_guong_ba_mat",
+        "item_category": "thiet_bi_ve_sinh",
+        "item_name": "Bàn rửa mặt gương ba mặt",
+        "item_spec": "Gương có nẹp viền khung, hạn chế bám vân tay khi đóng mở; mặt bàn đá tự nhiên; vòi một cần gạt có đầu sen rút ra được",
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「三面鏡洗面化粧台」",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "鏡の縁に框を配し、開閉時に指紋が付きづらい「三面鏡洗面化粧台」…を採用",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「三面鏡洗面化粧台」",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "鏡の縁に框を配し、開閉時に指紋が付きづらい「三面鏡洗面化粧台」、美しい「天然石カウンタートップ」、ヘッドが引き出せる「シングルレバー水栓」を採用",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "カウンタートップに天然石を採用したシステムキッチン・洗面化粧台、床タイル貼りの廊下・パウダールーム・トイレなど、高級感漂う仕様",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "may_suoi_say_phong_tam_tes",
+        "item_category": "dieu_hoa_thong_gio",
+        "item_name": "Máy sưởi – sấy phòng tắm kiểu TES kèm xông hơi sương",
+        "item_spec": "Kèm chức năng xông hơi dạng sương ở nhiệt độ thấp, độ ẩm cao, không gây ngột ngạt",
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「ミストサウナ」付きの「TES式浴室暖房乾燥機」",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "バスルームには…「TES式浴室暖房乾燥機」…など、快適な設備を装備",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「ミストサウナ」付きの「TES式浴室暖房乾燥機」",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "バスルームには、低温・高湿度で息苦しくなくリラックスできる「ミストサウナ」付きの「TES式浴室暖房乾燥機」",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「TES給湯暖房システム」「エコジョーズ」「節湯水栓」「ミストサウナ」「保温浴槽」「節水シャワーヘッド」「エコガラス」等も採用し",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "bon_tam_giu_nhiet",
+        "item_category": "thiet_bi_ve_sinh",
+        "item_name": "Bồn tắm giữ nhiệt",
+        "item_spec": "Vật liệu mới gốc kính hữu cơ, bề mặt nhẵn mịn chống bám bẩn",
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「保温浴槽」",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "バスルームには…「保温浴槽」、滑らかな表面で汚れをはじく「有機ガラス系新素材」など、快適な設備を装備",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「保温浴槽」",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「保温浴槽」、滑らかな表面で汚れをはじく「有機ガラス系新素材」など、快適な設備を装備",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「TES給湯暖房システム」「エコジョーズ」「節湯水栓」「ミストサウナ」「保温浴槽」「節水シャワーヘッド」「エコガラス」等も採用し",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "he_thong_nuoc_nong_suoi_tes",
+        "item_category": "dieu_hoa_thong_gio",
+        "item_name": "Hệ thống cấp nước nóng và sưởi TES",
+        "item_spec": null,
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": "Thuộc nhóm thiết bị tiết kiệm năng lượng được áp dụng cho căn hộ",
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「TES給湯暖房システム」",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「TES給湯暖房システム」「エコジョーズ」…等も採用し、省エネに配慮した快適な暮らしをサポートします。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「TES給湯暖房システム」",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「TES給湯暖房システム」「エコジョーズ」「節湯水栓」「ミストサウナ」「保温浴槽」「節水シャワーヘッド」「エコガラス」等も採用し",
+            "confidence": "medium"
+          },
+          {
+            "field": "note",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "等も採用し、省エネに配慮した快適な暮らしをサポートします。",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "thiet_bi_dun_nuoc_nong_gas_tiet_kiem",
+        "item_category": "dieu_hoa_thong_gio",
+        "item_name": "Thiết bị đun nước nóng gas hiệu suất cao tiết kiệm năng lượng",
+        "item_spec": null,
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「エコジョーズ」",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「TES給湯暖房システム」「エコジョーズ」…等も採用し、省エネに配慮した快適な暮らしをサポートします。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「エコジョーズ」",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「TES給湯暖房システム」「エコジョーズ」「節湯水栓」「ミストサウナ」「保温浴槽」「節水シャワーヘッド」「エコガラス」等も採用し",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "voi_tiet_kiem_nuoc",
+        "item_category": "thiet_bi_ve_sinh",
+        "item_name": "Vòi nước tiết kiệm nước nóng",
+        "item_spec": null,
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「節湯水栓」",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「節湯水栓」…等も採用し、省エネに配慮した快適な暮らしをサポートします。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「節湯水栓」",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「TES給湯暖房システム」「エコジョーズ」「節湯水栓」「ミストサウナ」「保温浴槽」「節水シャワーヘッド」「エコガラス」等も採用し",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "sen_tiet_kiem_nuoc",
+        "item_category": "thiet_bi_ve_sinh",
+        "item_name": "Đầu sen tắm tiết kiệm nước",
+        "item_spec": null,
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「節水シャワーヘッド」",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「節水シャワーヘッド」…等も採用し、省エネに配慮した快適な暮らしをサポートします。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「節水シャワーヘッド」",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「TES給湯暖房システム」「エコジョーズ」「節湯水栓」「ミストサウナ」「保温浴槽」「節水シャワーヘッド」「エコガラス」等も採用し",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "kinh_tiet_kiem_nang_luong",
+        "item_category": "cua",
+        "item_name": "Kính tiết kiệm năng lượng",
+        "item_spec": null,
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「エコガラス」",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「エコガラス」等も採用し、省エネに配慮した快適な暮らしをサポートします。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「エコガラス」",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「TES給湯暖房システム」「エコジョーズ」「節湯水栓」「ミストサウナ」「保温浴槽」「節水シャワーヘッド」「エコガラス」等も採用し",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": "W-80Atr",
+        "item_code": "dieu_hoa_am_tran_cassette",
+        "item_category": "dieu_hoa_thong_gio",
+        "item_name": "Điều hoà âm trần kiểu cassette",
+        "item_spec": "Loại lắp âm trần, giúp khu vực cạnh cửa sổ gọn gàng",
+        "brand": null,
+        "brand_origin": null,
+        "is_included": null,
+        "note": "Mô tả trong phần giới thiệu căn mẫu loại W-80Atr (bản mở rộng phòng khách); nguồn không nêu rõ thuộc gói bàn giao chuẩn hay tuỳ chọn",
+        "provenance": [
+          {
+            "field": "applies_to_type_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "モデルルームの見どころポイント（W-80Atrタイプ(LD拡大プラン)）",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "埋込型の「天井カセット型エアコン」を装備され",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "埋込型の「天井カセット型エアコン」を装備され、窓辺をすっきり使うことができます",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「天井カセット型エアコン」",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "リビング・ダイニングとキッチンを合わせると約23.2畳の大空間に。埋込型の「天井カセット型エアコン」を装備され、窓辺をすっきり使うことができます",
+            "confidence": "medium"
+          },
+          {
+            "field": "note",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "※掲載の写真はモデルルーム（W-80Atrタイプ(LD拡大プラン)）を撮影したもので、家具・調度品等オプション仕様は販売価格に含まれておりません。",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": "W-80Atr",
+        "item_code": "cua_so_panorama",
+        "item_category": "cua",
+        "item_name": "Cửa sổ panorama toàn cảnh",
+        "item_spec": "Khung kính vươn lên từ sát chân tường, phòng khách – ăn ở góc Tây Nam không có ban công phía ngoài nên tạo cảm giác hoà vào bầu trời và tầm nhìn mở rộng theo chiều ngang",
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": "Áp dụng cho căn mẫu loại W-80Atr (căn góc từ tầng 31 trở lên)",
+        "provenance": [
+          {
+            "field": "applies_to_type_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "モデルルームのW-80Atrタイプは、地上31階以上の上層階角住戸。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「ダイナミックパノラマウインドウ」も採用。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "足元近くから立ち上がる「ダイナミックパノラマウインドウ」も採用。",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「ダイナミックパノラマウインドウ」",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "建物南西コーナーにあたるリビング・ダイニングには、足元近くから立ち上がる「ダイナミックパノラマウインドウ」も採用。部屋の外にバルコニーがないため、空との一体感をもたらす圧倒的な開放感と、視界がひときわワイドに広がるダイナミックな眺望（ダイレクトスカイビュー）を座ったままでも楽しむことができます。",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「ダイナミックパノラマウインドウ」を採用したリビング・ダイニング。",
+            "confidence": "medium"
+          },
+          {
+            "field": "note",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "モデルルームのW-80Atrタイプは、地上31階以上の上層階角住戸。LD拡大プランにより、約20畳の広々としたリビング・ダイニングが実現しています。",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "san_suoi",
+        "item_category": "dieu_hoa_thong_gio",
+        "item_name": "Sàn sưởi",
+        "item_spec": null,
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": "Liệt kê trong danh mục đặc điểm thiết bị của dự án",
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "この物件のこだわり … 床暖房 食器洗い乾燥機 ディスポーザー 浴室乾燥機",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "床暖房",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "床暖房",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "この物件のこだわり … 床暖房 食器洗い乾燥機 ディスポーザー 浴室乾燥機 ブロードバンド",
+            "confidence": "medium"
+          },
+          {
+            "field": "note",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "この物件のこだわり",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "internet_bang_thong_rong",
+        "item_category": "thiet_bi_dien",
+        "item_name": "Hạ tầng internet băng thông rộng",
+        "item_spec": null,
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "ブロードバンド",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "この物件のこだわり … ブロードバンド ペット飼育可",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "ブロードバンド",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "この物件のこだわり … 浴室乾燥機 ブロードバンド ペット飼育可",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "camera_an_ninh",
+        "item_category": "an_ninh_pccc",
+        "item_name": "Camera giám sát an ninh",
+        "item_spec": null,
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": null,
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "防犯カメラ",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "この物件のこだわり … ごみ出し24時間OK 防犯カメラ",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "防犯カメラ",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_included",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "この物件のこだわり … キッズルーム ごみ出し24時間OK 防犯カメラ",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": null,
+        "item_code": "sanh_can_ho_tu_giay_lon",
+        "item_category": "cua",
+        "item_name": "Sảnh căn hộ có tủ giày dung tích lớn",
+        "item_spec": "Sảnh vào đủ chiều sâu để đưa xe đẩy trẻ em (còn cả bé ngồi trên xe) vào trong; tủ giày cao gần trần, phần dưới dùng cất giày đi hằng ngày",
+        "brand": null,
+        "brand_origin": null,
+        "is_included": true,
+        "note": "Mô tả tại căn mẫu; nguồn không nêu mã loại căn cụ thể cho hạng mục này",
+        "provenance": [
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "玄関には、子どもを乗せたままベビーカーを乗り入れられる奥行きを確保。",
+            "confidence": "low"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "玄関には…天井近くの高さがある大容量の下足入の下部には、普段使いの靴が収められます",
+            "confidence": "low"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "大容量の下足入",
+            "confidence": "low"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "玄関には、子どもを乗せたままベビーカーを乗り入れられる奥行きを確保。天井近くの高さがある大容量の下足入の下部には、普段使いの靴が収められます",
+            "confidence": "low"
+          },
+          {
+            "field": "is_included",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "【機能美にあふれた室内空間。家事の負担を軽減する先進設備も標準装備】",
+            "confidence": "low"
+          },
+          {
+            "field": "note",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "※掲載の室内写真は、モデルルーム（N-75Aタイプ）を撮影（2023年4月）したもので、家具・調度品等オプション仕様は販売価格に含まれておりません。",
+            "confidence": "low"
+          }
+        ]
+      }
+    ],
+    "notes": "Corpus không có mục \"tiêu chuẩn bàn giao/仕様一覧\" riêng; các hạng mục được trích từ phần mô tả \"室内の特徴\"/\"室内空間のポイント\" trên SUUMO (02_ngu_n_3.txt) — nơi ghi rõ 標準仕様/標準装備/採用 — nên is_included = true, confidence medium (nguồn bên thứ ba). Trang chính thức của chủ đầu tư (01_ngu_n_2.txt) chỉ nêu thông tin pháp lý/quy mô, không liệt kê thiết bị bàn giao. Danh mục \"この物件のこだわり\" trên Major Seven (03_ngu_n_4.txt) chỉ là danh sách từ khoá thiết bị, không có quy cách → item_spec = null. Điều hoà âm trần cassette: nguồn chỉ mô tả tại căn mẫu W-80Atr và có ghi chú \"家具・調度品等オプション仕様は販売価格に含まれておりません\" nên không xác định được thuộc gói chuẩn → is_included = null. Không có thông tin thương hiệu/xuất xứ cho hầu hết hạng mục (chỉ có Narumi cho mặt bếp kính) → để null, không suy đoán. 浴室乾燥機 và 食器洗い乾燥機/ディスポーザー ở 03 trùng với hạng mục đã trích từ 02 nên không tạo dòng lặp."
+  },
+  "amenity": {
+    "records": [
+      {
+        "slug": "grand_entrance_hall",
+        "amenity_category": "dich_vu_le_tan",
+        "amenity_name": "Sảnh vào chính thông tầng hai lớp",
+        "amenity_name_local": "グランドエントランスホール",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": true,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": true,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "2層吹き抜けの「グランドエントランスホール」やモダンデザインの家具を設えた「ラウンジスペース」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "2層吹き抜けの「グランドエントランスホール」やモダンデザインの家具を設えた「ラウンジスペース」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "2層吹き抜けの「グランドエントランスホール」やモダンデザインの家具を設えた「ラウンジスペース」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "2層吹き抜けの「グランドエントランスホール」",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_indoor",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "2層吹き抜けの「グランドエントランスホール」…ホテルライクな共用空間も魅力的なタワーレジデンス。",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "2層吹き抜けの「グランドエントランスホール」…ホテルライクな共用空間も魅力的なタワーレジデンス。",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "slug": "lounge_space",
+        "amenity_category": "cong_dong_su_kien",
+        "amenity_name": "Khu sảnh nghỉ bố trí nội thất thiết kế hiện đại",
+        "amenity_name_local": "ラウンジスペース",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": true,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": false,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "モダンデザインの家具を設えた「ラウンジスペース」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "モダンデザインの家具を設えた「ラウンジスペース」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "モダンデザインの家具を設えた「ラウンジスペース」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "モダンデザインの家具を設えた「ラウンジスペース」",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_indoor",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "モダンデザインの家具を設えた「ラウンジスペース」…ホテルライクな共用空間も魅力的なタワーレジデンス。",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "モダンデザインの家具を設えた「ラウンジスペース」",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "slug": "coach_entrance",
+        "amenity_category": "dich_vu_le_tan",
+        "amenity_name": "Lối đón trả khách bằng ô tô (2 vị trí)",
+        "amenity_name_local": "コーチエントランス",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": null,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": false,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "2箇所の「コーチエントランス」、「内廊下」をはじめ、ホテルライクな共用空間も魅力的なタワーレジデンス。",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "2箇所の「コーチエントランス」、「内廊下」をはじめ、ホテルライクな共用空間も魅力的なタワーレジデンス。",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "2箇所の「コーチエントランス」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "2箇所の「コーチエントランス」",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "2箇所の「コーチエントランス」",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "slug": "sky_lounge",
+        "amenity_category": "cong_dong_su_kien",
+        "amenity_name": "Sảnh nghỉ trên cao ngắm cảnh",
+        "amenity_name_local": "スカイラウンジ",
+        "location": "tang_trung",
+        "floor_level": "30",
+        "area_m2": null,
+        "is_indoor": true,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": true,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "隅田川や都心の眺望が楽しめる30階の「スカイラウンジ」と「パーティルーム」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "隅田川や都心の眺望が楽しめる30階の「スカイラウンジ」と「パーティルーム」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "隅田川や都心の眺望が楽しめる30階の「スカイラウンジ」と「パーティルーム」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "30階の「スカイラウンジ」",
+            "confidence": "medium"
+          },
+          {
+            "field": "location",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "地上30階のスカイラウンジから家庭菜園まで、大規模物件ならではの多彩な共用施設",
+            "confidence": "medium"
+          },
+          {
+            "field": "floor_level",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "地上30階のスカイラウンジから家庭菜園まで、大規模物件ならではの多彩な共用施設",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_indoor",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "スカイラウンジ完成予想図（現地30階相当より北方向を撮影した写真（2022年6月撮影）に計画段階の図面を基に描き起こしたもので、実際とは多少異なります）",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "地上30階のスカイラウンジから家庭菜園まで、大規模物件ならではの多彩な共用施設",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "slug": "party_room",
+        "amenity_category": "cong_dong_su_kien",
+        "amenity_name": "Phòng tiệc",
+        "amenity_name_local": "パーティルーム",
+        "location": "tang_trung",
+        "floor_level": "30",
+        "area_m2": null,
+        "is_indoor": true,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": true,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "隅田川や都心の眺望が楽しめる30階の「スカイラウンジ」と「パーティルーム」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "隅田川や都心の眺望が楽しめる30階の「スカイラウンジ」と「パーティルーム」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "隅田川や都心の眺望が楽しめる30階の「スカイラウンジ」と「パーティルーム」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "30階の「スカイラウンジ」と「パーティルーム」",
+            "confidence": "medium"
+          },
+          {
+            "field": "location",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "隅田川や都心の眺望が楽しめる30階の「スカイラウンジ」と「パーティルーム」",
+            "confidence": "medium"
+          },
+          {
+            "field": "floor_level",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "隅田川や都心の眺望が楽しめる30階の「スカイラウンジ」と「パーティルーム」",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_indoor",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "【パーティルーム完成予想図】",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "隅田川や都心の眺望が楽しめる30階の「スカイラウンジ」と「パーティルーム」",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "slug": "telework_lounge",
+        "amenity_category": "khong_gian_lam_viec",
+        "amenity_name": "Sảnh làm việc từ xa",
+        "amenity_name_local": "テレワークラウンジ",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": true,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": true,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "サードプレイスとして活用できる「テレワークラウンジ」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "サードプレイスとして活用できる「テレワークラウンジ」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "サードプレイスとして活用できる「テレワークラウンジ」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "サードプレイスとして活用できる「テレワークラウンジ」",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_indoor",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "テレワークラウンジ完成予想図（計画段階の図面を基に描き起こしたものに人物等をCG合成したもので、実際とは多少異なります）",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "サードプレイスとして活用できる「テレワークラウンジ」",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "slug": "kids_room",
+        "amenity_category": "tre_em",
+        "amenity_name": "Phòng vui chơi trẻ em (kiêm phòng họp cư dân)",
+        "amenity_name_local": "キッズルーム（集会室）",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": true,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": true,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "天候を気にせず安心して遊ばせられる「キッズルーム（集会室）」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "天候を気にせず安心して遊ばせられる「キッズルーム（集会室）」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "天候を気にせず安心して遊ばせられる「キッズルーム（集会室）」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "「キッズルーム（集会室）」",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_indoor",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "天候を気にせず安心して遊ばせられる「キッズルーム（集会室）」",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "天候を気にせず安心して遊ばせられる「キッズルーム（集会室）」",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "slug": "tsukishima_farm",
+        "amenity_category": "canh_quan_vuon",
+        "amenity_name": "Vườn rau gia đình trên mái Tsukishima FARM",
+        "amenity_name_local": "つきしまFARM",
+        "location": "ngoai_troi",
+        "floor_level": "mái tầng 3",
+        "area_m2": null,
+        "is_indoor": false,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": true,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "3階屋上の家庭菜園「つきしまFARM」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "3階屋上の家庭菜園「つきしまFARM」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "3階屋上の家庭菜園「つきしまFARM」",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "3階屋上の家庭菜園「つきしまFARM」",
+            "confidence": "medium"
+          },
+          {
+            "field": "location",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "3階屋上の家庭菜園「つきしまFARM」",
+            "confidence": "medium"
+          },
+          {
+            "field": "floor_level",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "3階屋上の家庭菜園「つきしまFARM」",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_indoor",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "3階屋上の家庭菜園「つきしまFARM」",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "地上30階のスカイラウンジから家庭菜園まで、大規模物件ならではの多彩な共用施設",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "slug": "guest_room",
+        "amenity_category": "cong_dong_su_kien",
+        "amenity_name": "Phòng lưu trú cho khách (2 phòng: kiểu Nhật và kiểu Tây)",
+        "amenity_name_local": "ゲストルーム",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": true,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": true,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "和・洋2室の「ゲストルーム」など多彩な共用施設（※3）も用意され",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "和・洋2室の「ゲストルーム」など多彩な共用施設（※3）も用意され",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "和・洋2室の「ゲストルーム」など多彩な共用施設（※3）も用意され",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "和・洋2室の「ゲストルーム」",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_indoor",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "ゲストルーム1完成予想図（計画段階の図面を基に描き起こしたもので、実際とは多少異なります）",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "和・洋2室の「ゲストルーム」など多彩な共用施設（※3）も用意され",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "slug": "forest_park",
+        "amenity_category": "canh_quan_vuon",
+        "amenity_name": "Công viên cây xanh nội khu",
+        "amenity_name_local": "フォレストパーク",
+        "location": "ngoai_troi",
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": false,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": true,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "フォレストパーク完成予想図（計画段階の図面を基に描き起こしたものに人物等をCG合成したもので、実際とは多少異なります。また、一部敷地外の道路等を合わせて着彩しています）",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "フォレストパーク完成予想図（計画段階の図面を基に描き起こしたものに人物等をCG合成したもので、実際とは多少異なります）",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "フォレストパーク完成予想図（計画段階の図面を基に描き起こしたものに人物等をCG合成したもので、実際とは多少異なります）",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "フォレストパーク完成予想図",
+            "confidence": "medium"
+          },
+          {
+            "field": "location",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "フォレストパーク完成予想図（…また、一部敷地外の道路等を合わせて着彩しています）",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_indoor",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "フォレストパーク完成予想図（…また、一部敷地外の道路等を合わせて着彩しています）",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "フォレストパーク完成予想図",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "slug": "car_parking",
+        "amenity_category": "do_xe",
+        "amenity_name": "Bãi đỗ ô tô (371 chỗ, gồm 98 chỗ của thành viên tổ hợp tái phát triển và 2 chỗ cho người khuyết tật)",
+        "amenity_name_local": "駐車場",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": null,
+        "is_resident_free": false,
+        "operator_brand": null,
+        "is_highlight": false,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "駐車場総台数\n371台（本再開発組合員分98台、身障者用2台含む）",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "駐車場総台数\n371台（本再開発組合員分98台、身障者用2台含む）",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "駐車場総台数\n371台（本再開発組合員分98台、身障者用2台含む）",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "駐車場総台数\n371台",
+            "confidence": "high"
+          },
+          {
+            "field": "is_resident_free",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "駐車場使用料（月額）\n37000円～50000円",
+            "confidence": "high"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "駐車場総台数\n371台（本再開発組合員分98台、身障者用2台含む）",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "slug": "bicycle_parking",
+        "amenity_category": "do_xe",
+        "amenity_name": "Bãi để xe đạp (1.530 chỗ, gồm 585 chỗ của thành viên tổ hợp tái phát triển)",
+        "amenity_name_local": "自転車置場",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": null,
+        "is_resident_free": false,
+        "operator_brand": null,
+        "is_highlight": false,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "自転車置場総台数\n1530台（本再開発組合員分585台含む）",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "自転車置場総台数\n1530台（本再開発組合員分585台含む）",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "自転車置場総台数\n1530台（本再開発組合員分585台含む）",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "自転車置場総台数\n1530台",
+            "confidence": "high"
+          },
+          {
+            "field": "is_resident_free",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "自転車置場利用料（月額）\n200円～800円",
+            "confidence": "high"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "自転車置場総台数\n1530台（本再開発組合員分585台含む）",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "slug": "motorcycle_parking",
+        "amenity_category": "do_xe",
+        "amenity_name": "Bãi để xe mô tô (41 chỗ, gồm 11 chỗ của thành viên tổ hợp tái phát triển)",
+        "amenity_name_local": "バイク置場",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": null,
+        "is_resident_free": false,
+        "operator_brand": null,
+        "is_highlight": false,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "バイク置場総台数\n41台（本再開発組合員分11台含む）",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "バイク置場総台数\n41台（本再開発組合員分11台含む）",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "バイク置場総台数\n41台（本再開発組合員分11台含む）",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "バイク置場総台数\n41台",
+            "confidence": "high"
+          },
+          {
+            "field": "is_resident_free",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "バイク置場使用料（月額）\n6000円・8000円",
+            "confidence": "high"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "バイク置場総台数\n41台（本再開発組合員分11台含む）",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "slug": "mini_bike_parking",
+        "amenity_category": "do_xe",
+        "amenity_name": "Bãi để xe máy cỡ nhỏ (24 chỗ, gồm 6 chỗ của thành viên tổ hợp tái phát triển)",
+        "amenity_name_local": "ミニバイク置場",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": null,
+        "is_resident_free": false,
+        "operator_brand": null,
+        "is_highlight": false,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "ミニバイク置場台数\n24台（本再開発組合員分6台含む）",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "ミニバイク置場台数\n24台（本再開発組合員分6台含む）",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "ミニバイク置場台数\n24台（本再開発組合員分6台含む）",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "ミニバイク置場台数\n24台",
+            "confidence": "high"
+          },
+          {
+            "field": "is_resident_free",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "ミニバイク置場使用料（月額）\n4000円",
+            "confidence": "high"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "ミニバイク置場台数\n24台（本再開発組合員分6台含む）",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "slug": "nursery",
+        "amenity_category": "tre_em",
+        "amenity_name": "Nhà trẻ trong toà nhà",
+        "amenity_name_local": "保育所",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": true,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": true,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "総戸数\n1,284戸（非分譲住戸339戸、その他住戸30戸（※１）含む）その他店舗21区画、保育所、デイサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "その他店舗21区画、保育所、デイサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "その他店舗21区画、保育所、デイサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "その他店舗21区画、保育所、デイサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "is_indoor",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "その他店舗21区画、保育所、デイサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "その他店舗21区画、保育所、デイサービス",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "slug": "day_service",
+        "amenity_category": "suc_khoe_spa",
+        "amenity_name": "Cơ sở dịch vụ chăm sóc ban ngày cho người cao tuổi",
+        "amenity_name_local": "デイサービス",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": true,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": false,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "その他店舗21区画、保育所、デイサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "その他店舗21区画、保育所、デイサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "その他店舗21区画、保育所、デイサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "その他店舗21区画、保育所、デイサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "is_indoor",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "その他店舗21区画、保育所、デイサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "その他店舗21区画、保育所、デイサービス",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "slug": "retail_shops",
+        "amenity_category": "thuong_mai_fnb",
+        "amenity_name": "Khối cửa hàng thương mại (21 gian; theo quy chế quản lý là 23 gian)",
+        "amenity_name_local": "店舗21区画",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": true,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": false,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "その他店舗21区画、保育所、デイサービス　※管理規約上の取扱いは1,285戸…その他店舗23区画、保育所、デイサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "その他店舗21区画、保育所、デイサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "その他店舗21区画…※管理規約上の取扱いは…その他店舗23区画",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "その他店舗21区画",
+            "confidence": "high"
+          },
+          {
+            "field": "is_indoor",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "その他店舗21区画、保育所、デイサービス",
+            "confidence": "high"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "その他店舗21区画、保育所、デイサービス",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "slug": "front_service",
+        "amenity_category": "dich_vu_le_tan",
+        "amenity_name": "Dịch vụ quầy lễ tân",
+        "amenity_name_local": "フロントサービス",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": null,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": true,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "この物件のこだわり … フロントサービス",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "この物件のこだわり … フロントサービス",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "この物件のこだわり … フロントサービス",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "フロントサービス",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "この物件のこだわり … フロントサービス",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "slug": "management_24h_resident_staff",
+        "amenity_category": "dich_vu_le_tan",
+        "amenity_name": "Quản lý có nhân viên thường trực 24 giờ",
+        "amenity_name_local": "24時間有人管理",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": null,
+        "is_resident_free": null,
+        "operator_brand": "Sumitomo Realty & Development Building Service",
+        "is_highlight": false,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "この物件のこだわり … 24時間有人管理",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "この物件のこだわり … 24時間有人管理",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "この物件のこだわり … 24時間有人管理",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "24時間有人管理",
+            "confidence": "medium"
+          },
+          {
+            "field": "operator_brand",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "管理会社\n住友不動産建物サービス株式会社",
+            "confidence": "high"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "この物件のこだわり … 24時間有人管理",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "slug": "pet_facility",
+        "amenity_category": "thu_cung",
+        "amenity_name": "Tiện ích dành cho thú cưng (được phép nuôi thú cưng)",
+        "amenity_name_local": "ペット用施設／ペット飼育可",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": null,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": false,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "ペット飼育可\nペット用施設",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "ペット飼育可\nペット用施設",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "ペット飼育可\nペット用施設",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "ペット飼育可\nペット用施設",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "ペット用施設",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "slug": "garbage_disposal_24h",
+        "amenity_category": "dich_vu_le_tan",
+        "amenity_name": "Khu đổ rác hoạt động 24/24",
+        "amenity_name_local": "ごみ出し24時間OK",
+        "location": null,
+        "floor_level": null,
+        "area_m2": null,
+        "is_indoor": null,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": false,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "この物件のこだわり … ごみ出し24時間OK",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "この物件のこだわり … ごみ出し24時間OK",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "ごみ出し24時間OK",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "ごみ出し24時間OK",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "03_ngu_n_4.txt",
+            "snippet": "ごみ出し24時間OK",
+            "confidence": "medium"
+          }
+        ]
+      }
+    ],
+    "notes": "Nguồn: 01 = trang chính thức Sumitomo Realty & Development (confidence high); 02 = SUUMO và 03 = Major7 (bên thứ ba uy tín, confidence medium). Không có nguồn nào nêu diện tích (area_m2) của bất kỳ tiện ích nào → để null toàn bộ. Vị trí tầng chỉ được nêu cho Sky Lounge/Party Room (tầng 30) và Tsukishima FARM (mái tầng 3); các tiện ích còn lại để location/floor_level = null, không suy đoán. Phí sử dụng chỉ nêu cho các loại chỗ đỗ xe (ô tô 37.000–50.000 JPY/tháng, xe đạp 200–800 JPY/tháng, mô tô 6.000/8.000 JPY/tháng, xe máy nhỏ 4.000 JPY/tháng) → is_resident_free = false; ghi chú nguồn 02 nêu '共用施設の利用は一部有料' (một phần tiện ích chung có thu phí) nhưng không nói rõ tiện ích nào → is_resident_free của các tiện ích khác để null. Các mục KHÔNG đưa vào B6: 内廊下 (hành lang trong nhà) và 防犯カメラ (camera an ninh) thuộc đặc điểm kiến trúc/an ninh, không có nhóm tương ứng ở §8.16; トランクルーム là kho riêng thuộc diện tích sở hữu riêng (専有トランクルーム面積0.89㎡～2.32㎡) nên thuộc B2 chứ không phải tiện ích chung; các thiết bị 床暖房/食器洗い乾燥機/ディスポーザー/浴室乾燥機 thuộc B5 bàn giao; các tiện ích ngoài ranh giới toà (ダイエー, 隅田川テラス, 西仲通り商店街) thuộc cấp khu đô thị (WS1). 保育所 và デイサービス được đưa vào B6 vì nguồn chính thức liệt kê chúng nằm trong chính công trình. Mâu thuẫn nhỏ giữa các nguồn: số gian cửa hàng 21 khu (thực tế bán) so với 23 khu (theo quy chế quản lý) — đã ghi cả hai trong amenity_name."
+  },
+  "price_obs": {
+    "records": [
+      {
+        "unit_type_code": null,
+        "market": "so_cap",
+        "price_min": 158000000,
+        "price_max": 305000000,
+        "price_avg": null,
+        "currency": "JPY",
+        "price_unit": "per_unit",
+        "price_basis": "khong_ro",
+        "includes_vat": null,
+        "includes_maintenance_fee": null,
+        "period": "2026-08",
+        "sample_size": 17,
+        "source_type": "cdt_official",
+        "listing_url": "https://www.sumitomo-rd-mansion.jp/shuto/tsukishima/detail.cgi",
+        "provenance": [
+          {
+            "field": "market",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "販売スケジュール\n先着順受付\n販売戸数\n17戸\n販売価格\n15,800万円～30,500万円",
+            "confidence": "high"
+          },
+          {
+            "field": "price_min",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "販売価格\n15,800万円～30,500万円",
+            "confidence": "high"
+          },
+          {
+            "field": "price_max",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "販売価格\n15,800万円～30,500万円",
+            "confidence": "high"
+          },
+          {
+            "field": "currency",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "販売価格\n15,800万円～30,500万円",
+            "confidence": "high"
+          },
+          {
+            "field": "price_unit",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "販売戸数\n17戸\n販売価格\n15,800万円～30,500万円",
+            "confidence": "high"
+          },
+          {
+            "field": "price_basis",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "販売価格\n15,800万円～30,500万円 / 専有面積 58.13m2～83.68m2",
+            "confidence": "high"
+          },
+          {
+            "field": "period",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "更新日\n2026年8月14日\n次回更新予定日\n2026年8月21日",
+            "confidence": "high"
+          },
+          {
+            "field": "sample_size",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "販売戸数\n17戸",
+            "confidence": "high"
+          },
+          {
+            "field": "source_type",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "グランドシティタワー月島｜物件概要ページ|住友不動産の分譲マンション",
+            "confidence": "high"
+          },
+          {
+            "field": "listing_url",
+            "source_file": "01_ngu_n_2.txt",
+            "snippet": "URL: https://www.sumitomo-rd-mansion.jp/shuto/tsukishima/detail.cgi",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "unit_type_code": "S-55E",
+        "market": "so_cap",
+        "price_min": null,
+        "price_max": null,
+        "price_avg": 158000000,
+        "currency": "JPY",
+        "price_unit": "per_unit",
+        "price_basis": "khong_ro",
+        "includes_vat": true,
+        "includes_maintenance_fee": null,
+        "period": "2026-08",
+        "sample_size": null,
+        "source_type": "portal_niem_yet",
+        "listing_url": "https://suumo.jp/ms/shinchiku/tokyo/sc_chuo/nc_67727473/",
+        "provenance": [
+          {
+            "field": "unit_type_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "間取り\nS-55E\n2LDK+N(納戸)+WIC(ウォークインクロゼット)\n専有面積：\n58.13m\n2\n価格：\n1億5800万円",
+            "confidence": "medium"
+          },
+          {
+            "field": "market",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-55E … 価格：\n1億5800万円\n販売期：\n先着順受付",
+            "confidence": "medium"
+          },
+          {
+            "field": "price_avg",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-55E … 専有面積：58.13m2 価格：\n1億5800万円",
+            "confidence": "medium"
+          },
+          {
+            "field": "currency",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "価格：\n1億5800万円",
+            "confidence": "medium"
+          },
+          {
+            "field": "price_unit",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-55E … 価格：\n1億5800万円",
+            "confidence": "medium"
+          },
+          {
+            "field": "price_basis",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "専有面積：\n58.13m\n2\n価格：\n1億5800万円",
+            "confidence": "medium"
+          },
+          {
+            "field": "includes_vat",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "※価格は物件の代金総額を表示しています。消費税が課税される場合は税込み価格を表示しており、10000円未満を切り上げている場合があります。",
+            "confidence": "medium"
+          },
+          {
+            "field": "period",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "情報更新日：2026/8/12",
+            "confidence": "medium"
+          },
+          {
+            "field": "source_type",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "【SUUMO】グランドシティタワー月島 | 新築マンション・分譲マンション物件情報",
+            "confidence": "medium"
+          },
+          {
+            "field": "listing_url",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "URL: https://suumo.jp/ms/shinchiku/tokyo/sc_chuo/nc_67727473/",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "unit_type_code": "S-70B",
+        "market": "so_cap",
+        "price_min": null,
+        "price_max": null,
+        "price_avg": 225000000,
+        "currency": "JPY",
+        "price_unit": "per_unit",
+        "price_basis": "khong_ro",
+        "includes_vat": true,
+        "includes_maintenance_fee": null,
+        "period": "2026-08",
+        "sample_size": null,
+        "source_type": "portal_niem_yet",
+        "listing_url": "https://suumo.jp/ms/shinchiku/tokyo/sc_chuo/nc_67727473/",
+        "provenance": [
+          {
+            "field": "unit_type_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-70B\n3LDK+N(納戸)+WIC(ウォークインクロゼット)+SIC(シューズインクロゼット)\n専有面積：\n73.52m\n2\n価格：\n2億2500万円",
+            "confidence": "medium"
+          },
+          {
+            "field": "market",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-70B … 価格：\n2億2500万円\n販売期：\n先着順受付",
+            "confidence": "medium"
+          },
+          {
+            "field": "price_avg",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-70B … 専有面積：73.52m2 価格：\n2億2500万円",
+            "confidence": "medium"
+          },
+          {
+            "field": "currency",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "価格：\n2億2500万円",
+            "confidence": "medium"
+          },
+          {
+            "field": "price_unit",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-70B … 価格：\n2億2500万円",
+            "confidence": "medium"
+          },
+          {
+            "field": "price_basis",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "専有面積：\n73.52m\n2\n価格：\n2億2500万円",
+            "confidence": "medium"
+          },
+          {
+            "field": "includes_vat",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "※価格は物件の代金総額を表示しています。消費税が課税される場合は税込み価格を表示しており、10000円未満を切り上げている場合があります。",
+            "confidence": "medium"
+          },
+          {
+            "field": "period",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "情報更新日：2026/8/12",
+            "confidence": "medium"
+          },
+          {
+            "field": "source_type",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "【SUUMO】グランドシティタワー月島 | 新築マンション・分譲マンション物件情報",
+            "confidence": "medium"
+          },
+          {
+            "field": "listing_url",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "URL: https://suumo.jp/ms/shinchiku/tokyo/sc_chuo/nc_67727473/",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "unit_type_code": "S-80Atr",
+        "market": "so_cap",
+        "price_min": null,
+        "price_max": null,
+        "price_avg": 228000000,
+        "currency": "JPY",
+        "price_unit": "per_unit",
+        "price_basis": "khong_ro",
+        "includes_vat": true,
+        "includes_maintenance_fee": null,
+        "period": "2026-08",
+        "sample_size": null,
+        "source_type": "portal_niem_yet",
+        "listing_url": "https://suumo.jp/ms/shinchiku/tokyo/sc_chuo/nc_67727473/",
+        "provenance": [
+          {
+            "field": "unit_type_code",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-80Atr\n3LDK+N(納戸)+2WIC(ウォークインクロゼット)+SIC(シューズインクロゼット)\n専有面積：\n80.63m\n2\n価格：\n2億2800万円",
+            "confidence": "medium"
+          },
+          {
+            "field": "market",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-80Atr … 価格：\n2億2800万円\n販売期：\n先着順受付",
+            "confidence": "medium"
+          },
+          {
+            "field": "price_avg",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-80Atr … 専有面積：80.63m2 価格：\n2億2800万円",
+            "confidence": "medium"
+          },
+          {
+            "field": "currency",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "価格：\n2億2800万円",
+            "confidence": "medium"
+          },
+          {
+            "field": "price_unit",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "S-80Atr … 価格：\n2億2800万円",
+            "confidence": "medium"
+          },
+          {
+            "field": "price_basis",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "専有面積：\n80.63m\n2\n価格：\n2億2800万円",
+            "confidence": "medium"
+          },
+          {
+            "field": "includes_vat",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "※価格は物件の代金総額を表示しています。消費税が課税される場合は税込み価格を表示しており、10000円未満を切り上げている場合があります。",
+            "confidence": "medium"
+          },
+          {
+            "field": "period",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "情報更新日：2026/8/12",
+            "confidence": "medium"
+          },
+          {
+            "field": "source_type",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "【SUUMO】グランドシティタワー月島 | 新築マンション・分譲マンション物件情報",
+            "confidence": "medium"
+          },
+          {
+            "field": "listing_url",
+            "source_file": "02_ngu_n_3.txt",
+            "snippet": "URL: https://suumo.jp/ms/shinchiku/tokyo/sc_chuo/nc_67727473/",
+            "confidence": "medium"
+          }
+        ]
+      }
+    ],
+    "notes": "1) Giá công bố theo CĂN (per_unit) đúng thông lệ Nhật; nguồn không nêu đơn giá/m² nên KHÔNG tự chia — price_basis = khong_ro dù diện tích công bố là 専有面積 (thông thuỷ). 2) Quy đổi §10: 万円 ×1e4, 億円 ×1e8 → 15,800万円 = 158.000.000 JPY; 30,500万円 = 305.000.000 JPY; 1億5800万円 = 158.000.000; 2億2500万円 = 225.000.000; 2億2800万円 = 228.000.000. 3) Ba nguồn (01 trang chính thức Sumitomo Realty & Development cập nhật 14/08/2026; 02 SUUMO và 03 Major Seven cập nhật 12/08/2026) cùng nêu dải giá 15,800万円～30,500万円 — không mâu thuẫn; chỉ giữ MỘT dòng giá tổng của toà theo nguồn chính thức/mới hơn để tránh trùng khoá (toà × loại căn × thị trường × kỳ). 4) 最多価格帯 16,000万円台(4戸) (dải giá phổ biến nhất, 4 căn) không lập thành dòng riêng vì là dải giá tóm tắt, không phải quan sát giá độc lập. 5) includes_vat: trang chính thức (01) không nêu → null; SUUMO/Major Seven ghi rõ 'giá là tổng số tiền, đã gồm thuế tiêu dùng nếu bị đánh thuế' → true cho các dòng theo loại căn. 6) includes_maintenance_fee để null: nguồn liệt kê 修繕積立基金 660,000円～950,100円 và 修繕積立金 hàng tháng riêng, nhưng không nêu rõ đã gồm/chưa gồm trong giá bán → không suy diễn. 7) sample_size = 17 lấy từ 販売戸数 17戸 (số căn đang chào bán ứng với dải giá). 8) Corpus không có bất kỳ dữ liệu giá thứ cấp (chuyển nhượng) hay giá cho thuê nào → không có dòng thu_cap/cho_thue."
+  }
+}

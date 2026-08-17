@@ -1,0 +1,5 @@
+# Bảng nguồn tự cấp — mỗi dòng: URL [| purpose]
+# purpose: official_overview | floorplan | brochure_pdf | amenities | handover_spec
+#          product_mix | price_primary | price_secondary | architecture | news_report
+https://ecopark.com.vn/                          | official_overview
+https://arxiv.org/pdf/1706.03762                 | brochure_pdf

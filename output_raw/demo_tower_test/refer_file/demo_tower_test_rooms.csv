@@ -1,0 +1,13 @@
+verified,type_code,room_code,room_type,room_label_raw,area_m2,width_m,length_m,has_window,is_ensuite,position_note,source_file,label_on_drawing
+,MOCK type_code #1,pk,phong_khach,MOCK phong_khach,20.3,,,True,False,,floorplans/01_ngu_n_4_img01.jpg,
+,MOCK type_code #1,pn1,phong_ngu_master,MOCK phong_ngu_master,17.5,,,True,False,,floorplans/01_ngu_n_4_img01.jpg,
+,MOCK type_code #1,pn2,phong_ngu_2,MOCK phong_ngu_2,13.2,,,True,False,,floorplans/01_ngu_n_4_img01.jpg,
+,MOCK type_code #1,bep,bep,MOCK bep,18.2,,,True,False,,floorplans/01_ngu_n_4_img01.jpg,
+,MOCK type_code #1,pk,phong_khach,MOCK phong_khach,20.3,,,True,False,,floorplans/01_ngu_n_4_img01.jpg,
+,MOCK type_code #1,pn1,phong_ngu_master,MOCK phong_ngu_master,17.5,,,True,False,,floorplans/01_ngu_n_4_img01.jpg,
+,MOCK type_code #1,pn2,phong_ngu_2,MOCK phong_ngu_2,13.2,,,True,False,,floorplans/01_ngu_n_4_img01.jpg,
+,MOCK type_code #1,bep,bep,MOCK bep,18.2,,,True,False,,floorplans/01_ngu_n_4_img01.jpg,
+,MOCK type_code #1,pk,phong_khach,MOCK phong_khach,20.3,,,True,False,,floorplans/01_ngu_n_4_img01.jpg,
+,MOCK type_code #1,pn1,phong_ngu_master,MOCK phong_ngu_master,17.5,,,True,False,,floorplans/01_ngu_n_4_img01.jpg,
+,MOCK type_code #1,pn2,phong_ngu_2,MOCK phong_ngu_2,13.2,,,True,False,,floorplans/01_ngu_n_4_img01.jpg,
+,MOCK type_code #1,bep,bep,MOCK bep,18.2,,,True,False,,floorplans/01_ngu_n_4_img01.jpg,

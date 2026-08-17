@@ -1,0 +1,193 @@
+{
+  "plans": [
+    {
+      "is_floorplan": true,
+      "plan_kind": "unit",
+      "matched_type_code": "MOCK type_code #1",
+      "unit_label_raw": "[mock] TYPE A",
+      "total_area_on_plan": 75.0,
+      "tower_code": null,
+      "floor_range": null,
+      "floor_label": null,
+      "units_on_floor": null,
+      "rooms": [
+        {
+          "room_code": "pk",
+          "room_type": "phong_khach",
+          "room_label_raw": "MOCK phong_khach",
+          "area_m2": 20.3,
+          "width_m": null,
+          "length_m": null,
+          "has_window": true,
+          "is_ensuite": false,
+          "position_note": null,
+          "label_on_drawing": "[mock] phong_khach 20.3"
+        },
+        {
+          "room_code": "pn1",
+          "room_type": "phong_ngu_master",
+          "room_label_raw": "MOCK phong_ngu_master",
+          "area_m2": 17.5,
+          "width_m": null,
+          "length_m": null,
+          "has_window": true,
+          "is_ensuite": false,
+          "position_note": null,
+          "label_on_drawing": "[mock] phong_ngu_master 17.5"
+        },
+        {
+          "room_code": "pn2",
+          "room_type": "phong_ngu_2",
+          "room_label_raw": "MOCK phong_ngu_2",
+          "area_m2": 13.2,
+          "width_m": null,
+          "length_m": null,
+          "has_window": true,
+          "is_ensuite": false,
+          "position_note": null,
+          "label_on_drawing": "[mock] phong_ngu_2 13.2"
+        },
+        {
+          "room_code": "bep",
+          "room_type": "bep",
+          "room_label_raw": "MOCK bep",
+          "area_m2": 18.2,
+          "width_m": null,
+          "length_m": null,
+          "has_window": true,
+          "is_ensuite": false,
+          "position_note": null,
+          "label_on_drawing": "[mock] bep 18.2"
+        }
+      ],
+      "notes": "[offline] dữ liệu giả",
+      "source_file": "floorplans/01_ngu_n_4_img01.jpg"
+    },
+    {
+      "is_floorplan": true,
+      "plan_kind": "unit",
+      "matched_type_code": "MOCK type_code #1",
+      "unit_label_raw": "[mock] TYPE A",
+      "total_area_on_plan": 75.0,
+      "tower_code": null,
+      "floor_range": null,
+      "floor_label": null,
+      "units_on_floor": null,
+      "rooms": [
+        {
+          "room_code": "pk",
+          "room_type": "phong_khach",
+          "room_label_raw": "MOCK phong_khach",
+          "area_m2": 20.3,
+          "width_m": null,
+          "length_m": null,
+          "has_window": true,
+          "is_ensuite": false,
+          "position_note": null,
+          "label_on_drawing": "[mock] phong_khach 20.3"
+        },
+        {
+          "room_code": "pn1",
+          "room_type": "phong_ngu_master",
+          "room_label_raw": "MOCK phong_ngu_master",
+          "area_m2": 17.5,
+          "width_m": null,
+          "length_m": null,
+          "has_window": true,
+          "is_ensuite": false,
+          "position_note": null,
+          "label_on_drawing": "[mock] phong_ngu_master 17.5"
+        },
+        {
+          "room_code": "pn2",
+          "room_type": "phong_ngu_2",
+          "room_label_raw": "MOCK phong_ngu_2",
+          "area_m2": 13.2,
+          "width_m": null,
+          "length_m": null,
+          "has_window": true,
+          "is_ensuite": false,
+          "position_note": null,
+          "label_on_drawing": "[mock] phong_ngu_2 13.2"
+        },
+        {
+          "room_code": "bep",
+          "room_type": "bep",
+          "room_label_raw": "MOCK bep",
+          "area_m2": 18.2,
+          "width_m": null,
+          "length_m": null,
+          "has_window": true,
+          "is_ensuite": false,
+          "position_note": null,
+          "label_on_drawing": "[mock] bep 18.2"
+        }
+      ],
+      "notes": "[offline] dữ liệu giả",
+      "source_file": "floorplans/01_ngu_n_4_img02.jpg"
+    },
+    {
+      "is_floorplan": true,
+      "plan_kind": "unit",
+      "matched_type_code": "MOCK type_code #1",
+      "unit_label_raw": "[mock] TYPE A",
+      "total_area_on_plan": 75.0,
+      "tower_code": null,
+      "floor_range": null,
+      "floor_label": null,
+      "units_on_floor": null,
+      "rooms": [
+        {
+          "room_code": "pk",
+          "room_type": "phong_khach",
+          "room_label_raw": "MOCK phong_khach",
+          "area_m2": 20.3,
+          "width_m": null,
+          "length_m": null,
+          "has_window": true,
+          "is_ensuite": false,
+          "position_note": null,
+          "label_on_drawing": "[mock] phong_khach 20.3"
+        },
+        {
+          "room_code": "pn1",
+          "room_type": "phong_ngu_master",
+          "room_label_raw": "MOCK phong_ngu_master",
+          "area_m2": 17.5,
+          "width_m": null,
+          "length_m": null,
+          "has_window": true,
+          "is_ensuite": false,
+          "position_note": null,
+          "label_on_drawing": "[mock] phong_ngu_master 17.5"
+        },
+        {
+          "room_code": "pn2",
+          "room_type": "phong_ngu_2",
+          "room_label_raw": "MOCK phong_ngu_2",
+          "area_m2": 13.2,
+          "width_m": null,
+          "length_m": null,
+          "has_window": true,
+          "is_ensuite": false,
+          "position_note": null,
+          "label_on_drawing": "[mock] phong_ngu_2 13.2"
+        },
+        {
+          "room_code": "bep",
+          "room_type": "bep",
+          "room_label_raw": "MOCK bep",
+          "area_m2": 18.2,
+          "width_m": null,
+          "length_m": null,
+          "has_window": true,
+          "is_ensuite": false,
+          "position_note": null,
+          "label_on_drawing": "[mock] bep 18.2"
+        }
+      ],
+      "notes": "[offline] dữ liệu giả",
+      "source_file": "floorplans/01_ngu_n_4_img03.png"
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+idx,title,purpose,expected_content,url,slug,kind,status,http_status,chars,page_title,raw_file,text_file,shot_file,accessed_at,error
+1,nguồn 4,official_overview,người dùng tự cấp,https://ecopark.com.vn/,01_ngu_n_4,html,ok,200,17319,Ecopark | Thành phố xanh Ecopark,pages/01_ngu_n_4.html,pages/01_ngu_n_4.txt,,2026-08-17T06:51:23+00:00,
+2,nguồn 5,brochure_pdf,người dùng tự cấp,https://arxiv.org/pdf/1706.03762,02_ngu_n_5,pdf,ok,200,39512,,pages/02_ngu_n_5.pdf,pages/02_ngu_n_5.txt,,2026-08-17T06:51:38+00:00,

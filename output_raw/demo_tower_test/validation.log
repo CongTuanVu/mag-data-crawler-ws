@@ -1,0 +1,6 @@
+[B3>B2] demo_tower_test__mock_type_code_1: tổng phòng 207.6 m² > area_gross_m2 118.1 m² — đặt confidence=low, KHÔNG sửa số
+[B3 PN] demo_tower_test__mock_type_code_1: đếm 6 phòng ngủ ≠ B2.bedrooms 38
+[B2 tổng] Σ num_units_of_type = 46 ≠ B1.num_units_total = 2
+[B2 share] Σ share_of_total_pct = 48.0% ≠ 100%
+[BẮT BUỘC] demo_tower_test__all__so_cap__MOCK period #1: thiếu currency
+[BẮT BUỘC] demo_tower_test__all__thu_cap__MOCK period #2: thiếu currency

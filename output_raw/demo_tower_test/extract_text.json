@@ -1,0 +1,1175 @@
+{
+  "building": {
+    "records": [
+      {
+        "building_name_local": "MOCK building_name_local #1",
+        "project_name": "MOCK project_name #1",
+        "tower_codes": [
+          "MOCK tower_codes A",
+          "MOCK tower_codes B"
+        ],
+        "district": null,
+        "address": "MOCK address #1",
+        "latitude": null,
+        "longitude": 100.3,
+        "developer": "MOCK developer #1",
+        "brochure_url": "MOCK brochure_url #1",
+        "building_type": "chung_cu",
+        "segment": null,
+        "status": "quy_hoach",
+        "year_launch": 37,
+        "year_handover": 29,
+        "num_towers": 5,
+        "num_floors_above": 19,
+        "num_basements": 33,
+        "height_m": 96.5,
+        "num_units_total": 2,
+        "land_area_m2": 44.9,
+        "gfa_m2": 100.5,
+        "nfa_sale_m2": 32.1,
+        "building_density_pct": 71.8,
+        "green_area_pct": null,
+        "parking_ratio": 88.9,
+        "handover_standard": "shell_core",
+        "architect_firm": "MOCK architect_firm #1",
+        "architect_country": "MOCK architect_country #1",
+        "interior_designer": null,
+        "landscape_architect": null,
+        "architectural_style": [
+          "MOCK architectural_style A",
+          "MOCK architectural_style B"
+        ],
+        "design_concept": "MOCK design_concept #1",
+        "design_concept_keywords": null,
+        "massing_form": null,
+        "facade_material": [
+          "MOCK facade_material A",
+          "MOCK facade_material B"
+        ],
+        "facade_system": "curtain_wall",
+        "window_wall_ratio_pct": 79.0,
+        "balcony_type": "logia",
+        "floor_to_ceiling_m": 109.0,
+        "signature_features": [
+          "MOCK signature_features A",
+          "MOCK signature_features B"
+        ],
+        "green_cert": "LEED",
+        "green_cert_level": null,
+        "awards": [
+          "MOCK awards A",
+          "MOCK awards B"
+        ],
+        "orientation_note": "MOCK orientation_note #1",
+        "provenance": [
+          {
+            "field": "building_name_local",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa building_name_local",
+            "confidence": "high"
+          },
+          {
+            "field": "project_name",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa project_name",
+            "confidence": "high"
+          },
+          {
+            "field": "tower_codes",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa tower_codes",
+            "confidence": "high"
+          },
+          {
+            "field": "address",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa address",
+            "confidence": "high"
+          },
+          {
+            "field": "longitude",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa longitude",
+            "confidence": "high"
+          },
+          {
+            "field": "developer",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa developer",
+            "confidence": "high"
+          },
+          {
+            "field": "brochure_url",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa brochure_url",
+            "confidence": "high"
+          },
+          {
+            "field": "building_type",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa building_type",
+            "confidence": "high"
+          },
+          {
+            "field": "status",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa status",
+            "confidence": "high"
+          },
+          {
+            "field": "year_launch",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa year_launch",
+            "confidence": "high"
+          },
+          {
+            "field": "year_handover",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa year_handover",
+            "confidence": "high"
+          },
+          {
+            "field": "num_towers",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa num_towers",
+            "confidence": "high"
+          },
+          {
+            "field": "num_floors_above",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa num_floors_above",
+            "confidence": "high"
+          },
+          {
+            "field": "num_basements",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa num_basements",
+            "confidence": "high"
+          },
+          {
+            "field": "height_m",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa height_m",
+            "confidence": "high"
+          },
+          {
+            "field": "num_units_total",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa num_units_total",
+            "confidence": "high"
+          },
+          {
+            "field": "land_area_m2",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa land_area_m2",
+            "confidence": "high"
+          },
+          {
+            "field": "gfa_m2",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa gfa_m2",
+            "confidence": "high"
+          },
+          {
+            "field": "nfa_sale_m2",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa nfa_sale_m2",
+            "confidence": "high"
+          },
+          {
+            "field": "building_density_pct",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa building_density_pct",
+            "confidence": "high"
+          },
+          {
+            "field": "parking_ratio",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa parking_ratio",
+            "confidence": "high"
+          },
+          {
+            "field": "handover_standard",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa handover_standard",
+            "confidence": "high"
+          },
+          {
+            "field": "architect_firm",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa architect_firm",
+            "confidence": "high"
+          },
+          {
+            "field": "architect_country",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa architect_country",
+            "confidence": "high"
+          },
+          {
+            "field": "architectural_style",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa architectural_style",
+            "confidence": "high"
+          },
+          {
+            "field": "design_concept",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa design_concept",
+            "confidence": "high"
+          },
+          {
+            "field": "facade_material",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa facade_material",
+            "confidence": "high"
+          },
+          {
+            "field": "facade_system",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa facade_system",
+            "confidence": "high"
+          },
+          {
+            "field": "window_wall_ratio_pct",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa window_wall_ratio_pct",
+            "confidence": "high"
+          },
+          {
+            "field": "balcony_type",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa balcony_type",
+            "confidence": "high"
+          },
+          {
+            "field": "floor_to_ceiling_m",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa floor_to_ceiling_m",
+            "confidence": "high"
+          },
+          {
+            "field": "signature_features",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa signature_features",
+            "confidence": "high"
+          },
+          {
+            "field": "green_cert",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa green_cert",
+            "confidence": "high"
+          },
+          {
+            "field": "awards",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa awards",
+            "confidence": "high"
+          },
+          {
+            "field": "orientation_note",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa orientation_note",
+            "confidence": "high"
+          }
+        ]
+      }
+    ],
+    "notes": "[offline] dữ liệu giả, không dùng để phân tích"
+  },
+  "unit_type": {
+    "records": [
+      {
+        "type_code": "MOCK type_code #1",
+        "type_name": "MOCK type_name #1",
+        "layout_class": "studio",
+        "bedrooms": 38,
+        "bathrooms": null,
+        "has_multipurpose_room": true,
+        "area_gross_m2": 118.1,
+        "area_net_m2": null,
+        "area_basis_reported": "tim_tuong",
+        "area_balcony_m2": 97.6,
+        "num_units_of_type": 23,
+        "share_of_total_pct": 24.0,
+        "facing": [
+          "MOCK facing A",
+          "MOCK facing B"
+        ],
+        "view_type": [
+          "MOCK view_type A",
+          "MOCK view_type B"
+        ],
+        "is_corner": true,
+        "floorplan_url": "MOCK floorplan_url #1",
+        "provenance": [
+          {
+            "field": "type_code",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa type_code",
+            "confidence": "high"
+          },
+          {
+            "field": "type_name",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa type_name",
+            "confidence": "high"
+          },
+          {
+            "field": "layout_class",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa layout_class",
+            "confidence": "high"
+          },
+          {
+            "field": "bedrooms",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa bedrooms",
+            "confidence": "high"
+          },
+          {
+            "field": "has_multipurpose_room",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa has_multipurpose_room",
+            "confidence": "high"
+          },
+          {
+            "field": "area_gross_m2",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa area_gross_m2",
+            "confidence": "high"
+          },
+          {
+            "field": "area_basis_reported",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa area_basis_reported",
+            "confidence": "high"
+          },
+          {
+            "field": "area_balcony_m2",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa area_balcony_m2",
+            "confidence": "high"
+          },
+          {
+            "field": "num_units_of_type",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa num_units_of_type",
+            "confidence": "high"
+          },
+          {
+            "field": "share_of_total_pct",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa share_of_total_pct",
+            "confidence": "high"
+          },
+          {
+            "field": "facing",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa facing",
+            "confidence": "high"
+          },
+          {
+            "field": "view_type",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa view_type",
+            "confidence": "high"
+          },
+          {
+            "field": "is_corner",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa is_corner",
+            "confidence": "high"
+          },
+          {
+            "field": "floorplan_url",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa floorplan_url",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "type_code": "MOCK type_code #2",
+        "type_name": "MOCK type_name #2",
+        "layout_class": "1pn",
+        "bedrooms": 38,
+        "bathrooms": null,
+        "has_multipurpose_room": true,
+        "area_gross_m2": 118.1,
+        "area_net_m2": null,
+        "area_basis_reported": "thong_thuy",
+        "area_balcony_m2": 97.6,
+        "num_units_of_type": 23,
+        "share_of_total_pct": 24.0,
+        "facing": [
+          "MOCK facing A",
+          "MOCK facing B"
+        ],
+        "view_type": [
+          "MOCK view_type A",
+          "MOCK view_type B"
+        ],
+        "is_corner": true,
+        "floorplan_url": "MOCK floorplan_url #2",
+        "provenance": [
+          {
+            "field": "type_code",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa type_code",
+            "confidence": "medium"
+          },
+          {
+            "field": "type_name",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa type_name",
+            "confidence": "medium"
+          },
+          {
+            "field": "layout_class",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa layout_class",
+            "confidence": "medium"
+          },
+          {
+            "field": "bedrooms",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa bedrooms",
+            "confidence": "medium"
+          },
+          {
+            "field": "has_multipurpose_room",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa has_multipurpose_room",
+            "confidence": "medium"
+          },
+          {
+            "field": "area_gross_m2",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa area_gross_m2",
+            "confidence": "medium"
+          },
+          {
+            "field": "area_basis_reported",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa area_basis_reported",
+            "confidence": "medium"
+          },
+          {
+            "field": "area_balcony_m2",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa area_balcony_m2",
+            "confidence": "medium"
+          },
+          {
+            "field": "num_units_of_type",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa num_units_of_type",
+            "confidence": "medium"
+          },
+          {
+            "field": "share_of_total_pct",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa share_of_total_pct",
+            "confidence": "medium"
+          },
+          {
+            "field": "facing",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa facing",
+            "confidence": "medium"
+          },
+          {
+            "field": "view_type",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa view_type",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_corner",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa is_corner",
+            "confidence": "medium"
+          },
+          {
+            "field": "floorplan_url",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa floorplan_url",
+            "confidence": "medium"
+          }
+        ]
+      }
+    ],
+    "notes": "[offline] dữ liệu giả, không dùng để phân tích"
+  },
+  "floor_plate": {
+    "records": [
+      {
+        "tower_code": "MOCK tower_code #1",
+        "floor_range": "MOCK floor_range #1",
+        "floor_label": "dien_hinh",
+        "units_per_floor": 38,
+        "unit_type_mix": [
+          {
+            "key": "2pn",
+            "value": 4
+          },
+          {
+            "key": "3pn",
+            "value": 2
+          }
+        ],
+        "gfa_per_floor_m2": 65.0,
+        "nfa_per_floor_m2": 65.8,
+        "corridor_type": "hanh_lang_giua",
+        "num_elevators": 38,
+        "num_elevators_service": null,
+        "num_stairs": 1,
+        "core_position": null,
+        "floorplate_url": "MOCK floorplate_url #1",
+        "provenance": [
+          {
+            "field": "tower_code",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa tower_code",
+            "confidence": "high"
+          },
+          {
+            "field": "floor_range",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa floor_range",
+            "confidence": "high"
+          },
+          {
+            "field": "floor_label",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa floor_label",
+            "confidence": "high"
+          },
+          {
+            "field": "units_per_floor",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa units_per_floor",
+            "confidence": "high"
+          },
+          {
+            "field": "unit_type_mix",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa unit_type_mix",
+            "confidence": "high"
+          },
+          {
+            "field": "gfa_per_floor_m2",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa gfa_per_floor_m2",
+            "confidence": "high"
+          },
+          {
+            "field": "nfa_per_floor_m2",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa nfa_per_floor_m2",
+            "confidence": "high"
+          },
+          {
+            "field": "corridor_type",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa corridor_type",
+            "confidence": "high"
+          },
+          {
+            "field": "num_elevators",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa num_elevators",
+            "confidence": "high"
+          },
+          {
+            "field": "num_stairs",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa num_stairs",
+            "confidence": "high"
+          },
+          {
+            "field": "floorplate_url",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa floorplate_url",
+            "confidence": "high"
+          }
+        ]
+      }
+    ],
+    "notes": "[offline] dữ liệu giả, không dùng để phân tích"
+  },
+  "handover_item": {
+    "records": [
+      {
+        "applies_to_type_code": "MOCK applies_to_type_code #1",
+        "item_code": "MOCK item_code #1",
+        "item_category": "san",
+        "item_name": "MOCK item_name #1",
+        "item_spec": "MOCK item_spec #1",
+        "brand": "MOCK brand #1",
+        "brand_origin": "MOCK brand_origin #1",
+        "is_included": null,
+        "note": "MOCK note #1",
+        "provenance": [
+          {
+            "field": "applies_to_type_code",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa applies_to_type_code",
+            "confidence": "high"
+          },
+          {
+            "field": "item_code",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa item_code",
+            "confidence": "high"
+          },
+          {
+            "field": "item_category",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa item_category",
+            "confidence": "high"
+          },
+          {
+            "field": "item_name",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa item_name",
+            "confidence": "high"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa item_spec",
+            "confidence": "high"
+          },
+          {
+            "field": "brand",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa brand",
+            "confidence": "high"
+          },
+          {
+            "field": "brand_origin",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa brand_origin",
+            "confidence": "high"
+          },
+          {
+            "field": "note",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa note",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": "MOCK applies_to_type_code #2",
+        "item_code": "MOCK item_code #2",
+        "item_category": "tuong_tran",
+        "item_name": "MOCK item_name #2",
+        "item_spec": "MOCK item_spec #2",
+        "brand": "MOCK brand #2",
+        "brand_origin": "MOCK brand_origin #2",
+        "is_included": null,
+        "note": "MOCK note #2",
+        "provenance": [
+          {
+            "field": "applies_to_type_code",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa applies_to_type_code",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_code",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa item_code",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_category",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa item_category",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_name",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa item_name",
+            "confidence": "medium"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa item_spec",
+            "confidence": "medium"
+          },
+          {
+            "field": "brand",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa brand",
+            "confidence": "medium"
+          },
+          {
+            "field": "brand_origin",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa brand_origin",
+            "confidence": "medium"
+          },
+          {
+            "field": "note",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa note",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "applies_to_type_code": "MOCK applies_to_type_code #3",
+        "item_code": "MOCK item_code #3",
+        "item_category": "cua",
+        "item_name": "MOCK item_name #3",
+        "item_spec": "MOCK item_spec #3",
+        "brand": "MOCK brand #3",
+        "brand_origin": "MOCK brand_origin #3",
+        "is_included": null,
+        "note": "MOCK note #3",
+        "provenance": [
+          {
+            "field": "applies_to_type_code",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa applies_to_type_code",
+            "confidence": "low"
+          },
+          {
+            "field": "item_code",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa item_code",
+            "confidence": "low"
+          },
+          {
+            "field": "item_category",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa item_category",
+            "confidence": "low"
+          },
+          {
+            "field": "item_name",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa item_name",
+            "confidence": "low"
+          },
+          {
+            "field": "item_spec",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa item_spec",
+            "confidence": "low"
+          },
+          {
+            "field": "brand",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa brand",
+            "confidence": "low"
+          },
+          {
+            "field": "brand_origin",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa brand_origin",
+            "confidence": "low"
+          },
+          {
+            "field": "note",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa note",
+            "confidence": "low"
+          }
+        ]
+      }
+    ],
+    "notes": "[offline] dữ liệu giả, không dùng để phân tích"
+  },
+  "amenity": {
+    "records": [
+      {
+        "slug": "MOCK slug #1",
+        "amenity_category": "be_boi",
+        "amenity_name": "MOCK amenity_name #1",
+        "amenity_name_local": "MOCK amenity_name_local #1",
+        "location": "tang_ham",
+        "floor_level": "MOCK floor_level #1",
+        "area_m2": 64.5,
+        "is_indoor": true,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": false,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa slug",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa amenity_category",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa amenity_name",
+            "confidence": "high"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa amenity_name_local",
+            "confidence": "high"
+          },
+          {
+            "field": "location",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa location",
+            "confidence": "high"
+          },
+          {
+            "field": "floor_level",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa floor_level",
+            "confidence": "high"
+          },
+          {
+            "field": "area_m2",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa area_m2",
+            "confidence": "high"
+          },
+          {
+            "field": "is_indoor",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa is_indoor",
+            "confidence": "high"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa is_highlight",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "slug": "MOCK slug #2",
+        "amenity_category": "the_thao_gym",
+        "amenity_name": "MOCK amenity_name #2",
+        "amenity_name_local": "MOCK amenity_name_local #2",
+        "location": "khoi_de",
+        "floor_level": "MOCK floor_level #2",
+        "area_m2": 64.5,
+        "is_indoor": true,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": false,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa slug",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa amenity_category",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa amenity_name",
+            "confidence": "medium"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa amenity_name_local",
+            "confidence": "medium"
+          },
+          {
+            "field": "location",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa location",
+            "confidence": "medium"
+          },
+          {
+            "field": "floor_level",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa floor_level",
+            "confidence": "medium"
+          },
+          {
+            "field": "area_m2",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa area_m2",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_indoor",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa is_indoor",
+            "confidence": "medium"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa is_highlight",
+            "confidence": "medium"
+          }
+        ]
+      },
+      {
+        "slug": "MOCK slug #3",
+        "amenity_category": "tre_em",
+        "amenity_name": "MOCK amenity_name #3",
+        "amenity_name_local": "MOCK amenity_name_local #3",
+        "location": "podium",
+        "floor_level": "MOCK floor_level #3",
+        "area_m2": 64.5,
+        "is_indoor": true,
+        "is_resident_free": null,
+        "operator_brand": null,
+        "is_highlight": false,
+        "provenance": [
+          {
+            "field": "slug",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa slug",
+            "confidence": "low"
+          },
+          {
+            "field": "amenity_category",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa amenity_category",
+            "confidence": "low"
+          },
+          {
+            "field": "amenity_name",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa amenity_name",
+            "confidence": "low"
+          },
+          {
+            "field": "amenity_name_local",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa amenity_name_local",
+            "confidence": "low"
+          },
+          {
+            "field": "location",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa location",
+            "confidence": "low"
+          },
+          {
+            "field": "floor_level",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa floor_level",
+            "confidence": "low"
+          },
+          {
+            "field": "area_m2",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa area_m2",
+            "confidence": "low"
+          },
+          {
+            "field": "is_indoor",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa is_indoor",
+            "confidence": "low"
+          },
+          {
+            "field": "is_highlight",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa is_highlight",
+            "confidence": "low"
+          }
+        ]
+      }
+    ],
+    "notes": "[offline] dữ liệu giả, không dùng để phân tích"
+  },
+  "price_obs": {
+    "records": [
+      {
+        "unit_type_code": "MOCK unit_type_code #1",
+        "market": "so_cap",
+        "price_min": null,
+        "price_max": 92.0,
+        "price_avg": 84.4,
+        "currency": null,
+        "price_unit": "per_m2",
+        "price_basis": "tim_tuong",
+        "includes_vat": false,
+        "includes_maintenance_fee": true,
+        "period": "MOCK period #1",
+        "sample_size": null,
+        "source_type": "cdt_official",
+        "listing_url": "MOCK listing_url #1",
+        "provenance": [
+          {
+            "field": "unit_type_code",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa unit_type_code",
+            "confidence": "high"
+          },
+          {
+            "field": "market",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa market",
+            "confidence": "high"
+          },
+          {
+            "field": "price_max",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa price_max",
+            "confidence": "high"
+          },
+          {
+            "field": "price_avg",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa price_avg",
+            "confidence": "high"
+          },
+          {
+            "field": "price_unit",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa price_unit",
+            "confidence": "high"
+          },
+          {
+            "field": "price_basis",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa price_basis",
+            "confidence": "high"
+          },
+          {
+            "field": "includes_vat",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa includes_vat",
+            "confidence": "high"
+          },
+          {
+            "field": "includes_maintenance_fee",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa includes_maintenance_fee",
+            "confidence": "high"
+          },
+          {
+            "field": "period",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa period",
+            "confidence": "high"
+          },
+          {
+            "field": "source_type",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa source_type",
+            "confidence": "high"
+          },
+          {
+            "field": "listing_url",
+            "source_file": "01_ngu_n_4.txt",
+            "snippet": "[mock] câu nguồn chứa listing_url",
+            "confidence": "high"
+          }
+        ]
+      },
+      {
+        "unit_type_code": "MOCK unit_type_code #2",
+        "market": "thu_cap",
+        "price_min": null,
+        "price_max": 92.0,
+        "price_avg": 84.4,
+        "currency": null,
+        "price_unit": "per_unit",
+        "price_basis": "thong_thuy",
+        "includes_vat": false,
+        "includes_maintenance_fee": true,
+        "period": "MOCK period #2",
+        "sample_size": null,
+        "source_type": "san_moi_gioi",
+        "listing_url": "MOCK listing_url #2",
+        "provenance": [
+          {
+            "field": "unit_type_code",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa unit_type_code",
+            "confidence": "medium"
+          },
+          {
+            "field": "market",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa market",
+            "confidence": "medium"
+          },
+          {
+            "field": "price_max",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa price_max",
+            "confidence": "medium"
+          },
+          {
+            "field": "price_avg",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa price_avg",
+            "confidence": "medium"
+          },
+          {
+            "field": "price_unit",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa price_unit",
+            "confidence": "medium"
+          },
+          {
+            "field": "price_basis",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa price_basis",
+            "confidence": "medium"
+          },
+          {
+            "field": "includes_vat",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa includes_vat",
+            "confidence": "medium"
+          },
+          {
+            "field": "includes_maintenance_fee",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa includes_maintenance_fee",
+            "confidence": "medium"
+          },
+          {
+            "field": "period",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa period",
+            "confidence": "medium"
+          },
+          {
+            "field": "source_type",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa source_type",
+            "confidence": "medium"
+          },
+          {
+            "field": "listing_url",
+            "source_file": "02_ngu_n_5.txt",
+            "snippet": "[mock] câu nguồn chứa listing_url",
+            "confidence": "medium"
+          }
+        ]
+      }
+    ],
+    "notes": "[offline] dữ liệu giả, không dùng để phân tích"
+  }
+}

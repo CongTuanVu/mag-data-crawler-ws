@@ -1,0 +1,4 @@
+idx,title,purpose,expected_content,url,slug,kind,status,http_status,chars,page_title,raw_file,text_file,shot_file,accessed_at,error
+1,nguồn 2,official_overview,người dùng tự cấp,https://www.sumitomo-rd-mansion.jp/shuto/tsukishima/detail.cgi,01_ngu_n_2,html,ok,200,2626,グランドシティタワー月島｜物件概要ページ|住友不動産の分譲マンション,pages/01_ngu_n_2.html,pages/01_ngu_n_2.txt,,2026-08-17T07:52:49+00:00,
+2,nguồn 3,product_mix,người dùng tự cấp,https://suumo.jp/ms/shinchiku/tokyo/sc_chuo/nc_67727473/,02_ngu_n_3,html,ok,200,12288,【SUUMO】グランドシティタワー月島 | 新築マンション・分譲マンション物件情報,pages/02_ngu_n_3.html,pages/02_ngu_n_3.txt,,2026-08-17T07:52:54+00:00,
+3,nguồn 4,price_primary,người dùng tự cấp,https://www.major7.net/Bukkendetail/00000010001160,03_ngu_n_4,html,ok,200,2501,グランドシティタワー月島 | マンション情報のメジャーセブン,pages/03_ngu_n_4.html,pages/03_ngu_n_4.txt,,2026-08-17T07:53:09+00:00,
