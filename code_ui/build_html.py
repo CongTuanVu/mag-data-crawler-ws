@@ -267,67 +267,96 @@ def name_key(b: dict) -> str:
     return re.sub(r"\s+", " ", (b.get("building_name") or "").strip().lower()).rstrip(" .")
 
 
+def rec_sig(rec: dict) -> tuple:
+    """Chữ ký nội dung một record con — để nhận ra hai dòng y hệt nhau."""
+    return tuple(sorted((k, str(v)) for k, v in rec.items()))
+
+
+def fold_into(base: dict, other: dict) -> int:
+    """Gộp `other` vào `base`, GIỮ MỌI DÒNG. Trả số dòng con thêm được.
+
+    Hai bản của cùng một toà thường bổ khuyết cho nhau: bản này có 3 loại căn mà
+    thiếu tiện ích, bản kia ngược lại. Chọn một bản là vứt mất dữ liệu của bản
+    kia, nên hợp hai danh sách rồi chỉ bỏ dòng TRÙNG Y HỆT.
+
+    Ô vô hướng của B1: `base` là bản đầy hơn nên giữ giá trị của nó; chỉ lấy từ
+    `other` những ô mà `base` đang để trống.
+    """
+    gained = 0
+    for key, val in other.items():
+        if key.startswith("_"):
+            continue
+        if isinstance(val, list):
+            kids = base.setdefault(key, [])
+            seen = {rec_sig(r) for r in kids}
+            for rec in val:
+                sig = rec_sig(rec)
+                if sig not in seen:
+                    seen.add(sig)
+                    kids.append(rec)
+                    gained += 1
+        elif base.get(key) in (None, ""):
+            base[key] = val
+    return gained
+
+
+def fold_group(versions: list[dict]) -> tuple[dict, int]:
+    """Gộp mọi bản của một toà thành một. Bản đầy nhất làm gốc."""
+    versions.sort(key=richness, reverse=True)
+    base = versions[0]
+    gained = sum(fold_into(base, other) for other in versions[1:])
+    return base, gained
+
+
 def build(csv_dir: Path, template: Path, out: Path, every: bool = False,
           merge_names: bool = True) -> None:
     files = pick_files(csv_dir, every)
     if not files:
         raise SystemExit(f"Không tìm thấy CSV nào trong {csv_dir}")
 
-    # building_id → (điểm xếp hạng, dữ liệu toà). Cùng một toà nằm ở nhiều file là
-    # chuyện bình thường (CSV riêng + các mẻ gộp), nên chọn BẢN ĐẦY ĐỦ NHẤT thay
-    # vì để nó hiện lên nhiều lần trong UI. Hoà điểm mới xét tới file mới hơn.
-    best: dict[str, tuple[tuple[int, float], dict]] = {}
-    dups = won_by_data = 0
+    # Đọc TẤT CẢ, không bỏ bản nào — gom theo building_id rồi mới gộp.
+    groups: dict[str, list[dict]] = {}
     for path in files:
-        mtime = path.stat().st_mtime
         found = load_csv(path)
-        added = 0
+        added = sum(1 for b in found if b["building_id"] not in groups)
         for b in found:
-            bid = b["building_id"]
-            rank = (richness(b), mtime)
-            old = best.get(bid)
-            if old is None:
-                added += 1
-            else:
-                dups += 1
-                if old[0] >= rank:
-                    continue
-                if rank[0] > old[0][0]:
-                    won_by_data += 1
-            best[bid] = (rank, b)
+            groups.setdefault(b["building_id"], []).append(b)
         note = f" ({added} mới)" if every and added != len(found) else ""
         print(f"  · đọc {path.name} → {len(found)} toà{note}")
-
-    buildings = [b for _, b in best.values()]
-    if not buildings:
+    if not groups:
         raise SystemExit("Không dựng được toà nhà nào từ CSV.")
-    if dups:
-        extra = f", {won_by_data} lần bản đầy hơn thắng bản mới hơn" if won_by_data else ""
-        print(f"  · khử {dups} bản trùng → giữ bản nhiều dữ liệu nhất{extra}")
+
+    buildings, gained = [], 0
+    for versions in groups.values():
+        base, n = fold_group(versions)
+        gained += n
+        buildings.append(base)
+    n_extra = sum(len(v) for v in groups.values()) - len(groups)
+    if n_extra:
+        print(f"  · gộp {n_extra} bản trùng building_id → +{gained} dòng con "
+              f"lấy được từ bản phụ")
 
     # ── Gộp lần hai: cùng TÊN nhưng khác building_id ────────────────────────
-    # buildings.txt có những dòng chỉ cùng một toà viết khác đi ("Asakusa Tower"
-    # và "Asakusa Tower, Taito"), bước tìm nguồn sinh ra hai slug khác nhau, và
-    # UI hiện lên hai lần. Khử theo id không bắt được, phải khử theo tên.
+    # buildings.txt có những dòng chỉ là cùng một toà viết khác đi ("Asakusa
+    # Tower" và "Asakusa Tower, Taito"), bước tìm nguồn sinh ra hai slug khác
+    # nhau, và UI hiện lên hai lần. Khử theo id không bắt được, phải theo tên.
     if merge_names:
-        by_name: dict[str, dict] = {}
-        collapsed: list[tuple[dict, dict]] = []
+        by_name: dict[str, list[dict]] = {}
         for b in buildings:
-            key = name_key(b) or f"\x00{b['building_id']}"     # không tên → để riêng
-            prev = by_name.get(key)
-            if prev is None:
-                by_name[key] = b
-                continue
-            keep, drop = ((b, prev) if richness(b) > richness(prev) else (prev, b))
-            by_name[key] = keep
-            collapsed.append((keep, drop))
-        buildings = list(by_name.values())
-        if collapsed:
-            print(f"  · gộp {len(collapsed)} toà trùng TÊN (khác building_id) "
-                  f"→ giữ bản nhiều dữ liệu nhất:")
-            for keep, drop in sorted(collapsed, key=lambda kd: kd[0]["building_name"]):
-                print(f"      {keep['building_name']}: giữ {keep['building_id']} "
-                      f"({richness(keep)} ô) · bỏ {drop['building_id']} ({richness(drop)} ô)")
+            by_name.setdefault(name_key(b) or f"\x00{b['building_id']}", []).append(b)
+        merged = []
+        buildings = []
+        for versions in by_name.values():
+            base, n = fold_group(versions)
+            buildings.append(base)
+            if len(versions) > 1:
+                merged.append((base, versions[1:], n))
+        if merged:
+            print(f"  · gộp {len(merged)} toà trùng TÊN (khác building_id):")
+            for base, others, n in sorted(merged, key=lambda m: m[0]["building_name"]):
+                ids = ", ".join(o["building_id"] for o in others)
+                print(f"      {base['building_name']}: {base['building_id']} "
+                      f"◀ {ids} · +{n} dòng con")
 
     buildings.sort(key=lambda b: (b.get("building_name") or "").lower())
 
