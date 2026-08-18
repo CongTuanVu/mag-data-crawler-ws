@@ -84,20 +84,60 @@ def stale_thread_files(csv_dir: Path, keep: set) -> List[Path]:
             if THREAD_RE.match(p.name) and p not in keep]
 
 
-def split_threads(files: List[Path], threads: int) -> List[List[Path]]:
+def split_threads(items: List[Any], threads: int) -> List[List[Any]]:
     """Chia đều danh sách toà cho N thread, theo thứ tự building_id đã sắp xếp."""
     threads = max(1, threads)
-    return [files[i::threads] for i in range(threads)] if files else []
+    return [items[i::threads] for i in range(threads)] if items else []
+
+
+def read_thread_file(path: Path) -> Tuple[List[Dict[str, Any]], List[str]]:
+    """Dòng + tên cột của một file thread đã có. Cột trả về để không đánh rơi
+    cột lạ khi ghi đè (vd bản cũ có evidence_json mà lần này chạy --no-evidence)."""
+    with path.open(encoding="utf-8-sig", newline="") as f:
+        rd = csv.DictReader(f)
+        return list(rd), list(rd.fieldnames or [])
+
+
+def carry_rows(csv_dir: Path, day: str, skip_ids: set) -> Tuple[Dict[str, List[Dict]], List[str]]:
+    """Đọc lại file thread CÙNG NGÀY, giữ dòng của toà lần này KHÔNG ghi lại.
+
+    Dùng cho chế độ append. Toà nào có CSV riêng trong output_csv/ thì lần gộp này
+    dựng lại từ đó (bản mới thắng), nên loại khỏi phần mang sang — nếu không mỗi
+    toà sẽ nằm hai lần trong file. Gom theo building_id chứ không theo file cũ, vì
+    số thread có thể đổi giữa hai lần chạy và toà sẽ rơi sang file khác.
+    """
+    carried: Dict[str, List[Dict[str, Any]]] = {}
+    extra_cols: List[str] = []
+    for path in sorted(csv_dir.glob(f"thread*_{day}.csv")):
+        if not THREAD_RE.match(path.name):
+            continue
+        rows, cols = read_thread_file(path)
+        for col in cols:
+            if col not in extra_cols:
+                extra_cols.append(col)
+        for row in rows:
+            bid = str(row.get("building_id") or "").strip()
+            if bid and bid not in skip_ids:
+                carried.setdefault(bid, []).append(row)
+    return carried, extra_cols
 
 
 def run(csv_dir: Optional[Path] = None, *, threads: int = 1, day: str = "",
         drop_evidence: bool = False, clean: bool = True,
-        quiet: bool = False) -> Dict[str, Path]:
-    """Ghi thread<N>_<ngày>.csv + _benchmark.csv. Trả {tên file: đường dẫn}."""
+        quiet: bool = False, append: bool = False) -> Dict[str, Path]:
+    """Ghi thread<N>_<ngày>.csv + _benchmark.csv. Trả {tên file: đường dẫn}.
+
+    `append=False` (mặc định): dựng lại file thread từ đầu, chỉ phản ánh những gì
+    đang có trong output_csv/. Xoá CSV một toà là toà đó biến mất khỏi bảng gộp.
+
+    `append=True`: file thread CÙNG NGÀY đã có thì gộp thêm vào, chưa có thì tạo
+    mới. Toà đang có CSV riêng vẫn được dựng lại từ CSV đó (bản mới đè bản cũ,
+    không nhân đôi); toà chỉ còn trong file thread cũ thì được mang sang nguyên
+    vẹn. Nhờ vậy file thread thành sổ tích luỹ của cả ngày, chạy bao nhiêu mẻ
+    cũng cộng dồn.
+    """
     csv_dir = csv_dir or config.CSV_DIR
     files = building_files(csv_dir)
-    if not files:
-        raise SystemExit(f"Không có CSV toà nhà nào trong {csv_dir}")
     day = day or time.strftime("%Y%m%d")
 
     cols = writer.META + writer.feature_columns() + writer.EVIDENCE
@@ -106,25 +146,56 @@ def run(csv_dir: Optional[Path] = None, *, threads: int = 1, day: str = "",
         # cần nó inline — vẫn tra được ở CSV từng toà.
         cols = [c for c in cols if c != "evidence_json"]
 
+    # Đơn vị chia thread: (building_id, cách lấy dòng). Toà có CSV riêng thì đọc
+    # từ CSV; toà mang sang từ mẻ trước thì đã có sẵn dòng trong bộ nhớ.
+    units: List[Tuple[str, Any]] = [(p.stem, p) for p in files]
+    n_carried = 0
+    if append:
+        carried, old_cols = carry_rows(csv_dir, day, {p.stem for p in files})
+        units += [(bid, rows) for bid, rows in carried.items()]
+        n_carried = len(carried)
+        # Bản cũ có cột lạ (schema đổi giữa hai lần chạy) → giữ lại ở cuối thay vì
+        # đánh rơi dữ liệu. Trừ cột NGƯỜI DÙNG CHỦ ĐỘNG bỏ: --no-evidence mà vẫn
+        # khôi phục evidence_json thì cờ đó thành vô nghĩa.
+        dropped = {"evidence_json"} if drop_evidence else set()
+        extra = [c for c in old_cols if c not in cols and c not in dropped]
+        if extra:
+            cols = cols + extra
+            if not quiet:
+                print(f"      · giữ {len(extra)} cột chỉ có ở bản cũ: {', '.join(extra)}")
+    if not units:
+        raise SystemExit(f"Không có CSV toà nhà nào trong {csv_dir}")
+    units.sort(key=lambda u: u[0])
+
     written: Dict[str, Path] = {}
     rows: List[Dict[str, Any]] = []
-    for i, chunk in enumerate(split_threads(files, threads), 1):
+    for i, chunk in enumerate(split_threads(units, threads), 1):
         if not chunk:
             continue
-        part = sorted((r for p in chunk for r in _rows_of(p)), key=_order)
+        part = sorted((r for _, src in chunk
+                       for r in (_rows_of(src) if isinstance(src, Path) else src)),
+                      key=_order)
         rows += part
         path = csv_dir / f"thread{i}_{day}.csv"
         with path.open("w", encoding="utf-8-sig", newline="") as f:
-            wr = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore")
+            wr = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore", restval="")
             wr.writeheader()
             wr.writerows(part)
         written[path.name] = path
         if not quiet:
             print(f"      → {path.name}: {len(chunk)} toà · {len(part):,} dòng "
                   f"· {path.stat().st_size / 1024 / 1024:.1f} MB")
+    if append and not quiet and n_carried:
+        print(f"      · mang sang {n_carried} toà chỉ còn trong bản gộp cũ")
 
     if clean:
-        for old_path in stale_thread_files(csv_dir, set(written.values())):
+        stale = stale_thread_files(csv_dir, set(written.values()))
+        if append:
+            # Chỉ dọn file THỪA của chính ngày này (số thread đổi nên dôi ra) —
+            # nội dung của chúng đã được mang sang file mới. File của ngày khác là
+            # lịch sử, append không có quyền xoá.
+            stale = [p for p in stale if p.name.endswith(f"_{day}.csv")]
+        for old_path in stale:
             old_path.unlink()
             if not quiet:
                 print(f"      ✗ dọn bản cũ {old_path.name}")

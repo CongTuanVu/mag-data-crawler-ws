@@ -148,6 +148,7 @@ def run(query: str, out_dir: Path) -> Dict[str, Any]:
         tools=llm.WEB_TOOLS,
         max_tokens=24000,
         effort=config.EFFORT_DISCOVER,
+        model=config.MODEL_DISCOVER,
         label="discover",
     )
     r = result["resolved"]

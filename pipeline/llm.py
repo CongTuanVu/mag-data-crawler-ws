@@ -43,10 +43,11 @@ _USAGE: Dict[str, Dict[str, int]] = {}
 _USAGE_LOCK = threading.Lock()
 
 
-def _record(label: str, usage) -> None:
+def _record(label: str, usage, seconds: float = 0.0) -> None:
     key = (label or "?").split(":")[0]
     row = {
         "calls": 1,
+        "secs": int(seconds),
         "in": getattr(usage, "input_tokens", 0) or 0,
         "cache_write": getattr(usage, "cache_creation_input_tokens", 0) or 0,
         "cache_read": getattr(usage, "cache_read_input_tokens", 0) or 0,
@@ -66,19 +67,20 @@ def usage_summary() -> str:
         return ""
     # Giá niêm yết Opus 5: $5/1M input, $25/1M output; cache đọc 0.1x, ghi 2x (ttl 1h).
     price_in, price_out = 5e-6, 25e-6
-    lines = [f"{'bước':<14}{'lượt':>6}{'in':>12}{'cache ghi':>12}{'cache đọc':>12}"
-             f"{'out':>10}{'~USD':>9}", "─" * 75]
+    lines = [f"{'bước':<14}{'lượt':>6}{'giây':>8}{'in':>12}{'cache ghi':>11}"
+             f"{'cache đọc':>11}{'out':>9}{'~USD':>8}", "─" * 81]
     total = 0.0
     for key in sorted(rows, key=lambda k: -rows[k]["in"] - rows[k]["out"]):
         r = rows[key]
         cost = ((r["in"] + r["cache_write"] * 2 + r["cache_read"] * 0.1) * price_in
                 + r["out"] * price_out)
         total += cost
-        lines.append(f"{key:<14}{r['calls']:>6}{r['in']:>12,}{r['cache_write']:>12,}"
-                     f"{r['cache_read']:>12,}{r['out']:>10,}{cost:>9.2f}")
-    lines.append("─" * 75)
+        lines.append(f"{key:<14}{r['calls']:>6}{r.get('secs', 0):>8,}{r['in']:>12,}"
+                     f"{r['cache_write']:>11,}{r['cache_read']:>11,}{r['out']:>9,}"
+                     f"{cost:>8.2f}")
+    lines.append("─" * 81)
     lines.append(f"{'TỔNG':<14}{sum(r['calls'] for r in rows.values()):>6}"
-                 f"{'':>46}{total:>9.2f}")
+                 f"{sum(r.get('secs', 0) for r in rows.values()):>8,}{'':>43}{total:>8.2f}")
     lines.append("(ước tính theo giá niêm yết claude-opus-5; hợp đồng có chiết khấu "
                  "thì thấp hơn)")
     return "\n".join(lines)
@@ -131,6 +133,7 @@ def call_json(
     max_tokens: int = config.MAX_TOKENS,
     effort: str = config.EFFORT,
     label: str = "",
+    model: str = "",
 ) -> Dict[str, Any]:
     """Gọi model, ép output theo `schema`, trả dict. Tự nối lại khi pause_turn."""
     if config.OFFLINE:
@@ -138,7 +141,7 @@ def call_json(
         return mock.call_json(system, user_content, schema, tools, max_tokens, effort, label)
 
     system = list(system)
-    kwargs: Dict[str, Any] = dict(model=config.MODEL, max_tokens=max_tokens)
+    kwargs: Dict[str, Any] = dict(model=model or config.MODEL, max_tokens=max_tokens)
 
     if config.COMPAT:
         if tools and not all(_is_web_tool(t) for t in tools):
@@ -163,6 +166,7 @@ def call_json(
 
     messages: List[Dict[str, Any]] = [{"role": "user", "content": user_content}]
     msg = None
+    started = time.monotonic()
     for _ in range(6):                             # trần chống lặp vô hạn pause_turn
         with client().messages.stream(messages=messages, **kwargs) as stream:
             msg = stream.get_final_message()
@@ -178,8 +182,9 @@ def call_json(
         raise RuntimeError(f"[{label}] pause_turn quá 6 vòng")
 
     u = msg.usage
-    _record(label, u)
-    print(f"    · {label}: in={u.input_tokens:,} "
+    took = time.monotonic() - started
+    _record(label, u, took)
+    print(f"    · {label}: {took:.0f}s · in={u.input_tokens:,} "
           f"cache_r={getattr(u, 'cache_read_input_tokens', 0) or 0:,} out={u.output_tokens:,}")
     text = _text_of(msg)
     return _parse_json(text, label) if config.COMPAT else json.loads(text)

@@ -72,6 +72,12 @@ SOURCES_MAX = int(os.environ.get("WS1_SOURCES_MAX", "16"))
 # URL. Hạ effort riêng cho bước này cắt được phần lớn token suy nghĩ.
 EFFORT_DISCOVER = os.environ.get("WS1_EFFORT_DISCOVER", "medium")
 
+# Model riêng cho bước tìm nguồn. Đây là bước chậm nhất theo ĐỒNG HỒ, không phải
+# theo token: mỗi lượt search/fetch là một vòng đi-về, cộng thời gian model suy
+# nghĩ giữa các vòng. Tuyển URL không phải việc khó nhất — đổi sang model nhanh
+# hơn cắt được phần lớn thời gian chờ mà chất lượng nguồn gần như không đổi.
+MODEL_DISCOVER = os.environ.get("WS1_MODEL_DISCOVER", MODEL)
+
 # Gửi cả feature_spec (30k ký tự) cho bước tìm nguồn là thừa: nó chỉ dùng §9
 # (danh mục purpose), §10 (thuật ngữ bản địa) và §11 (nguồn ưu tiên) — 17% spec.
 SPEC_SECTIONS_DISCOVER = os.environ.get("WS1_SPEC_SECTIONS_DISCOVER", "9,10,11")

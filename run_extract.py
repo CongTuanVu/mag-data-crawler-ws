@@ -188,7 +188,8 @@ def cmd_run(args) -> int:
         print("  tổng record: " + " · ".join(f"{k}={v}" for k, v in totals.items()))
     if args.merge:
         print("\n── Gộp CSV theo thread ──")
-        merge.run(threads=args.workers, drop_evidence=args.no_evidence)
+        merge.run(threads=args.workers, drop_evidence=args.no_evidence,
+                  append=args.append)
 
     pending = translate.pending()
     if pending:
@@ -201,7 +202,8 @@ def cmd_run(args) -> int:
 
 def cmd_merge(args) -> int:
     merge.run(threads=args.threads, day=args.day,
-              drop_evidence=args.no_evidence, clean=args.clean)
+              drop_evidence=args.no_evidence, clean=args.clean,
+              append=args.append)
     return 0
 
 
@@ -248,6 +250,8 @@ def main() -> None:
                    help="Không gộp thành thread<N>_<ngày>.csv sau khi chạy")
     r.add_argument("--no-evidence", action="store_true",
                    help="Bỏ cột evidence_json khỏi file gộp (~85%% dung lượng)")
+    r.add_argument("--append", action="store_true",
+                   help="File thread cùng ngày đã có thì gộp thêm vào thay vì ghi đè")
     r.set_defaults(fn=cmd_run, merge=True)
 
     m = sub.add_parser("merge", help="Gộp CSV từng toà → thread<N>_<ngày>.csv "
@@ -258,6 +262,10 @@ def main() -> None:
                    help="Bỏ cột evidence_json (~85%% dung lượng)")
     m.add_argument("--keep-old", dest="clean", action="store_false",
                    help="Giữ file thread của lần gộp trước")
+    m.add_argument("--append", action="store_true",
+                   help="File thread cùng ngày đã có thì gộp thêm vào thay vì ghi đè: "
+                        "toà có CSV riêng được dựng lại, toà chỉ còn trong bản gộp cũ "
+                        "được mang sang nguyên vẹn")
     m.set_defaults(fn=cmd_merge, clean=True)
 
     t = sub.add_parser("translate", help="Dịch gộp thuật ngữ còn sót → lexicon_auto.json")
