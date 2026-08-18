@@ -19,7 +19,15 @@ BATCH = int(os.environ.get("WS1_TRANSLATE_BATCH", "250"))
 
 SYSTEM = """\
 Bạn dịch thuật ngữ bất động sản Nhật/Hàn/Trung sang tiếng Việt cho một bộ dữ liệu
-đã chuẩn hoá. Với MỖI term đầu vào, trả đúng một bản dịch theo hai quy tắc:
+đã chuẩn hoá.
+
+Đầu vào là những MẢNH NGẮN còn sót sau khi bộ quy tắc đã xử lý xong phần có mẫu
+(tầng, số căn, ngày tháng, số thửa, hậu tố pháp nhân). Nên phần lớn những gì bạn
+thấy sẽ là: TÊN ĐỊA DANH (phường/khu, vd 南青山, 月島), tên thương hiệu, hoặc thuật
+ngữ thiết bị/tiện ích. Mỗi mảnh dịch xong dùng lại cho hàng chục toà — dịch sai
+một mảnh là sai ở mọi toà, nên thà để rỗng còn hơn đoán.
+
+Với MỖI term đầu vào, trả đúng một bản dịch theo hai quy tắc:
 
 8a. Từ mô tả (thiết bị, vật liệu, tiện ích, kết cấu, hướng, ghi chú) → TIẾNG VIỆT.
     Dịch nghĩa, không phiên âm, KHÔNG kèm bản gốc trong ngoặc.
@@ -33,7 +41,13 @@ Bạn dịch thuật ngữ bất động sản Nhật/Hàn/Trung sang tiếng Vi
     中央区 → Quận Chuo          (phần chức danh chung thì dịch: 丁目 → chome)
     鳴海製陶 → Narumi
 
+8c. ĐỊA DANH (tên phường/khu/phố) → romaji, KHÔNG dịch nghĩa và KHÔNG thêm chữ
+    "Quận"/"Phường" (bộ quy tắc đã xử lý phần chức danh đó rồi).
+    南青山 → Nam-Aoyama là SAI. Đúng: 南青山 → Minami-Aoyama
+    月島 → Tsukishima · 千住橋戸町 → Senju-Hashido-cho · 芝浦 → Shibaura
+
 Giữ nguyên con số, đơn vị, mã hiệu, tên thương hiệu La-tinh. Không thêm giải thích.
+Bản dịch KHÔNG được chứa chữ Nhật/Hàn/Trung — còn sót là bị loại.
 Term không hiểu nghĩa → để `vi` là chuỗi rỗng, đừng đoán bừa.
 """
 
@@ -98,8 +112,10 @@ def run(*, limit: int = 0, dry_run: bool = False) -> int:
                             schema=SCHEMA, label=f"translate:{i}/{len(batches)}")
         pairs = {r["src"]: r["vi"] for r in res.get("terms", [])
                  if r.get("src") and r.get("vi")}
-        n = lexicon.merge_auto(pairs)
+        n = lexicon.merge_auto(pairs)          # tự loại bản dịch còn chữ gốc
         added += n
-        print(f"      lượt {i}/{len(batches)}: +{n} mục (tổng {added})")
+        rejected = len(pairs) - n
+        print(f"      lượt {i}/{len(batches)}: +{n} mục (tổng {added})"
+              + (f" · bỏ {rejected} bản dịch hỏng/trùng" if rejected else ""))
     print(f"✓ Từ điển bổ sung {added} mục → {lexicon.AUTO_PATH}")
     return added
