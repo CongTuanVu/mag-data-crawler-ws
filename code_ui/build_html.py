@@ -194,13 +194,36 @@ def load_csv(path: Path) -> list[dict]:
     return out
 
 
-def pick_files(csv_dir: Path) -> list[Path]:
+SIGNATURE = ("bang", "record_key")
+
+
+def is_data_csv(path: Path) -> bool:
+    """CSV đúng định dạng long của pipeline, không phải file của công cụ khác."""
+    try:
+        with path.open(encoding="utf-8-sig", newline="") as fh:
+            header = next(csv.reader(fh), [])
+    except OSError:
+        return False
+    return all(col in header for col in SIGNATURE)
+
+
+def pick_files(csv_dir: Path, every: bool = False) -> list[Path]:
     """File nào để dựng UI.
 
-    Có file `thread<N>_<ngày>.csv` thì chỉ đọc chúng — chúng đã chứa mọi toà, đọc
-    thêm CSV từng toà là mỗi toà hiện lên hai lần. Chưa gộp thì đọc file từng toà
-    như cũ. `_benchmark.csv` luôn bỏ qua (nó là bản rút gọn của cùng dữ liệu).
+    Mặc định: có file `thread<N>_<dấu thời gian>.csv` thì chỉ đọc MẺ MỚI NHẤT —
+    chúng đã chứa mọi toà, đọc thêm nữa là mỗi toà hiện lên hai lần. Chưa gộp thì
+    đọc file từng toà.
+
+    `every=True` (--all): đọc MỌI CSV đúng định dạng trong thư mục — cả mẻ gộp cũ
+    lẫn CSV từng toà. Trùng lặp là chắc chắn xảy ra, nên `build()` khử trùng theo
+    building_id, bản ở file sửa gần đây nhất thắng.
+
+    `_benchmark.csv` luôn bỏ qua (bản rút gọn của cùng dữ liệu); file lạ định dạng
+    (vd file_lan.csv) bị loại bằng kiểm tra cột đặc trưng.
     """
+    if every:
+        return sorted(p for p in csv_dir.glob("*.csv")
+                      if not p.name.startswith("_") and is_data_csv(p))
     stamps = {}
     for p in csv_dir.glob("thread*_*.csv"):
         # `thread3_20260818_143052.csv` → `20260818_143052`; đời cũ chỉ có ngày.
@@ -211,22 +234,42 @@ def pick_files(csv_dir: Path) -> list[Path]:
         # Dấu thời gian sắp xếp theo chuỗi là đúng thứ tự thời gian. Bản chỉ có
         # ngày xếp TRƯỚC mọi bản cùng ngày có giờ, đúng ý: nó là bản cũ hơn.
         return sorted(stamps[max(stamps)])
-    return sorted(p for p in csv_dir.glob("*.csv") if not p.name.startswith("_"))
+    return sorted(p for p in csv_dir.glob("*.csv")
+                  if not p.name.startswith("_") and is_data_csv(p))
 
 
-def build(csv_dir: Path, template: Path, out: Path) -> None:
-    files = pick_files(csv_dir)
+def build(csv_dir: Path, template: Path, out: Path, every: bool = False) -> None:
+    files = pick_files(csv_dir, every)
     if not files:
         raise SystemExit(f"Không tìm thấy CSV nào trong {csv_dir}")
 
-    buildings = []
+    # building_id → (mtime file nguồn, dữ liệu toà). Cùng một toà nằm ở nhiều file
+    # là chuyện bình thường (CSV riêng + các mẻ gộp), nên lấy bản ở file sửa gần
+    # đây nhất thay vì để nó hiện lên nhiều lần trong UI.
+    best: dict[str, tuple[float, dict]] = {}
+    dups = 0
     for path in files:
+        mtime = path.stat().st_mtime
         found = load_csv(path)
-        print(f"  · đọc {path.name} → {len(found)} toà")
-        buildings.extend(found)
+        added = 0
+        for b in found:
+            bid = b["building_id"]
+            old = best.get(bid)
+            if old is None:
+                added += 1
+            else:
+                dups += 1
+                if old[0] >= mtime:
+                    continue
+            best[bid] = (mtime, b)
+        note = f" ({added} mới)" if every and added != len(found) else ""
+        print(f"  · đọc {path.name} → {len(found)} toà{note}")
 
+    buildings = [b for _, b in best.values()]
     if not buildings:
         raise SystemExit("Không dựng được toà nhà nào từ CSV.")
+    if dups:
+        print(f"  · khử {dups} bản trùng → giữ bản ở file sửa gần đây nhất")
 
     buildings.sort(key=lambda b: (b.get("building_name") or "").lower())
 
@@ -266,9 +309,12 @@ def main() -> None:
     ap.add_argument("--csv-dir", default=str(ROOT / "output_csv"), type=Path)
     ap.add_argument("--template", default=str(HERE / "template.html"), type=Path)
     ap.add_argument("--out", default=str(HERE / "dist" / "index.html"), type=Path)
+    ap.add_argument("--all", dest="every", action="store_true",
+                    help="Đọc MỌI CSV trong thư mục (cả mẻ gộp cũ lẫn CSV từng toà), "
+                         "khử trùng theo building_id")
     args = ap.parse_args()
 
-    build(args.csv_dir.resolve(), args.template.resolve(), args.out.resolve())
+    build(args.csv_dir.resolve(), args.template.resolve(), args.out.resolve(), args.every)
 
 
 if __name__ == "__main__":
