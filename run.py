@@ -224,13 +224,25 @@ def predicted_building_id(query: str, args, index: dict | None = None) -> str:
     return config.slugify(query, "building")
 
 
+def done_marker(building_id: str, args) -> Path:
+    """File chứng tỏ toà này đã xong — tuỳ theo lần chạy dừng ở bước nào.
+
+    `--crawl-only` không bao giờ ghi CSV, nên nếu vẫn lấy CSV làm mốc thì
+    `--skip-done` không lọc được gì và lần chạy lại sẽ discover + crawl lại từ
+    đầu cả danh sách. Ở chế độ đó, mốc là manifest.json của bước crawl.
+    """
+    if getattr(args, "crawl_only", False):
+        return config.RAW_DIR / building_id / "manifest.json"
+    return config.CSV_DIR / f"{building_id}.csv"
+
+
 def split_done(queries: List[str], args) -> Tuple[List[str], List[str]]:
-    """Tách danh sách thành (cần chạy, đã có CSV)."""
+    """Tách danh sách thành (cần chạy, đã xong)."""
     todo, done = [], []
     index = load_done_index()               # đọc một lần, dùng cho cả danh sách
     for query in queries:
-        csv_path = config.CSV_DIR / f"{predicted_building_id(query, args, index)}.csv"
-        (done if csv_path.exists() else todo).append(query)
+        marker = done_marker(predicted_building_id(query, args, index), args)
+        (done if marker.exists() else todo).append(query)
     return todo, done
 
 
@@ -417,9 +429,9 @@ def process(query: str, args: argparse.Namespace) -> None:
 
     # Lưới an toàn cho đường discover: id chỉ biết được sau khi agent tìm nguồn,
     # nên lọc trước ở main() không bắt được trường hợp này.
-    if getattr(args, "skip_done", False) and (config.CSV_DIR / f"{bid}.csv").exists():
+    if getattr(args, "skip_done", False) and done_marker(bid, args).exists():
         record_done(query, bid)             # lần sau lọc được từ đầu, khỏi discover lại
-        print(f"      ↷ bỏ qua: đã có output_csv/{bid}.csv")
+        print(f"      ↷ bỏ qua: đã có {done_marker(bid, args).relative_to(config.ROOT)}")
         return
 
     # ── [2] crawl ───────────────────────────────────────────────────────────
@@ -551,7 +563,8 @@ def main() -> None:
     if args.skip_done:
         queries, done = split_done(queries, args)
         if done:
-            print(f"↷ Bỏ qua {len(done)}/{total} toà đã có CSV: {', '.join(done)}")
+            what = "đã crawl xong" if args.crawl_only else "đã có CSV"
+            print(f"↷ Bỏ qua {len(done)}/{total} toà {what}: {', '.join(done)}")
 
     if args.dry_run:
         print(f"Đọc {total} toà nhà từ {args.input or 'tham số dòng lệnh'}"
@@ -571,7 +584,11 @@ def main() -> None:
         return
 
     if not queries:
-        print(f"\n✓ Cả {total} toà nhà đã có CSV → {config.CSV_DIR}")
+        if args.crawl_only:
+            print(f"\n✓ Cả {total} toà nhà đã crawl xong → {config.RAW_DIR}\n"
+                  f"  Bóc tách: python run_extract.py build && python run_extract.py run")
+        else:
+            print(f"\n✓ Cả {total} toà nhà đã có CSV → {config.CSV_DIR}")
         return
 
     if config.OFFLINE:
