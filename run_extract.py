@@ -247,7 +247,7 @@ def main() -> None:
     r.add_argument("--no-merge", dest="merge", action="store_false",
                    help="Không gộp thành thread<N>_<ngày>.csv sau khi chạy")
     r.add_argument("--no-evidence", action="store_true",
-                   help="Bỏ cột evidence_json khỏi file gộp (~85% dung lượng)")
+                   help="Bỏ cột evidence_json khỏi file gộp (~85%% dung lượng)")
     r.set_defaults(fn=cmd_run, merge=True)
 
     m = sub.add_parser("merge", help="Gộp CSV từng toà → thread<N>_<ngày>.csv "
@@ -255,7 +255,7 @@ def main() -> None:
     m.add_argument("--threads", type=int, default=8, help="Số file thread (mặc định 8)")
     m.add_argument("--day", default="", help="Ngày trong tên file, YYYYMMDD (mặc định hôm nay)")
     m.add_argument("--no-evidence", action="store_true",
-                   help="Bỏ cột evidence_json (~85% dung lượng)")
+                   help="Bỏ cột evidence_json (~85%% dung lượng)")
     m.add_argument("--keep-old", dest="clean", action="store_false",
                    help="Giữ file thread của lần gộp trước")
     m.set_defaults(fn=cmd_merge, clean=True)
