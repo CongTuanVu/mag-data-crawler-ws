@@ -31,9 +31,33 @@ SIGNATURE = ("bang", "record_key")
 # File do CHÍNH bước gộp sinh ra. Phải loại khỏi đầu vào: chúng cùng định dạng với
 # CSV từng toà, nên không loại là lần gộp sau ăn lại output lần trước và mọi toà
 # bị nhân đôi.
-THREAD_RE = re.compile(r"^thread\d+_\d{8}\.csv$")
+THREAD_RE = re.compile(r"^thread\d+_(\d{8})(?:_\d{6})?\.csv$")
+# Dấu thời gian trong tên file = lúc SINH file. Có giờ-phút-giây thì hai mẻ cùng
+# ngày không đè lên nhau, và nhìn tên là biết bản nào mới. Bản chỉ có ngày
+# (thread1_20260818.csv) vẫn đọc được — cùng thư mục có thể lẫn cả hai đời file.
+STAMP_FMT = "%Y%m%d_%H%M%S"
 
 csv.field_size_limit(min(sys.maxsize, 2**31 - 1))    # evidence_json có ô rất dài
+
+
+def day_of(stamp: str) -> str:
+    """8 ký tự đầu của dấu thời gian là ngày — dùng để gom các mẻ cùng ngày."""
+    return (stamp or "")[:8]
+
+
+def thread_files(csv_dir: Path, day: str = "") -> List[Path]:
+    """File thread trong thư mục, lọc theo ngày nếu có. Sắp theo tên = theo giờ."""
+    out = []
+    for path in sorted(csv_dir.glob("thread*_*.csv")):
+        m = THREAD_RE.match(path.name)
+        if m and (not day or m.group(1) == day):
+            out.append(path)
+    return out
+
+
+def stamp_of(path: Path) -> str:
+    """`thread3_20260818_143052.csv` → `20260818_143052`."""
+    return path.stem.split("_", 1)[1]
 
 
 def building_files(csv_dir: Optional[Path] = None) -> List[Path]:
@@ -80,8 +104,7 @@ def stale_thread_files(csv_dir: Path, keep: set) -> List[Path]:
     Không dọn thì thư mục lẫn lộn nhiều bản, UI đọc cả bản cũ lẫn mới và một toà
     hiện lên hai lần.
     """
-    return [p for p in csv_dir.glob("thread*_*.csv")
-            if THREAD_RE.match(p.name) and p not in keep]
+    return [p for p in thread_files(csv_dir) if p not in keep]
 
 
 def split_threads(items: List[Any], threads: int) -> List[List[Any]]:
@@ -108,9 +131,7 @@ def carry_rows(csv_dir: Path, day: str, skip_ids: set) -> Tuple[Dict[str, List[D
     """
     carried: Dict[str, List[Dict[str, Any]]] = {}
     extra_cols: List[str] = []
-    for path in sorted(csv_dir.glob(f"thread*_{day}.csv")):
-        if not THREAD_RE.match(path.name):
-            continue
+    for path in thread_files(csv_dir, day):
         rows, cols = read_thread_file(path)
         for col in cols:
             if col not in extra_cols:
@@ -125,7 +146,10 @@ def carry_rows(csv_dir: Path, day: str, skip_ids: set) -> Tuple[Dict[str, List[D
 def run(csv_dir: Optional[Path] = None, *, threads: int = 1, day: str = "",
         drop_evidence: bool = False, clean: bool = True,
         quiet: bool = False, append: bool = False) -> Dict[str, Path]:
-    """Ghi thread<N>_<ngày>.csv + _benchmark.csv. Trả {tên file: đường dẫn}.
+    """Ghi thread<N>_<YYYYMMDD>_<HHMMSS>.csv + _benchmark.csv.
+
+    Trả {tên file: đường dẫn}. Dấu thời gian là lúc SINH file; `day` truyền vào
+    thì dùng nguyên văn làm dấu (vd `20260818` cho tên kiểu cũ chỉ có ngày).
 
     `append=False` (mặc định): dựng lại file thread từ đầu, chỉ phản ánh những gì
     đang có trong output_csv/. Xoá CSV một toà là toà đó biến mất khỏi bảng gộp.
@@ -138,7 +162,8 @@ def run(csv_dir: Optional[Path] = None, *, threads: int = 1, day: str = "",
     """
     csv_dir = csv_dir or config.CSV_DIR
     files = building_files(csv_dir)
-    day = day or time.strftime("%Y%m%d")
+    stamp = day or time.strftime(STAMP_FMT)
+    today = day_of(stamp)
 
     cols = writer.META + writer.feature_columns() + writer.EVIDENCE
     if drop_evidence:
@@ -151,9 +176,14 @@ def run(csv_dir: Optional[Path] = None, *, threads: int = 1, day: str = "",
     units: List[Tuple[str, Any]] = [(p.stem, p) for p in files]
     n_carried = 0
     if append:
-        carried, old_cols = carry_rows(csv_dir, day, {p.stem for p in files})
+        carried, old_cols = carry_rows(csv_dir, today, {p.stem for p in files})
         units += [(bid, rows) for bid, rows in carried.items()]
         n_carried = len(carried)
+        # Sổ của ngày này đã mở rồi thì viết tiếp vào chính nó — giữ nguyên dấu
+        # thời gian LÚC TẠO thay vì đẻ ra bộ file mới mỗi lần append.
+        prev = thread_files(csv_dir, today)
+        if prev:
+            stamp = stamp_of(prev[0])
         # Bản cũ có cột lạ (schema đổi giữa hai lần chạy) → giữ lại ở cuối thay vì
         # đánh rơi dữ liệu. Trừ cột NGƯỜI DÙNG CHỦ ĐỘNG bỏ: --no-evidence mà vẫn
         # khôi phục evidence_json thì cờ đó thành vô nghĩa.
@@ -176,7 +206,7 @@ def run(csv_dir: Optional[Path] = None, *, threads: int = 1, day: str = "",
                        for r in (_rows_of(src) if isinstance(src, Path) else src)),
                       key=_order)
         rows += part
-        path = csv_dir / f"thread{i}_{day}.csv"
+        path = csv_dir / f"thread{i}_{stamp}.csv"
         with path.open("w", encoding="utf-8-sig", newline="") as f:
             wr = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore", restval="")
             wr.writeheader()
@@ -194,7 +224,7 @@ def run(csv_dir: Optional[Path] = None, *, threads: int = 1, day: str = "",
             # Chỉ dọn file THỪA của chính ngày này (số thread đổi nên dôi ra) —
             # nội dung của chúng đã được mang sang file mới. File của ngày khác là
             # lịch sử, append không có quyền xoá.
-            stale = [p for p in stale if p.name.endswith(f"_{day}.csv")]
+            stale = [p for p in stale if THREAD_RE.match(p.name).group(1) == today]
         for old_path in stale:
             old_path.unlink()
             if not quiet:

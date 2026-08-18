@@ -257,7 +257,9 @@ def main() -> None:
     m = sub.add_parser("merge", help="Gộp CSV từng toà → thread<N>_<ngày>.csv "
                                      "(đọc file đã có, KHÔNG chạy lại bước trích)")
     m.add_argument("--threads", type=int, default=8, help="Số file thread (mặc định 8)")
-    m.add_argument("--day", default="", help="Ngày trong tên file, YYYYMMDD (mặc định hôm nay)")
+    m.add_argument("--day", default="",
+                   help="Ép dấu thời gian trong tên file, vd 20260818 hoặc "
+                        "20260818_143052 (mặc định: lúc chạy, có giờ-phút-giây)")
     m.add_argument("--no-evidence", action="store_true",
                    help="Bỏ cột evidence_json (~85%% dung lượng)")
     m.add_argument("--keep-old", dest="clean", action="store_false",

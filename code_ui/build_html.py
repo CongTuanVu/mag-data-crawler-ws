@@ -201,11 +201,16 @@ def pick_files(csv_dir: Path) -> list[Path]:
     thêm CSV từng toà là mỗi toà hiện lên hai lần. Chưa gộp thì đọc file từng toà
     như cũ. `_benchmark.csv` luôn bỏ qua (nó là bản rút gọn của cùng dữ liệu).
     """
-    threads = sorted(p for p in csv_dir.glob("thread*_*.csv")
-                     if re.fullmatch(r"thread\d+_\d{8}\.csv", p.name))
-    if threads:
-        newest = max(p.name.split("_")[-1] for p in threads)   # chỉ mẻ gộp mới nhất
-        return [p for p in threads if p.name.endswith(f"_{newest}")]
+    stamps = {}
+    for p in csv_dir.glob("thread*_*.csv"):
+        # `thread3_20260818_143052.csv` → `20260818_143052`; đời cũ chỉ có ngày.
+        m = re.fullmatch(r"thread\d+_(\d{8}(?:_\d{6})?)\.csv", p.name)
+        if m:
+            stamps.setdefault(m.group(1), []).append(p)
+    if stamps:
+        # Dấu thời gian sắp xếp theo chuỗi là đúng thứ tự thời gian. Bản chỉ có
+        # ngày xếp TRƯỚC mọi bản cùng ngày có giờ, đúng ý: nó là bản cũ hơn.
+        return sorted(stamps[max(stamps)])
     return sorted(p for p in csv_dir.glob("*.csv") if not p.name.startswith("_"))
 
 
