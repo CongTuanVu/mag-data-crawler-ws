@@ -212,9 +212,9 @@ class CliDiscoveryTests(unittest.TestCase):
 class ChildEnvironmentTests(unittest.TestCase):
     def test_endpoint_vars_are_dropped_so_the_cli_cannot_loop_back(self):
         with patch.dict("os.environ",
-                        {"ANTHROPIC_BASE_URL": "http://127.0.0.1:11435",
-                         "CLAUDE_CODE_API_BASE_URL": "http://127.0.0.1:11435",
-                         "OPENAI_BASE_URL": "http://127.0.0.1:11435/v1",
+                        {"ANTHROPIC_BASE_URL": "http://127.0.0.1:11439",
+                         "CLAUDE_CODE_API_BASE_URL": "http://127.0.0.1:11439",
+                         "OPENAI_BASE_URL": "http://127.0.0.1:11439/v1",
                          "PATH": "/usr/bin"}, clear=True):
             env = child_environment()
             self.assertNotIn("ANTHROPIC_BASE_URL", env)

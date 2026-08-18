@@ -684,7 +684,8 @@ class ClaudeBackend:
             state["usage"] = _claude_usage(event.get("usage"))
             state["structured"] = event.get("structured_output")
             if event.get("is_error") or event.get("subtype") != "success":
-                raise ProxyError(_result_error(event), 502, "claude_error")
+                status, code = _result_status(event)
+                raise ProxyError(_result_error(event), status, code)
             if isinstance(event.get("result"), str):
                 state["result_text"] = event["result"]
 
@@ -765,6 +766,21 @@ def _result_error(event: Dict[str, Any]) -> str:
     if detail:
         return "Claude failed ({}): {}".format(subtype, detail[:300])
     return "Claude failed ({}).".format(subtype)
+
+
+def _result_status(event: Dict[str, Any]) -> Tuple[int, str]:
+    """Giữ nguyên status của upstream thay vì nuốt hết thành 502.
+
+    CLI gắn api_error_status khi Claude API từ chối (429 hết hạn mức phiên,
+    401 chưa đăng nhập…). Ép về 502 thì SDK anthropic coi là lỗi server: retry
+    4 lần vô ích rồi ném InternalServerError, che mất nguyên nhân thật.
+    """
+    status = event.get("api_error_status")
+    if isinstance(status, str) and status.strip().isdigit():
+        status = int(status)
+    if isinstance(status, int) and 400 <= status < 500:
+        return status, "claude_api_error"
+    return 502, "claude_error"
 
 
 # ── Tool decision ────────────────────────────────────────────────────────────
@@ -902,7 +918,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):  # noqa: N802
         if self.path in {"/", "/v1", "/v1/"}:
-            host = self.headers.get("Host", "127.0.0.1:11435")
+            host = self.headers.get("Host", "127.0.0.1:11439")
             self._json(
                 200,
                 {
@@ -1260,7 +1276,7 @@ def _reject_unsupported(body: Dict[str, Any]) -> None:
 def parse_args(argv=None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Claude CLI proxy cho pipeline WS1")
     parser.add_argument("--host", default=os.getenv("LLM_PROXY_HOST", "127.0.0.1"))
-    parser.add_argument("--port", type=int, default=int(os.getenv("LLM_PROXY_PORT", "11435")))
+    parser.add_argument("--port", type=int, default=int(os.getenv("LLM_PROXY_PORT", "11439")))
     parser.add_argument(
         "--timeout",
         type=int,

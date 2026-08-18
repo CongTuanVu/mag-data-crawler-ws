@@ -160,15 +160,50 @@ def resolve_sources_file(query: str, args) -> Path | None:
     return args.sources
 
 
-def predicted_building_id(query: str, args) -> str:
+DONE_INDEX = config.CSV_DIR / ".done_index.json"
+_INDEX_LOCK = threading.Lock()
+
+
+def load_done_index() -> dict:
+    """Bảng tra query → building_id của các toà đã ghi CSV xong.
+
+    Nằm cạnh chính output_csv/ nên khi dọn output_raw/ cho nhẹ đĩa, --skip-done
+    vẫn biết dòng nào trong buildings.txt ứng với file CSV nào — không phải chạy
+    lại discover chỉ để biết building_id.
+    """
+    try:
+        data = json.loads(DONE_INDEX.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def record_done(query: str, building_id: str) -> None:
+    with _INDEX_LOCK:                       # tối đa 4 toà chạy song song, cùng ghi một file
+        index = load_done_index()
+        if index.get(query) == building_id:
+            return
+        index[query] = building_id
+        DONE_INDEX.parent.mkdir(parents=True, exist_ok=True)
+        tmp = DONE_INDEX.with_name(DONE_INDEX.name + ".tmp")
+        tmp.write_text(json.dumps(index, ensure_ascii=False, indent=2, sort_keys=True),
+                       encoding="utf-8")
+        tmp.replace(DONE_INDEX)             # thay nguyên tử: đứt giữa chừng không để lại file hỏng
+
+
+def predicted_building_id(query: str, args, index: dict | None = None) -> str:
     """Đoán building_id TRƯỚC khi chạy, để bỏ qua toà đã có CSV mà không tốn gì.
 
-    Khớp với `discover.building_id`: id là slug của --building-id, của gợi ý
-    trong sources.json đã lưu, hoặc của chính tên toà. Đường `discover` sinh gợi ý
-    bằng model nên lần đầu không đoán được — `process()` kiểm lại sau khi có id.
+    Thứ tự tra: --building-id → bảng .done_index.json cạnh output_csv/ → gợi ý
+    trong sources.json đã lưu → slug của chính tên toà. Hai nguồn đầu là chắc
+    chắn; hai nguồn sau là phỏng đoán, nên `process()` vẫn kiểm lại sau khi
+    discover trả về id thật.
     """
     if args.building_id:
         return config.slugify(args.building_id, "building")
+    recorded = (load_done_index() if index is None else index).get(query)
+    if recorded:
+        return recorded
     for candidate in sorted(config.RAW_DIR.glob("*/sources.json")):
         try:
             data = json.loads(candidate.read_text(encoding="utf-8"))
@@ -185,8 +220,9 @@ def predicted_building_id(query: str, args) -> str:
 def split_done(queries: List[str], args) -> Tuple[List[str], List[str]]:
     """Tách danh sách thành (cần chạy, đã có CSV)."""
     todo, done = [], []
+    index = load_done_index()               # đọc một lần, dùng cho cả danh sách
     for query in queries:
-        csv_path = config.CSV_DIR / f"{predicted_building_id(query, args)}.csv"
+        csv_path = config.CSV_DIR / f"{predicted_building_id(query, args, index)}.csv"
         (done if csv_path.exists() else todo).append(query)
     return todo, done
 
@@ -320,6 +356,7 @@ def process(query: str, args: argparse.Namespace) -> None:
     # Lưới an toàn cho đường discover: id chỉ biết được sau khi agent tìm nguồn,
     # nên lọc trước ở main() không bắt được trường hợp này.
     if getattr(args, "skip_done", False) and (config.CSV_DIR / f"{bid}.csv").exists():
+        record_done(query, bid)             # lần sau lọc được từ đầu, khỏi discover lại
         print(f"      ↷ bỏ qua: đã có output_csv/{bid}.csv")
         return
 
@@ -360,6 +397,7 @@ def process(query: str, args: argparse.Namespace) -> None:
         linked_case_id=args.linked_case_id, is_target=args.target)
     warns += validate.check(tables, prov)
     csv_path = writer.run(bid, tables, prov, bench, warns, out_dir)
+    record_done(query, bid)
     print(f"      → {csv_path}")
 
     if tables["unit_room"]:
@@ -381,7 +419,7 @@ def main() -> None:
     ap.add_argument("--batch-sleep", type=int, default=90,
                     help="Giây nghỉ giữa hai lô, giãn tải lên hạn mức (mặc định 90)")
     ap.add_argument("--skip-done", action="store_true",
-                    help="Bỏ qua toà đã có output_csv/<building_id>.csv — chạy tiếp lô dài bị đứt")
+                    help="Bỏ qua toà đã có output_csv/<building_id>.csv — chạy tiếp lô dài bị đứt. Cặp query↔id ghi vào output_csv/.done_index.json nên lần sau lọc được ngay từ đầu")
     ap.add_argument("--building-id", default="", help="Ép building_id thay vì để agent tự sinh")
     ap.add_argument("--linked-case-id", default=None, help="FK sang case_benchmark của WS1 khu đô thị")
     ap.add_argument("--target", action="store_true", help="Đánh dấu is_target = true (sản phẩm GBAC)")

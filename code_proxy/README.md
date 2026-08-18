@@ -26,7 +26,7 @@ CLAUDE_PROXY_MODEL=claude-opus-5 ./code_proxy/start.sh --timeout 900
 
 ```bash
 unset ANTHROPIC_API_KEY
-export ANTHROPIC_BASE_URL=http://127.0.0.1:11435
+export ANTHROPIC_BASE_URL=http://127.0.0.1:11439
 
 # Đầu vào duy nhất là buildings.txt — agent tự tìm nguồn
 python3 run.py --input buildings.txt \
@@ -72,7 +72,7 @@ endpoint này không chạy vòng lặp tool phía client.
 | Biến | Mặc định | Ý nghĩa |
 | --- | --- | --- |
 | `CLAUDE_PROXY_MODEL` | `claude-sonnet-5` | model khi request không nêu tên |
-| `LLM_PROXY_PORT` / `--port` | `11435` | cổng lắng nghe |
+| `LLM_PROXY_PORT` / `--port` | `11439` | cổng lắng nghe |
 | `LLM_PROXY_HOST` / `--host` | `127.0.0.1` | địa chỉ bind |
 | `LLM_PROXY_TIMEOUT` / `--timeout` | `300` | giây cho mỗi request; đặt `900` cho corpus lớn |
 | `LLM_PROXY_MAX_CONCURRENCY` | `4` | số tiến trình CLI đồng thời, mỗi cái ~400 MB RSS |
@@ -101,7 +101,7 @@ không cho chỉnh.
 ## Kiểm tra nhanh
 
 ```bash
-curl -s http://127.0.0.1:11435/healthz
+curl -s http://127.0.0.1:11439/healthz
 
 python3 -m unittest discover -s code_proxy/tests -p 'test_*.py'
 ```
