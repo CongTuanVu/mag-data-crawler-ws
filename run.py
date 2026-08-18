@@ -8,6 +8,12 @@
 Bốn bước: [1] agent tìm nguồn trên mạng → [2] crawl raw về output_raw/
 → [3] trích feature (text + vision bản vẽ) → [4] kiểm tra chéo & ghi output_csv/.
 
+Muốn chạy nhanh cho danh sách dài: crawl hết trước rồi bóc tách bằng CODE thay vì
+gọi LLM từng trang (xem run_extract.py):
+
+    python run.py --input buildings.txt --crawl-only
+    python run_extract.py build && python run_extract.py run
+
 Chạy lại an toàn: raw append-only, mỗi bước ghi kết quả trung gian trong
 output_raw/<building_id>/ nên có thể bỏ qua bước đã xong bằng --skip-*.
 """
@@ -23,6 +29,7 @@ import threading
 import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Tuple
 
@@ -227,34 +234,86 @@ def split_done(queries: List[str], args) -> Tuple[List[str], List[str]]:
     return todo, done
 
 
-def _run_one(query: str, args, tag: str | None, stream: TaggedStdout) -> Tuple[str, str | None, bool]:
-    """Chạy một toà nhà. Trả về (query, lỗi hoặc None, có phải lỗi xác thực không)."""
+# Mốc hạn mức mở lại, do luồng nào chạm 429 trước ghi vào; main đọc để chờ.
+_RATE_LIMIT_HINT: dict = {}
+
+# CLI Claude Code báo "resets at 3pm" / "resets at 15:00"; API thật gắn header
+# retry-after. Đọc được cái nào thì chờ đúng chừng đó, không thì chờ mặc định.
+_RESET_EPOCH_RE = re.compile(r"resets?[_\s]*at\D{0,4}(\d{10})", re.I)
+_RESET_CLOCK_RE = re.compile(r"resets?\s+at\s+(\d{1,2})(?::(\d{2}))?\s*(am|pm)?", re.I)
+RATE_LIMIT_WAIT_DEFAULT = 15 * 60
+RATE_LIMIT_WAIT_MAX = 6 * 60 * 60
+
+
+def rate_limit_wait_seconds(exc: Exception) -> int | None:
+    """Số giây tới lúc hạn mức mở lại. None nếu không đoán được từ lỗi."""
+    response = getattr(exc, "response", None)
+    header = getattr(response, "headers", {}) or {}
+    retry_after = str(header.get("retry-after", "")).strip()
+    if retry_after.isdigit():
+        return min(int(retry_after) + 30, RATE_LIMIT_WAIT_MAX)
+
+    message = str(exc)
+    epoch = _RESET_EPOCH_RE.search(message)
+    if epoch:
+        delta = int(epoch.group(1)) - int(time.time())
+        if 0 < delta <= RATE_LIMIT_WAIT_MAX:
+            return delta + 30
+
+    clock = _RESET_CLOCK_RE.search(message)
+    if clock:
+        hour, minute = int(clock.group(1)), int(clock.group(2) or 0)
+        suffix = (clock.group(3) or "").lower()
+        if suffix == "pm" and hour < 12:
+            hour += 12
+        elif suffix == "am" and hour == 12:
+            hour = 0
+        if 0 <= hour <= 23:
+            now = datetime.now()
+            target = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+            if target <= now:                      # mốc đã qua → sang ngày/chu kỳ sau
+                target += timedelta(days=1)
+            return min(int((target - now).total_seconds()) + 30, RATE_LIMIT_WAIT_MAX)
+    return None
+
+
+def _run_one(query: str, args, tag: str | None, stream: TaggedStdout) -> Tuple[str, str | None, str | None]:
+    """Chạy một toà nhà.
+
+    Trả về (query, lỗi hoặc None, loại lỗi chặn cả hàng đợi: 'auth' | 'rate_limit'
+    | None). Hai loại đó không phải lỗi riêng của toà này — mọi toà sau cũng dính,
+    nên gọi thêm chỉ tổ đốt hàng đợi.
+    """
     if tag is not None:
         stream.set_tag(tag)
     try:
         process(query, args)
-        return query, None, False
+        return query, None, None
     except anthropic.AuthenticationError:
-        return query, "xác thực không hợp lệ (401)", True
+        return query, "xác thực không hợp lệ (401)", "auth"
     except anthropic.RateLimitError as e:
-        return query, f"chạm rate limit — {str(e)[:120]}", False
+        _RATE_LIMIT_HINT.setdefault("seconds", rate_limit_wait_seconds(e))
+        return query, f"chạm rate limit — {str(e)[:120]}", "rate_limit"
     except SystemExit as e:
-        return query, str(e), False
+        return query, str(e), None
     except Exception:
-        return query, traceback.format_exc(limit=4), False
+        return query, traceback.format_exc(limit=4), None
     finally:
         stream.flush()
 
 
-def run_batches(queries: List[str], args) -> Tuple[List[str], bool]:
+def run_batches(queries: List[str], args) -> Tuple[List[str], str | None, List[str]]:
     """Chạy theo lô: mỗi lô `batch_size` toà song song, xong lô thì nghỉ.
 
     Nghỉ giữa các lô để giãn tải lên hạn mức sử dụng; không nghỉ sau lô cuối.
+
+    Trả về (toà lỗi, lý do dừng sớm hoặc None, toà chưa kịp chạy).
     """
     size = max(1, args.batch_size)
     batches = [queries[i:i + size] for i in range(0, len(queries), size)]
     width = max((len(config.slugify(q)[:16]) for q in queries), default=8)
     failed: List[str] = []
+    finished: set = set()
     parallel = size > 1 and len(queries) > 1
 
     stream = TaggedStdout(sys.stdout)
@@ -269,18 +328,21 @@ def run_batches(queries: List[str], args) -> Tuple[List[str], bool]:
                     for q in batch
                 ]
                 for future in as_completed(futures):
-                    query, error, is_auth_error = future.result()
-                    if is_auth_error:
+                    query, error, blocking = future.result()
+                    finished.add(query)
+                    if blocking == "auth" or (blocking == "rate_limit"
+                                              and args.on_rate_limit != "continue"):
                         for pending in futures:
                             pending.cancel()
-                        return failed, True
+                        remaining = [q for q in queries if q not in finished]
+                        return failed, blocking, remaining
                     if error:
                         print(f"  ✗ {query}: {error}")
                         failed.append(query)
             if index < len(batches) and args.batch_sleep > 0:
                 print(f"\n⏸  nghỉ {args.batch_sleep}s trước lô {index + 1}/{len(batches)}…")
                 time.sleep(args.batch_sleep)
-    return failed, False
+    return failed, None, []
 
 
 URL_RE = re.compile(r"https?://[^\s|)\]]+")
@@ -370,12 +432,20 @@ def process(query: str, args: argparse.Namespace) -> None:
         manifest = crawl.run(bid, srcs, out_dir, fresh=args.fresh, timeout=args.timeout,
                              shots=not args.no_shots, headful=args.headful)
 
+    if getattr(args, "crawl_only", False):
+        print(f"      ↷ dừng sau crawl (--crawl-only) — bóc tách bằng: "
+              f"python run_extract.py run --only {bid}")
+        return
+
     # ── [3] trích ───────────────────────────────────────────────────────────
     ex_path = out_dir / "extract_text.json"
     if args.skip_extract and ex_path.exists():
         # Chuẩn hoá lại khi nạp: file cũ có thể được trích trước khi có quy tắc 8.
         text_out = extract.normalize_language(json.loads(ex_path.read_text(encoding="utf-8")))
         print(f"[3/4] Dùng lại extract_text.json")
+    elif getattr(args, "extract_mode", "llm") == "code":
+        from code_extract import runner as code_runner
+        text_out = code_runner.run(out_dir, manifest, resolved, building_id=bid)
     else:
         text_out = extract.run(out_dir, manifest, resolved)
 
@@ -418,6 +488,10 @@ def main() -> None:
                     help="Số toà chạy SONG SONG trong một lô (mặc định 4). 1 = tuần tự.")
     ap.add_argument("--batch-sleep", type=int, default=90,
                     help="Giây nghỉ giữa hai lô, giãn tải lên hạn mức (mặc định 90)")
+    ap.add_argument("--on-rate-limit", choices=["stop", "wait", "continue"], default="stop",
+                    help="Khi chạm hạn mức 429 (mọi toà sau cũng dính): stop = dừng cả hàng đợi, "
+                         "chạy lại sau bằng --skip-done (mặc định) · wait = chờ tới lúc hạn mức mở "
+                         "lại rồi chạy tiếp · continue = vẫn gọi tiếp cho hết danh sách (nết cũ)")
     ap.add_argument("--skip-done", action="store_true",
                     help="Bỏ qua toà đã có output_csv/<building_id>.csv — chạy tiếp lô dài bị đứt. Cặp query↔id ghi vào output_csv/.done_index.json nên lần sau lọc được ngay từ đầu")
     ap.add_argument("--building-id", default="", help="Ép building_id thay vì để agent tự sinh")
@@ -431,6 +505,12 @@ def main() -> None:
     ap.add_argument("--skip-discover", action="store_true", help="Dùng lại sources.json")
     ap.add_argument("--skip-crawl", action="store_true", help="Dùng lại manifest.json")
     ap.add_argument("--skip-extract", action="store_true", help="Dùng lại extract_text.json")
+    ap.add_argument("--crawl-only", action="store_true",
+                    help="Chỉ chạy [1][2] rồi dừng — crawl cả danh sách trước, bóc tách sau "
+                         "bằng code: python run_extract.py build && python run_extract.py run")
+    ap.add_argument("--extract-mode", choices=["llm", "code"], default="llm",
+                    help="Bước [3] trích text: llm = mỗi toà 6 lượt gọi model (mặc định) · "
+                         "code = chạy code_extract/ đã sinh sẵn, không gọi model")
     ap.add_argument("--skip-vision", action="store_true", help="Bỏ bước đọc ảnh mặt bằng")
     ap.add_argument("--dry-run", action="store_true",
                     help="Chỉ in danh sách toà nhà đọc được từ input rồi dừng, không gọi API")
@@ -505,16 +585,36 @@ def main() -> None:
     config.RAW_DIR.mkdir(parents=True, exist_ok=True)
     print(f"{len(queries)} toà nhà")
 
-    failed, aborted = run_batches(queries, args)
-    if aborted:
-        sys.exit("\n✗ Xác thực không hợp lệ (401) — dừng toàn bộ.\n"
-                 "  Đặt key hợp lệ rồi chạy lại:\n"
-                 "    export ANTHROPIC_API_KEY=sk-ant-...\n"
-                 f"  hoặc ghi vào {config.ROOT / '.env'}")
+    planned, failed, remaining = len(queries), [], queries
+    while remaining:
+        batch_failed, aborted, remaining = run_batches(remaining, args)
+        failed += batch_failed
+        if aborted == "auth":
+            sys.exit("\n✗ Xác thực không hợp lệ (401) — dừng toàn bộ.\n"
+                     "  Đặt key hợp lệ rồi chạy lại:\n"
+                     "    export ANTHROPIC_API_KEY=sk-ant-...\n"
+                     f"  hoặc ghi vào {config.ROOT / '.env'}")
+        if aborted == "rate_limit":
+            wait = _RATE_LIMIT_HINT.get("seconds")
+            if args.on_rate_limit == "wait":
+                wait = wait or RATE_LIMIT_WAIT_DEFAULT
+                _RATE_LIMIT_HINT.clear()           # lần chạm sau đọc lại mốc mới
+                print(f"\n⏸  chạm hạn mức — chờ {wait // 60} phút rồi chạy tiếp "
+                      f"{len(remaining)} toà (dừng bằng Ctrl-C, chạy lại với --skip-done)…")
+                time.sleep(wait)
+                continue
+            resume = (f"python run.py --input {args.input} --skip-done"
+                      if args.input else "python run.py <toà nhà>")
+            when = f" (khoảng {wait // 60} phút nữa)" if wait else ""
+            sys.exit(f"\n✗ Chạm hạn mức Claude (429) — dừng để khỏi đốt hàng đợi{when}.\n"
+                     f"  Còn {len(remaining)}/{planned} toà chưa chạy. Khi hạn mức mở lại:\n"
+                     f"    {resume}\n"
+                     "  Hoặc để nó tự chờ rồi chạy tiếp: thêm --on-rate-limit wait")
+        break
     if failed:
-        print(f"\n✗ {len(failed)}/{len(queries)} toà nhà lỗi: {', '.join(failed)}")
+        print(f"\n✗ {len(failed)}/{planned} toà nhà lỗi: {', '.join(failed)}")
         sys.exit(1)
-    print(f"\n✓ Xong {len(queries)} toà nhà → {config.CSV_DIR}")
+    print(f"\n✓ Xong {planned} toà nhà → {config.CSV_DIR}")
 
 
 if __name__ == "__main__":

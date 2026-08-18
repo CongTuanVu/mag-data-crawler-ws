@@ -27,3 +27,8 @@ code_ui/dist/
 .idea/
 .vscode/
 .DS_Store
+
+# code_extract: bản sao lưu code sinh ra + sổ ghi thuật ngữ chưa dịch
+# (lexicon_auto.json thì GIỮ LẠI — đó là từ điển đã dịch, dùng chung giữa các máy)
+code_extract/.bak/
+code_extract/.lexicon_misses.json

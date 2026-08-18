@@ -139,3 +139,40 @@ def cached(text: str) -> Dict[str, Any]:
 
 def image_block(data_b64: str, media_type: str) -> Dict[str, Any]:
     return {"type": "image", "source": {"type": "base64", "media_type": media_type, "data": data_b64}}
+
+
+def call_text(
+    system: List[Dict[str, Any]],
+    user_content: Any,
+    max_tokens: int = config.MAX_TOKENS,
+    effort: str = config.EFFORT,
+    label: str = "",
+) -> str:
+    """Gọi model lấy TEXT thô, không ép JSON schema.
+
+    Dùng cho bước sinh code (pipeline/codegen.py): mã nguồn nhét trong chuỗi JSON
+    vừa tốn token vừa dễ hỏng vì escape, nên ở đó ta phân định file bằng dòng
+    `===== FILE: … =====` rồi tự cắt.
+    """
+    if config.OFFLINE:
+        from . import mock
+        return mock.call_text(system, user_content, max_tokens, effort, label)
+
+    kwargs: Dict[str, Any] = dict(model=config.MODEL, max_tokens=max_tokens)
+    if config.COMPAT:
+        system = [{k: v for k, v in b.items() if k != "cache_control"} for b in system]
+    else:
+        kwargs["output_config"] = {"effort": effort}
+    kwargs["system"] = system
+
+    with client().messages.stream(
+            messages=[{"role": "user", "content": user_content}], **kwargs) as stream:
+        msg = stream.get_final_message()
+    if msg.stop_reason == "refusal":
+        raise RuntimeError(f"[{label}] model từ chối: {getattr(msg, 'stop_details', None)}")
+    if msg.stop_reason == "max_tokens":
+        raise RuntimeError(f"[{label}] chạm max_tokens={max_tokens} — tăng WS1_CODEGEN_MAX_TOKENS")
+    u = msg.usage
+    print(f"    · {label}: in={u.input_tokens:,} "
+          f"cache_r={getattr(u, 'cache_read_input_tokens', 0) or 0:,} out={u.output_tokens:,}")
+    return _text_of(msg)

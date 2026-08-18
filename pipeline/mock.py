@@ -109,3 +109,21 @@ def call_json(system: List[Dict[str, Any]], user_content: Any, schema: Dict[str,
     n = RECORDS_PER_TABLE.get(table, 2)
     return {"records": [_record(item_props, i, files) for i in range(n)],
             "notes": "[offline] dữ liệu giả, không dùng để phân tích"}
+
+
+def call_text(system, user_content, max_tokens=0, effort="", label="") -> str:
+    """Giả lập sinh code: trả một rules.py tối thiểu để test đường ống offline."""
+    return (
+        "===== FILE: rules.py =====\n"
+        '"""Bản GIẢ LẬP (chế độ offline) — số liệu là RÁC, chỉ để thử đường ống."""\n'
+        "from code_extract import common as C\n\n\n"
+        "def building(pages, ctx):\n"
+        "    p = pages[0]\n"
+        "    return [C.auto_prov({'district': 'mock', 'num_floors_above': 1}, p, 'mock')]\n\n\n"
+        "def unit_type(pages, ctx):\n"
+        "    return []\n\n\n"
+        "def floor_plate(pages, ctx):\n    return []\n\n\n"
+        "def handover_item(pages, ctx):\n    return []\n\n\n"
+        "def amenity(pages, ctx):\n    return []\n\n\n"
+        "def price_obs(pages, ctx):\n    return []\n"
+    )

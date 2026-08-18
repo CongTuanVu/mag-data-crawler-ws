@@ -16,6 +16,17 @@ python3 run.py "Marina One Residences, Singapore"
 python3 run.py --input buildings.txt
 ```
 
+Danh sách dài thì đi **đường nhanh**: crawl hết trước, rồi một lượt agent đọc cấu
+trúc HTML để viết trình bóc tách, sau đó mọi toà chạy bằng code (~0.15 s/toà,
+không token) — xem [`code_extract/README.md`](code_extract/README.md).
+
+```bash
+python3 run.py --input buildings.txt --crawl-only    # [1][2] crawl cả danh sách
+python3 run_extract.py build                         # 1 lượt agent → code_extract/rules.py
+python3 run_extract.py run --workers 8               # [3][4] bằng code → output_csv/
+python3 run_extract.py translate                     # dịch gộp thuật ngữ còn sót
+```
+
 ## Luồng
 
 ```
@@ -35,6 +46,9 @@ tên toà nhà
          validate.py   kiểm tra chéo §4.1/§13.9 (chỉ cảnh báo, không sửa số)
          writer.py                          → output_csv/<building_id>.csv
 ```
+
+Bước [3] có hai backend: `extract.py` (mặc định, LLM đọc corpus từng toà) và
+`code_extract/` (`--extract-mode code`, chạy code đã sinh sẵn — không gọi model).
 
 ## Output — mỗi toà nhà đúng một file CSV
 
@@ -75,6 +89,8 @@ df.query("bang == 'B2'")[["record_label", "area_gross_m2", "bedrooms", "source_u
 | `--headful`, `--no-shots`, `--timeout N` | điều khiển trình duyệt |
 | `--dry-run` | in danh sách toà nhà đọc được từ input rồi dừng, không gọi API |
 | `--check-spec` | đối chiếu `feature_spec.md` ↔ `schema.py`, thoát mã 1 nếu lệch |
+| `--crawl-only` | chỉ chạy [1][2] rồi dừng — để bóc tách sau bằng `run_extract.py` |
+| `--extract-mode code` | bước [3] chạy `code_extract/` thay vì 6 lượt gọi model |
 
 Input nhận **mỗi dòng một tên toà**, hoặc **bảng markdown** (tự nhận cột
 `Toà nhà`/`Building`/`Tên` và ghép thêm cột `Thành phố`/`City` cho đỡ nhầm toà).
