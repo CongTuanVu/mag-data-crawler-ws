@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import re
 import json
 import sys
 from pathlib import Path
@@ -139,47 +140,85 @@ def pick(row: dict, table: str) -> dict:
     return out
 
 
-def load_csv(path: Path) -> dict | None:
+def _building_key(row: dict, fallback: str) -> str:
+    """Toà nào sở hữu dòng này.
+
+    File `thread<N>_<ngày>.csv` chứa NHIỀU toà nên không thể lấy tên file làm khoá
+    nữa. `record_key` có dạng `<building_id>__<gì đó>` nên vẫn nhận ra chủ của
+    dòng B3 unit_room — bảng duy nhất không có cột building_id.
+    """
+    bid = (row.get("building_id") or "").strip()
+    if bid:
+        return bid
+    key = (row.get("record_key") or "").strip()
+    return key.split("__")[0] if "__" in key else fallback
+
+
+def load_csv(path: Path) -> list[dict]:
+    """Đọc một CSV → danh sách toà. Nhận cả file 1 toà lẫn file gộp nhiều toà."""
     with path.open(encoding="utf-8-sig", newline="") as fh:
         rows = list(csv.DictReader(fh))
     if not rows:
-        return None
+        return []
 
-    building = None
-    children: dict[str, list] = {key: [] for key in CHILD_TABLES.values()}
+    order: list[str] = []
+    found: dict[str, dict] = {}
+    kids: dict[str, dict[str, list]] = {}
 
     for row in rows:
+        bid = _building_key(row, path.stem)
+        if bid not in kids:
+            order.append(bid)
+            kids[bid] = {key: [] for key in CHILD_TABLES.values()}
         table = (row.get("bang_ten") or "").strip()
         if table == "building":
-            building = pick(row, "building")
+            found[bid] = pick(row, "building")
         elif table in CHILD_TABLES:
             record = pick(row, table)
             if record:
                 record["_label"] = (row.get("record_label") or "").strip()
-                children[CHILD_TABLES[table]].append(record)
+                kids[bid][CHILD_TABLES[table]].append(record)
 
-    if building is None:
-        print(f"  ! bỏ qua {path.name}: không có dòng B1 building", file=sys.stderr)
-        return None
+    out = []
+    for bid in order:
+        building = found.get(bid)
+        if building is None:
+            print(f"  ! bỏ qua {bid} trong {path.name}: không có dòng B1 building",
+                  file=sys.stderr)
+            continue
+        building.setdefault("building_id", bid)
+        building.setdefault("building_name", bid)
+        building["_file"] = path.name
+        building.update(kids[bid])
+        out.append(building)
+    return out
 
-    building.setdefault("building_id", path.stem)
-    building.setdefault("building_name", path.stem)
-    building["_file"] = path.name
-    building.update(children)
-    return building
+
+def pick_files(csv_dir: Path) -> list[Path]:
+    """File nào để dựng UI.
+
+    Có file `thread<N>_<ngày>.csv` thì chỉ đọc chúng — chúng đã chứa mọi toà, đọc
+    thêm CSV từng toà là mỗi toà hiện lên hai lần. Chưa gộp thì đọc file từng toà
+    như cũ. `_benchmark.csv` luôn bỏ qua (nó là bản rút gọn của cùng dữ liệu).
+    """
+    threads = sorted(p for p in csv_dir.glob("thread*_*.csv")
+                     if re.fullmatch(r"thread\d+_\d{8}\.csv", p.name))
+    if threads:
+        newest = max(p.name.split("_")[-1] for p in threads)   # chỉ mẻ gộp mới nhất
+        return [p for p in threads if p.name.endswith(f"_{newest}")]
+    return sorted(p for p in csv_dir.glob("*.csv") if not p.name.startswith("_"))
 
 
 def build(csv_dir: Path, template: Path, out: Path) -> None:
-    files = sorted(p for p in csv_dir.glob("*.csv"))
+    files = pick_files(csv_dir)
     if not files:
         raise SystemExit(f"Không tìm thấy CSV nào trong {csv_dir}")
 
     buildings = []
     for path in files:
-        print(f"  · đọc {path.name}")
-        data = load_csv(path)
-        if data:
-            buildings.append(data)
+        found = load_csv(path)
+        print(f"  · đọc {path.name} → {len(found)} toà")
+        buildings.extend(found)
 
     if not buildings:
         raise SystemExit("Không dựng được toà nhà nào từ CSV.")

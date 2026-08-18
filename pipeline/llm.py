@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import re
+import threading
 import time
 from typing import Any, Dict, List, Optional
 
@@ -21,12 +22,66 @@ from . import config
 
 _client: Optional[anthropic.Anthropic] = None
 
+# Server tool tra web. `max_content_tokens` là van quan trọng nhất của cả pipeline:
+# không đặt thì mỗi trang fetch về nguyên xi (trang bất động sản Nhật thường
+# 15.000–40.000 token), và nội dung đó nằm lại trong context suốt các vòng còn lại
+# của tool loop — chi phí cộng dồn theo bình phương số trang. Xem pipeline/config.py.
 WEB_TOOLS = [
-    {"type": "web_search_20260209", "name": "web_search", "max_uses": 12},
-    {"type": "web_fetch_20260209", "name": "web_fetch", "max_uses": 12},
+    {"type": "web_search_20260209", "name": "web_search",
+     "max_uses": config.WEB_SEARCH_USES},
+    {"type": "web_fetch_20260209", "name": "web_fetch",
+     "max_uses": config.WEB_FETCH_USES,
+     "max_content_tokens": config.WEB_FETCH_TOKENS},
 ]
 
 FENCE_RE = re.compile(r"```(?:json)?\s*(.+?)\s*```", re.S)
+
+# Sổ ghi token của cả lần chạy — để biết bước nào ăn tiền chứ không phải đoán.
+# Cộng dồn theo nhãn (`discover`, `extract:building`, `codegen`…); nhiều toà chạy
+# song song nên phải khoá.
+_USAGE: Dict[str, Dict[str, int]] = {}
+_USAGE_LOCK = threading.Lock()
+
+
+def _record(label: str, usage) -> None:
+    key = (label or "?").split(":")[0]
+    row = {
+        "calls": 1,
+        "in": getattr(usage, "input_tokens", 0) or 0,
+        "cache_write": getattr(usage, "cache_creation_input_tokens", 0) or 0,
+        "cache_read": getattr(usage, "cache_read_input_tokens", 0) or 0,
+        "out": getattr(usage, "output_tokens", 0) or 0,
+    }
+    with _USAGE_LOCK:
+        acc = _USAGE.setdefault(key, {k: 0 for k in row})
+        for k, v in row.items():
+            acc[k] += v
+
+
+def usage_summary() -> str:
+    """Bảng token theo bước, kèm ước tính chi phí. Rỗng nếu chưa gọi model."""
+    with _USAGE_LOCK:
+        rows = {k: dict(v) for k, v in _USAGE.items()}
+    if not rows:
+        return ""
+    # Giá niêm yết Opus 5: $5/1M input, $25/1M output; cache đọc 0.1x, ghi 2x (ttl 1h).
+    price_in, price_out = 5e-6, 25e-6
+    lines = [f"{'bước':<14}{'lượt':>6}{'in':>12}{'cache ghi':>12}{'cache đọc':>12}"
+             f"{'out':>10}{'~USD':>9}", "─" * 75]
+    total = 0.0
+    for key in sorted(rows, key=lambda k: -rows[k]["in"] - rows[k]["out"]):
+        r = rows[key]
+        cost = ((r["in"] + r["cache_write"] * 2 + r["cache_read"] * 0.1) * price_in
+                + r["out"] * price_out)
+        total += cost
+        lines.append(f"{key:<14}{r['calls']:>6}{r['in']:>12,}{r['cache_write']:>12,}"
+                     f"{r['cache_read']:>12,}{r['out']:>10,}{cost:>9.2f}")
+    lines.append("─" * 75)
+    lines.append(f"{'TỔNG':<14}{sum(r['calls'] for r in rows.values()):>6}"
+                 f"{'':>46}{total:>9.2f}")
+    lines.append("(ước tính theo giá niêm yết claude-opus-5; hợp đồng có chiết khấu "
+                 "thì thấp hơn)")
+    return "\n".join(lines)
 
 WEB_TOOL_PREFIXES = ("web_search", "web_fetch")
 
@@ -123,6 +178,7 @@ def call_json(
         raise RuntimeError(f"[{label}] pause_turn quá 6 vòng")
 
     u = msg.usage
+    _record(label, u)
     print(f"    · {label}: in={u.input_tokens:,} "
           f"cache_r={getattr(u, 'cache_read_input_tokens', 0) or 0:,} out={u.output_tokens:,}")
     text = _text_of(msg)
@@ -173,6 +229,7 @@ def call_text(
     if msg.stop_reason == "max_tokens":
         raise RuntimeError(f"[{label}] chạm max_tokens={max_tokens} — tăng WS1_CODEGEN_MAX_TOKENS")
     u = msg.usage
+    _record(label, u)
     print(f"    · {label}: in={u.input_tokens:,} "
           f"cache_r={getattr(u, 'cache_read_input_tokens', 0) or 0:,} out={u.output_tokens:,}")
     return _text_of(msg)

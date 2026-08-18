@@ -6,6 +6,7 @@
 #   ./run_all.sh --skip-crawl     đã crawl rồi, chỉ bóc tách + ghi CSV lại
 #   ./run_all.sh --rebuild        sinh lại code_extract/rules.py (tốn 1 lượt model)
 #   ./run_all.sh --vision         chạy thêm vision đọc bản vẽ để có B3 unit_room
+#   ./run_all.sh --ui             dựng thêm code_ui/dist/index.html để xem kết quả
 #
 # Cờ:
 #   -i, --input FILE      danh sách toà nhà            (mặc định buildings.txt)
@@ -13,10 +14,13 @@
 #       --batch-size N    số toà crawl song song       (mặc định 4)
 #       --batch-sleep N   giây nghỉ giữa hai lô crawl  (mặc định 30)
 #       --on-rate-limit X stop | wait | continue       (mặc định stop)
+#       --min-ok N        chặng 1 coi là "đã crawl xong" khi ≥N nguồn tải được
+#                         (mặc định 1; đặt 5 để crawl lại các toà thưa dữ liệu)
 #       --skip-crawl      bỏ chặng 1
 #       --skip-translate  bỏ bước dịch gộp + ghi CSV lượt hai
 #       --rebuild         ép sinh lại code bóc tách
 #       --vision          chạy thêm chặng vision cho B3
+#       --ui              dựng code_ui/dist/index.html sau khi có CSV
 #   -n, --dry-run         in lệnh, không chạy
 #   -h, --help            trợ giúp này
 #
@@ -33,7 +37,8 @@ WORKERS=8
 BATCH_SIZE=4
 BATCH_SLEEP=30
 ON_RATE_LIMIT="stop"
-DO_CRAWL=1; DO_BUILD=1; DO_EXTRACT=1; DO_TRANSLATE=1; DO_VISION=0
+MIN_OK=1
+DO_CRAWL=1; DO_BUILD=1; DO_EXTRACT=1; DO_TRANSLATE=1; DO_VISION=0; DO_UI=0
 REBUILD=0; DRY_RUN=0
 
 usage() { awk 'NR>1 { if ($0 !~ /^#/) exit; sub(/^# ?/, ""); print }' "$0"; exit 0; }
@@ -45,10 +50,12 @@ while [ $# -gt 0 ]; do
     --batch-size)    BATCH_SIZE="$2"; shift 2 ;;
     --batch-sleep)   BATCH_SLEEP="$2"; shift 2 ;;
     --on-rate-limit) ON_RATE_LIMIT="$2"; shift 2 ;;
+    --min-ok)        MIN_OK="$2"; shift 2 ;;
     --skip-crawl)    DO_CRAWL=0; shift ;;
     --skip-translate) DO_TRANSLATE=0; shift ;;
     --rebuild)       REBUILD=1; shift ;;
     --vision)        DO_VISION=1; shift ;;
+    --ui)            DO_UI=1; shift ;;
     -n|--dry-run)    DRY_RUN=1; shift ;;
     -h|--help)       usage ;;
     *) echo "cờ không hiểu: $1 (xem --help)" >&2; exit 2 ;;
@@ -67,7 +74,7 @@ step()   { echo "  \$ $*"; [ "$DRY_RUN" = 1 ] || "$@"; }
 if [ "$DO_CRAWL" = 1 ]; then
   banner "[1/4] Crawl raw về output_raw/  (chặng duy nhất còn gọi model — bước tìm nguồn)"
   step "$PY" run.py --input "$INPUT" --crawl-only --no-shots --skip-done \
-       --batch-size "$BATCH_SIZE" --batch-sleep "$BATCH_SLEEP" \
+       --min-ok "$MIN_OK" --batch-size "$BATCH_SIZE" --batch-sleep "$BATCH_SLEEP" \
        --on-rate-limit "$ON_RATE_LIMIT"
   CRAWL_RC=$?
   if [ "$CRAWL_RC" != 0 ]; then
@@ -110,11 +117,23 @@ if [ "$DO_VISION" = 1 ]; then
   step "$PY" run.py --input "$INPUT" --skip-discover --skip-crawl --skip-extract
 fi
 
+# ── Tuỳ chọn: dựng trang xem kết quả ────────────────────────────────────────
+if [ "$DO_UI" = 1 ]; then
+  banner "[+] Dựng trang xem kết quả  (đọc file thread<N>_<ngày>.csv)"
+  step "$PY" code_ui/build_html.py
+fi
+
 TOOK=$(( $(date +%s) - START ))
 banner "Xong sau $((TOOK / 60))m$((TOOK % 60))s"
 if [ "$DRY_RUN" = 0 ]; then
-  echo "  CSV:  $(ls output_csv/*.csv 2>/dev/null | wc -l | tr -d ' ') file trong output_csv/"
-  echo "  Raw:  $(ls -d output_raw/*/ 2>/dev/null | wc -l | tr -d ' ') toà trong output_raw/"
+  # Đếm riêng: output_csv/ giờ có cả CSV từng toà lẫn file gộp theo thread, cộng
+  # gộp lại thành một con số là nói sai số toà đã xong.
+  n_raw=$(ls -d output_raw/*/ 2>/dev/null | wc -l | tr -d ' ')
+  n_thread=$(ls output_csv/thread*_*.csv 2>/dev/null | wc -l | tr -d ' ')
+  n_bldg=$(ls output_csv/*.csv 2>/dev/null | grep -vE '/(_|thread[0-9]+_)' | wc -l | tr -d ' ')
+  echo "  Raw:  $n_raw toà đã crawl trong output_raw/"
+  echo "  CSV:  $n_bldg file theo toà · $n_thread file gộp theo thread trong output_csv/"
+  [ "$DO_UI" = 1 ] && echo "  UI:   code_ui/dist/index.html"
   [ "$CRAWL_RC" != 0 ] && echo "  ⚠ crawl chưa xong hết — chạy lại ./run_all.sh để tiếp tục"
 fi
 exit 0

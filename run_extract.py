@@ -26,7 +26,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from code_extract import lexicon, runner
-from pipeline import assemble, codegen, config, floorplan, translate, validate, writer
+from pipeline import (assemble, codegen, config, floorplan, llm, merge, translate,
+                      validate, writer)
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -102,6 +103,9 @@ def cmd_build(args) -> int:
         print("[codegen] bỏ qua chạy thử (--no-verify)")
         return 0
     totals = codegen.build_and_verify(repairs=args.repairs)
+    report = llm.usage_summary()
+    if report:
+        print(f"\n── Token đã dùng ──\n{report}")
     return 0 if sum(totals.values()) else 1
 
 
@@ -182,6 +186,10 @@ def cmd_run(args) -> int:
           f"({took / max(1, len(dirs)):.2f}s/toà)")
     if totals:
         print("  tổng record: " + " · ".join(f"{k}={v}" for k, v in totals.items()))
+    if args.merge:
+        print("\n── Gộp CSV theo thread ──")
+        merge.run(threads=args.workers, drop_evidence=args.no_evidence)
+
     pending = translate.pending()
     if pending:
         print(f"  {len(pending)} thuật ngữ chưa dịch — `python run_extract.py translate`")
@@ -191,8 +199,17 @@ def cmd_run(args) -> int:
     return 0
 
 
+def cmd_merge(args) -> int:
+    merge.run(threads=args.threads, day=args.day,
+              drop_evidence=args.no_evidence, clean=args.clean)
+    return 0
+
+
 def cmd_translate(args) -> int:
     translate.run(limit=args.limit, dry_run=args.dry_run)
+    report = llm.usage_summary()
+    if report:
+        print(f"\n── Token đã dùng ──\n{report}")
     return 0
 
 
@@ -227,7 +244,21 @@ def main() -> None:
     r.add_argument("--linked-case-id", default=None)
     r.add_argument("--target", action="store_true")
     r.add_argument("--verbose", action="store_true", help="In đầy đủ traceback khi lỗi")
-    r.set_defaults(fn=cmd_run)
+    r.add_argument("--no-merge", dest="merge", action="store_false",
+                   help="Không gộp thành thread<N>_<ngày>.csv sau khi chạy")
+    r.add_argument("--no-evidence", action="store_true",
+                   help="Bỏ cột evidence_json khỏi file gộp (~85% dung lượng)")
+    r.set_defaults(fn=cmd_run, merge=True)
+
+    m = sub.add_parser("merge", help="Gộp CSV từng toà → thread<N>_<ngày>.csv "
+                                     "(đọc file đã có, KHÔNG chạy lại bước trích)")
+    m.add_argument("--threads", type=int, default=8, help="Số file thread (mặc định 8)")
+    m.add_argument("--day", default="", help="Ngày trong tên file, YYYYMMDD (mặc định hôm nay)")
+    m.add_argument("--no-evidence", action="store_true",
+                   help="Bỏ cột evidence_json (~85% dung lượng)")
+    m.add_argument("--keep-old", dest="clean", action="store_false",
+                   help="Giữ file thread của lần gộp trước")
+    m.set_defaults(fn=cmd_merge, clean=True)
 
     t = sub.add_parser("translate", help="Dịch gộp thuật ngữ còn sót → lexicon_auto.json")
     t.add_argument("--limit", type=int, default=0, help="Chỉ dịch N term nhiều lượt nhất")

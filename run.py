@@ -35,8 +35,8 @@ from typing import List, Tuple
 
 import anthropic
 
-from pipeline import (assemble, config, crawl, discover, extract, floorplan, speccheck,
-                      validate, writer)
+from pipeline import (assemble, config, crawl, discover, extract, floorplan, llm,
+                      speccheck, validate, writer)
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -172,11 +172,15 @@ _INDEX_LOCK = threading.Lock()
 
 
 def load_done_index() -> dict:
-    """Bảng tra query → building_id của các toà đã ghi CSV xong.
+    """Bảng tra query → building_id của các toà đã xử lý (crawl xong hoặc có CSV).
 
     Nằm cạnh chính output_csv/ nên khi dọn output_raw/ cho nhẹ đĩa, --skip-done
     vẫn biết dòng nào trong buildings.txt ứng với file CSV nào — không phải chạy
     lại discover chỉ để biết building_id.
+
+    Ghi cả ở chế độ --crawl-only: không có nó thì mỗi lần chạy lại phải quét toàn
+    bộ output_raw/*/sources.json cho từng dòng trong danh sách (209×209 lượt đọc
+    file) chỉ để đoán ra building_id.
     """
     try:
         data = json.loads(DONE_INDEX.read_text(encoding="utf-8"))
@@ -224,16 +228,40 @@ def predicted_building_id(query: str, args, index: dict | None = None) -> str:
     return config.slugify(query, "building")
 
 
-def done_marker(building_id: str, args) -> Path:
-    """File chứng tỏ toà này đã xong — tuỳ theo lần chạy dừng ở bước nào.
+def done_mode(args) -> str:
+    """`raw` = đo bằng output_raw/ (đã crawl) · `csv` = đo bằng output_csv/ (đã ra CSV).
 
-    `--crawl-only` không bao giờ ghi CSV, nên nếu vẫn lấy CSV làm mốc thì
-    `--skip-done` không lọc được gì và lần chạy lại sẽ discover + crawl lại từ
-    đầu cả danh sách. Ở chế độ đó, mốc là manifest.json của bước crawl.
+    `auto` chọn theo việc lần chạy này dừng ở đâu: --crawl-only không bao giờ ghi
+    CSV, nên lấy CSV làm mốc thì --skip-done không lọc được gì và mẻ sau sẽ
+    discover + crawl lại từ đầu cả danh sách.
     """
-    if getattr(args, "crawl_only", False):
-        return config.RAW_DIR / building_id / "manifest.json"
-    return config.CSV_DIR / f"{building_id}.csv"
+    mode = getattr(args, "done_by", "auto")
+    if mode != "auto":
+        return mode
+    return "raw" if getattr(args, "crawl_only", False) else "csv"
+
+
+def is_done(building_id: str, args) -> bool:
+    """Toà này đã xong chưa, theo mốc đang chọn.
+
+    Ở chế độ `raw`, riêng sự tồn tại của manifest.json là KHÔNG đủ: crawl hỏng
+    (2/25 nguồn ok) vẫn để lại manifest, và bỏ qua nó thì toà đó vĩnh viễn thiếu
+    dữ liệu mà không ai biết. Phải đủ `--min-ok` nguồn tải được mới tính là xong.
+    """
+    if done_mode(args) == "csv":
+        return (config.CSV_DIR / f"{building_id}.csv").exists()
+    man_path = config.RAW_DIR / building_id / "manifest.json"
+    try:
+        manifest = json.loads(man_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    return int(manifest.get("ok", 0)) >= max(1, getattr(args, "min_ok", 1))
+
+
+def done_label(args) -> str:
+    if done_mode(args) == "csv":
+        return "đã có CSV"
+    return f"đã crawl xong (≥{max(1, getattr(args, 'min_ok', 1))} nguồn ok)"
 
 
 def split_done(queries: List[str], args) -> Tuple[List[str], List[str]]:
@@ -241,8 +269,8 @@ def split_done(queries: List[str], args) -> Tuple[List[str], List[str]]:
     todo, done = [], []
     index = load_done_index()               # đọc một lần, dùng cho cả danh sách
     for query in queries:
-        marker = done_marker(predicted_building_id(query, args, index), args)
-        (done if marker.exists() else todo).append(query)
+        bid = predicted_building_id(query, args, index)
+        (done if is_done(bid, args) else todo).append(query)
     return todo, done
 
 
@@ -429,9 +457,9 @@ def process(query: str, args: argparse.Namespace) -> None:
 
     # Lưới an toàn cho đường discover: id chỉ biết được sau khi agent tìm nguồn,
     # nên lọc trước ở main() không bắt được trường hợp này.
-    if getattr(args, "skip_done", False) and done_marker(bid, args).exists():
+    if getattr(args, "skip_done", False) and is_done(bid, args):
         record_done(query, bid)             # lần sau lọc được từ đầu, khỏi discover lại
-        print(f"      ↷ bỏ qua: đã có {done_marker(bid, args).relative_to(config.ROOT)}")
+        print(f"      ↷ bỏ qua: {bid} {done_label(args)}")
         return
 
     # ── [2] crawl ───────────────────────────────────────────────────────────
@@ -445,6 +473,7 @@ def process(query: str, args: argparse.Namespace) -> None:
                              shots=not args.no_shots, headful=args.headful)
 
     if getattr(args, "crawl_only", False):
+        record_done(query, bid)             # lần sau --skip-done lọc được ngay từ đầu
         print(f"      ↷ dừng sau crawl (--crawl-only) — bóc tách bằng: "
               f"python run_extract.py run --only {bid}")
         return
@@ -504,8 +533,16 @@ def main() -> None:
                     help="Khi chạm hạn mức 429 (mọi toà sau cũng dính): stop = dừng cả hàng đợi, "
                          "chạy lại sau bằng --skip-done (mặc định) · wait = chờ tới lúc hạn mức mở "
                          "lại rồi chạy tiếp · continue = vẫn gọi tiếp cho hết danh sách (nết cũ)")
+    ap.add_argument("--done-by", choices=["auto", "raw", "csv"], default="auto",
+                    help="--skip-done đo bằng gì: raw = output_raw/<id>/manifest.json "
+                         "(đã crawl) · csv = output_csv/<id>.csv (đã ra CSV) · "
+                         "auto = raw khi có --crawl-only, csv khi không (mặc định)")
+    ap.add_argument("--min-ok", type=int, default=1,
+                    help="Với --done-by raw: cần ít nhất N nguồn crawl thành công mới "
+                         "tính là xong. Crawl hỏng vẫn để lại manifest.json, nên đặt "
+                         "cao hơn (vd 5) để mẻ sau tự crawl lại các toà thưa dữ liệu")
     ap.add_argument("--skip-done", action="store_true",
-                    help="Bỏ qua toà đã có output_csv/<building_id>.csv — chạy tiếp lô dài bị đứt. Cặp query↔id ghi vào output_csv/.done_index.json nên lần sau lọc được ngay từ đầu")
+                    help="Bỏ qua toà đã xong (mốc do --done-by quyết định) — chạy tiếp lô dài bị đứt. Cặp query↔id ghi vào output_csv/.done_index.json nên lần sau lọc được ngay từ đầu")
     ap.add_argument("--building-id", default="", help="Ép building_id thay vì để agent tự sinh")
     ap.add_argument("--linked-case-id", default=None, help="FK sang case_benchmark của WS1 khu đô thị")
     ap.add_argument("--target", action="store_true", help="Đánh dấu is_target = true (sản phẩm GBAC)")
@@ -563,8 +600,7 @@ def main() -> None:
     if args.skip_done:
         queries, done = split_done(queries, args)
         if done:
-            what = "đã crawl xong" if args.crawl_only else "đã có CSV"
-            print(f"↷ Bỏ qua {len(done)}/{total} toà {what}: {', '.join(done)}")
+            print(f"↷ Bỏ qua {len(done)}/{total} toà {done_label(args)}: {', '.join(done)}")
 
     if args.dry_run:
         print(f"Đọc {total} toà nhà từ {args.input or 'tham số dòng lệnh'}"
@@ -599,6 +635,10 @@ def main() -> None:
         where = config.BASE_URL or "api.anthropic.com"
         mode = " · chế độ tương thích (JSON qua prompt, không server tool)" if config.COMPAT else ""
         print(f"model = {config.MODEL} · effort = {config.EFFORT} · endpoint = {where}{mode}")
+        print(f"ngân sách tìm nguồn: {config.WEB_SEARCH_USES} search + "
+              f"{config.WEB_FETCH_USES} fetch × {config.WEB_FETCH_TOKENS:,} token · "
+              f"effort {config.EFFORT_DISCOVER} · nhắm {config.SOURCES_MIN}–"
+              f"{config.SOURCES_MAX} nguồn")
     config.RAW_DIR.mkdir(parents=True, exist_ok=True)
     print(f"{len(queries)} toà nhà")
 
@@ -628,6 +668,9 @@ def main() -> None:
                      f"    {resume}\n"
                      "  Hoặc để nó tự chờ rồi chạy tiếp: thêm --on-rate-limit wait")
         break
+    report = llm.usage_summary()
+    if report:
+        print(f"\n── Token đã dùng ──\n{report}")
     if failed:
         print(f"\n✗ {len(failed)}/{planned} toà nhà lỗi: {', '.join(failed)}")
         sys.exit(1)

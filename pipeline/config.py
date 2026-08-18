@@ -51,6 +51,31 @@ MODEL = os.environ.get("WS1_MODEL", "claude-opus-5")
 EFFORT = os.environ.get("WS1_EFFORT", "high")        # low|medium|high|xhigh|max
 MAX_TOKENS = int(os.environ.get("WS1_MAX_TOKENS", "32000"))
 
+# ── Van tiết kiệm token cho bước [1] tìm nguồn ───────────────────────────────
+# Đây là bước duy nhất còn gọi model khi chạy đường nhanh, và là bước đắt nhất:
+# mỗi `web_fetch` nạp trọn nội dung một trang vào context, rồi context đó được
+# mang theo qua từng vòng của server tool — chi phí tăng theo BÌNH PHƯƠNG số
+# trang đọc. Ba con số dưới đây quyết định phần lớn hoá đơn.
+WEB_SEARCH_USES = int(os.environ.get("WS1_WEB_SEARCH_USES", "6"))
+WEB_FETCH_USES = int(os.environ.get("WS1_WEB_FETCH_USES", "5"))
+# Trần nội dung MỖI trang web_fetch kéo về. Không đặt = trọn trang (có trang
+# 40.000+ token). 4.000 đủ để xác minh trang có bảng 物件概要 hay không —
+# việc bóc số liệu là của bước [3], không phải bước này.
+WEB_FETCH_TOKENS = int(os.environ.get("WS1_WEB_FETCH_TOKENS", "4000"))
+
+# Số nguồn nhắm tới. Ít nguồn = ít fetch ở bước [1], ít trang crawl ở bước [2],
+# corpus nhỏ hơn ở bước [3]. Cắt ở đây tiết kiệm cả ba bước.
+SOURCES_MIN = int(os.environ.get("WS1_SOURCES_MIN", "10"))
+SOURCES_MAX = int(os.environ.get("WS1_SOURCES_MAX", "16"))
+
+# Bước tìm nguồn không cần suy luận sâu như bước trích số liệu — nó chỉ tuyển
+# URL. Hạ effort riêng cho bước này cắt được phần lớn token suy nghĩ.
+EFFORT_DISCOVER = os.environ.get("WS1_EFFORT_DISCOVER", "medium")
+
+# Gửi cả feature_spec (30k ký tự) cho bước tìm nguồn là thừa: nó chỉ dùng §9
+# (danh mục purpose), §10 (thuật ngữ bản địa) và §11 (nguồn ưu tiên) — 17% spec.
+SPEC_SECTIONS_DISCOVER = os.environ.get("WS1_SPEC_SECTIONS_DISCOVER", "9,10,11")
+
 # ── Tỷ giá quy đổi sang USD (chỉ dùng cho cột derived price_usd_per_m2) ──────
 # Cập nhật tay khi cần; ghi rõ ngày để mọi con số USD truy được nguồn tỷ giá.
 FX_DATE = "2026-08-01"
@@ -100,3 +125,29 @@ def read_spec() -> str:
     if "unit_room" not in text:      # chặn nhầm với file stub cùng tên
         raise SystemExit(f"{SPEC_PATH} không phải feature_spec WS1 Building (thiếu bảng B3).")
     return text
+
+
+def read_spec_sections(sections: str = "") -> str:
+    """Chỉ vài mục cấp 2 của spec, vd `9,10,11`. Rỗng/`all` → trọn spec.
+
+    Giữ nguyên tiêu đề file ở đầu để model biết đang đọc spec nào, và ghi rõ
+    phần nào bị lược để nó không tưởng spec chỉ có ngần ấy.
+    """
+    text = read_spec()
+    wanted = [s.strip() for s in (sections or "").split(",") if s.strip()]
+    if not wanted or "all" in wanted:
+        return text
+    blocks = re.split(r"(?m)^(?=## )", text)
+    head = blocks[0] if blocks and not blocks[0].startswith("## ") else ""
+    keep, dropped = [], 0
+    for block in blocks:
+        m = re.match(r"## (\d+)\.", block.strip())
+        if m and m.group(1) in wanted:
+            keep.append(block)
+        elif block is not head:
+            dropped += 1
+    if not keep:                     # số mục sai → thà gửi thừa còn hơn thiếu
+        return text
+    note = (f"\n\n[Đã lược {dropped} mục khác của spec — bước này chỉ cần mục "
+            f"{', '.join('§' + w for w in wanted)}.]\n")
+    return head + note + "\n".join(keep)

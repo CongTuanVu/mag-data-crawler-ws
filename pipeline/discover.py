@@ -6,6 +6,10 @@ output_raw/<building_id>/sources.json.
 
 Agent dùng server tool web_search + web_fetch của Claude API — Anthropic chạy
 tìm kiếm phía server, không cần API search riêng.
+
+Đây là bước TỐN TOKEN NHẤT của pipeline (nội dung trang fetch về nằm lại trong
+context suốt tool loop), nên ngân sách search/fetch, trần nội dung mỗi trang, số
+nguồn nhắm tới và effort đều đặt được ở pipeline/config.py.
 """
 from __future__ import annotations
 
@@ -97,17 +101,36 @@ Cách làm:
    mix — luôn cố tìm.
 2b. §11 cảnh báo nhiều portal niêm yết chặn crawl: kiểm tra `robots.txt` trước
    khi đưa vào, bị chặn thì thay bằng báo cáo thị trường. KHÔNG vượt rào.
-3. web_fetch vài trang ứng viên để KIỂM CHỨNG trang thật sự chứa số liệu trước
-   khi đưa vào danh sách. Không liệt kê link chỉ dựa vào tiêu đề kết quả tìm kiếm.
+3. web_fetch để KIỂM CHỨNG, và chỉ khi cần. Ngân sách mỗi toà: {search_uses} lượt
+   search + {fetch_uses} lượt fetch, mỗi fetch chỉ trả về ~{fetch_tokens} token ĐẦU
+   trang (bị cắt có chủ ý). Vậy nên:
+   · Kết quả tìm kiếm đã đủ chắc (đúng tên toà + đúng loại trang) → đưa vào luôn,
+     KHÔNG fetch. Dành lượt fetch cho trang bạn thực sự nghi ngờ.
+   · Fetch là để trả lời "trang này có phải của ĐÚNG toà này và có bảng số liệu
+     không", KHÔNG phải để đọc số. Việc bóc số là của bước sau.
+   · Đừng fetch cùng một domain nhiều lần để tìm trang con — suy ra đường dẫn từ
+     trang chủ CĐT (/outline/, /plan/, /quality/) rồi đưa thẳng vào danh sách.
 4. Cần phủ đủ các purpose: official_overview, floorplan, brochure_pdf, amenities,
    handover_spec, product_mix, price_primary, price_secondary, architecture.
-   Nhắm 12–25 nguồn. Thiếu nhóm nào thì ghi vào `gaps`, KHÔNG bịa URL.
+   Nhắm {src_min}–{src_max} nguồn, ưu tiên trang giàu số liệu hơn là gom cho đủ số.
+   Thiếu nhóm nào thì ghi vào `gaps`, KHÔNG bịa URL.
 5. Nếu tên toà mơ hồ hoặc trùng nhiều dự án: chọn ứng viên khớp nhất và giải
    thích trong `disambiguation_note`. Nếu không xác minh được toà có thật →
    `found = false`, `sources` để rỗng.
 
-Chỉ trả URL bạn đã thấy tồn tại. Không đoán đường dẫn theo mẫu.
+Chỉ trả URL bạn đã thấy tồn tại, hoặc suy ra được từ cấu trúc điều hướng của
+chính trang chủ CĐT mà bạn đã xem. Không đoán đường dẫn theo mẫu chung chung.
+
+`expected_content` viết NGẮN — một dòng nêu trang đó cho trường nào, không chép
+lại số liệu bạn thấy (bước sau tự đọc từ raw).
 """
+
+
+def system_prompt() -> str:
+    return SYSTEM.format(search_uses=config.WEB_SEARCH_USES,
+                         fetch_uses=config.WEB_FETCH_USES,
+                         fetch_tokens=f"{config.WEB_FETCH_TOKENS:,}",
+                         src_min=config.SOURCES_MIN, src_max=config.SOURCES_MAX)
 
 
 def run(query: str, out_dir: Path) -> Dict[str, Any]:
@@ -116,12 +139,15 @@ def run(query: str, out_dir: Path) -> Dict[str, Any]:
         # Spec là nguồn sự thật cho từ khoá tìm kiếm (§10, §11) và danh mục
         # purpose (§9) — gửi nguyên văn thay vì chép lại vào prompt, để hai nơi
         # không lệch nhau khi spec đổi.
-        system=[{"type": "text", "text": SYSTEM},
-                llm.cached("<feature_spec>\n" + config.read_spec() + "\n</feature_spec>")],
+        system=[{"type": "text", "text": system_prompt()},
+                llm.cached("<feature_spec>\n"
+                           + config.read_spec_sections(config.SPEC_SECTIONS_DISCOVER)
+                           + "\n</feature_spec>")],
         user_content=f"Toà nhà cần khảo sát: {query}\n\nHôm nay: {date.today().isoformat()}",
         schema=SCHEMA,
         tools=llm.WEB_TOOLS,
         max_tokens=24000,
+        effort=config.EFFORT_DISCOVER,
         label="discover",
     )
     r = result["resolved"]

@@ -90,6 +90,8 @@ df.query("bang == 'B2'")[["record_label", "area_gross_m2", "bedrooms", "source_u
 | `--dry-run` | in danh sách toà nhà đọc được từ input rồi dừng, không gọi API |
 | `--check-spec` | đối chiếu `feature_spec.md` ↔ `schema.py`, thoát mã 1 nếu lệch |
 | `--crawl-only` | chỉ chạy [1][2] rồi dừng — để bóc tách sau bằng `run_extract.py` |
+| `--done-by raw\|csv` | `--skip-done` đo bằng `output_raw/<id>/manifest.json` (đã crawl) hay `output_csv/<id>.csv` (đã ra CSV). Mặc định `auto`: raw khi có `--crawl-only` |
+| `--min-ok 5` | với `--done-by raw`: cần ≥5 nguồn crawl được mới tính là xong — crawl hỏng vẫn để lại `manifest.json` |
 | `--extract-mode code` | bước [3] chạy `code_extract/` thay vì 6 lượt gọi model |
 
 Input nhận **mỗi dòng một tên toà**, hoặc **bảng markdown** (tự nhận cột
