@@ -52,12 +52,12 @@ FIELDS: dict[str, list[str]] = {
         "bathrooms", "has_multipurpose_room", "area_gross_m2", "area_net_m2",
         "area_basis_reported", "ratio_net_gross_pct", "area_balcony_m2",
         "num_units_of_type", "share_of_total_pct", "facing", "view_type",
-        "is_corner", "floorplan_url", "confidence", "source_urls",
+        "is_corner", "floorplan_url", "floorplan_file", "confidence", "source_urls",
     ],
     "unit_room": [
         "room_id", "unit_type_id", "room_code", "room_type", "room_label_raw",
         "area_m2", "width_m", "length_m", "has_window", "is_ensuite",
-        "position_note", "confidence", "source_urls",
+        "position_note", "source_type", "confidence", "source_urls",
     ],
     "floor_plate": [
         "floor_plate_id", "tower_code", "floor_range", "floor_label",
@@ -75,7 +75,7 @@ FIELDS: dict[str, list[str]] = {
     "amenity": [
         "amenity_id", "amenity_category", "amenity_name", "amenity_name_local",
         "location", "floor_level", "is_indoor", "is_resident_free",
-        "operator_brand", "is_highlight", "confidence", "source_urls",
+        "operator_brand", "is_highlight", "area_m2", "confidence", "source_urls",
     ],
     "price_obs": [
         "price_id", "unit_type_id", "market", "price_min", "price_max",
@@ -309,7 +309,7 @@ def fold_group(versions: list[dict]) -> tuple[dict, int]:
 
 
 def build(csv_dir: Path, template: Path, out: Path, every: bool = False,
-          merge_names: bool = True) -> None:
+          merge_names: bool = True, dedup: bool = True) -> None:
     files = pick_files(csv_dir, every)
     if not files:
         raise SystemExit(f"Không tìm thấy CSV nào trong {csv_dir}")
@@ -326,15 +326,26 @@ def build(csv_dir: Path, template: Path, out: Path, every: bool = False,
     if not groups:
         raise SystemExit("Không dựng được toà nhà nào từ CSV.")
 
-    buildings, gained = [], 0
-    for versions in groups.values():
-        base, n = fold_group(versions)
-        gained += n
-        buildings.append(base)
-    n_extra = sum(len(v) for v in groups.values()) - len(groups)
-    if n_extra:
-        print(f"  · gộp {n_extra} bản trùng building_id → +{gained} dòng con "
-              f"lấy được từ bản phụ")
+    if not dedup:
+        # Không gộp gì cả: mỗi bản đọc được từ mỗi file là một thẻ riêng trong UI.
+        # Dùng khi cần NHÌN TẬN MẮT toàn bộ dữ liệu thô — kể cả trùng — để tự
+        # quyết bản nào đúng, thay vì tin luật gộp tự động.
+        buildings = [b for versions in groups.values() for b in versions]
+        for b in buildings:
+            b["building_name"] = f"{b.get('building_name') or b['building_id']}"
+        print(f"  · KHÔNG gộp: giữ nguyên {len(buildings)} bản từ "
+              f"{len(groups)} building_id")
+        merge_names = False
+    else:
+        buildings, gained = [], 0
+        for versions in groups.values():
+            base, n = fold_group(versions)
+            gained += n
+            buildings.append(base)
+        n_extra = sum(len(v) for v in groups.values()) - len(groups)
+        if n_extra:
+            print(f"  · gộp {n_extra} bản trùng building_id → +{gained} dòng con "
+                  f"lấy được từ bản phụ")
 
     # ── Gộp lần hai: cùng TÊN nhưng khác building_id ────────────────────────
     # buildings.txt có những dòng chỉ là cùng một toà viết khác đi ("Asakusa
@@ -399,13 +410,15 @@ def main() -> None:
     ap.add_argument("--all", dest="every", action="store_true",
                     help="Đọc MỌI CSV trong thư mục (cả mẻ gộp cũ lẫn CSV từng toà), "
                          "khử trùng theo building_id")
+    ap.add_argument("--no-dedup", dest="dedup", action="store_false",
+                    help="Không gộp gì hết — hiển thị mọi bản của mọi file, kể cả trùng")
     ap.add_argument("--keep-dupes", dest="merge_names", action="store_false",
                     help="Giữ nguyên các toà trùng tên nhưng khác building_id "
                          "(mặc định gộp, giữ bản nhiều dữ liệu nhất)")
     args = ap.parse_args()
 
     build(args.csv_dir.resolve(), args.template.resolve(), args.out.resolve(),
-          args.every, args.merge_names)
+          args.every, args.merge_names, args.dedup)
 
 
 if __name__ == "__main__":
