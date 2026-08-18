@@ -238,30 +238,52 @@ def pick_files(csv_dir: Path, every: bool = False) -> list[Path]:
                   if not p.name.startswith("_") and is_data_csv(p))
 
 
+def richness(b: dict) -> int:
+    """Số ô CÓ DỮ LIỆU của một toà, tính cả bảng con.
+
+    Dùng để chọn giữa các bản trùng. Cùng một toà có thể được trích nhiều lần với
+    độ phủ khác nhau (đổi rules.py, thêm nguồn crawl, dịch xong thuật ngữ) — bản
+    ghi sau CHƯA CHẮC đầy đủ hơn, nên đếm dữ liệu chứ đừng tin dấu thời gian.
+    """
+    score = 0
+    for key, val in b.items():
+        if key.startswith("_"):
+            continue
+        if isinstance(val, list):                      # unit_types, amenities…
+            score += sum(1 for rec in val for k, v in rec.items()
+                         if not k.startswith("_") and v not in (None, ""))
+        elif val not in (None, ""):
+            score += 1
+    return score
+
+
 def build(csv_dir: Path, template: Path, out: Path, every: bool = False) -> None:
     files = pick_files(csv_dir, every)
     if not files:
         raise SystemExit(f"Không tìm thấy CSV nào trong {csv_dir}")
 
-    # building_id → (mtime file nguồn, dữ liệu toà). Cùng một toà nằm ở nhiều file
-    # là chuyện bình thường (CSV riêng + các mẻ gộp), nên lấy bản ở file sửa gần
-    # đây nhất thay vì để nó hiện lên nhiều lần trong UI.
-    best: dict[str, tuple[float, dict]] = {}
-    dups = 0
+    # building_id → (điểm xếp hạng, dữ liệu toà). Cùng một toà nằm ở nhiều file là
+    # chuyện bình thường (CSV riêng + các mẻ gộp), nên chọn BẢN ĐẦY ĐỦ NHẤT thay
+    # vì để nó hiện lên nhiều lần trong UI. Hoà điểm mới xét tới file mới hơn.
+    best: dict[str, tuple[tuple[int, float], dict]] = {}
+    dups = won_by_data = 0
     for path in files:
         mtime = path.stat().st_mtime
         found = load_csv(path)
         added = 0
         for b in found:
             bid = b["building_id"]
+            rank = (richness(b), mtime)
             old = best.get(bid)
             if old is None:
                 added += 1
             else:
                 dups += 1
-                if old[0] >= mtime:
+                if old[0] >= rank:
                     continue
-            best[bid] = (mtime, b)
+                if rank[0] > old[0][0]:
+                    won_by_data += 1
+            best[bid] = (rank, b)
         note = f" ({added} mới)" if every and added != len(found) else ""
         print(f"  · đọc {path.name} → {len(found)} toà{note}")
 
@@ -269,7 +291,8 @@ def build(csv_dir: Path, template: Path, out: Path, every: bool = False) -> None
     if not buildings:
         raise SystemExit("Không dựng được toà nhà nào từ CSV.")
     if dups:
-        print(f"  · khử {dups} bản trùng → giữ bản ở file sửa gần đây nhất")
+        extra = f", {won_by_data} lần bản đầy hơn thắng bản mới hơn" if won_by_data else ""
+        print(f"  · khử {dups} bản trùng → giữ bản nhiều dữ liệu nhất{extra}")
 
     buildings.sort(key=lambda b: (b.get("building_name") or "").lower())
 
