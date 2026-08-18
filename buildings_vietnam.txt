@@ -1,0 +1,313 @@
+Landmark 81
+Bitexco Financial Tower
+Saigon Marina IFC
+Vietcombank Tower
+Saigon Center Phase Two
+Vinhomes Golden River Aqua 1
+Vinhomes Golden River Aqua 2
+Vinhomes Golden River Aqua 3
+Vinhomes Golden River Aqua 4
+Vinhomes Golden River Lux 5
+Vinhomes Golden River Lux 6
+Times Square
+Petroland Tower
+Dragon City 1
+Dragon City 2
+The EverRich II
+Saigon Trade Center
+Cantavil Premier Tower 1
+Cantavil Premier Tower 2
+Sunrise City Tower 1
+Sunrise City Tower 2
+Sunrise City Tower 3
+Sunrise City Tower 4
+Sunrise City Tower 5
+Sunrise City Tower 6
+Sunrise City Tower 7
+Sunrise City Tower 8
+Sunrise City Tower 9
+Sunrise City Tower 10
+Sunrise City Tower 11
+Sunrise City Tower 12
+Saigon Pearl Tower I
+Saigon Pearl Tower II
+Saigon Pearl Tower III
+The Sun City Tower 1
+The Sun City Tower 2
+City Garden 1
+City Garden 2
+City Garden 3
+City Garden 4
+Lim Tower
+Hung Vuong Plaza
+Vincom Center
+Richland Emerald Tower
+Thuan Kieu Plaza I
+Thuan Kieu Plaza II
+Thuan Kieu Plaza III
+Kumho Asian Plaza Apartment
+Saigon Center Phase One
+Sunwah Tower
+FLC Grand Hotel Halong
+Citadines Marina Halong
+A La Carte Ha Long Bay
+The Sapphire Residence
+The Sapphire Mansions
+Green Bay Garden
+Green Bay Premium
+New Life Tower
+Ramada Hotel & Suites Halong Bay
+Halong Plaza Hotel
+Wyndham Legend Halong Hotel
+Muong Thanh Luxury Quang Ninh Hotel
+Royal Lotus Hotel Halong
+Hạ Long DC Hotel
+Best Western Premier Sapphire Ha Long
+The Watson Premium Ha Long Hotel
+Grand Fleuve Boutique Hotel
+Citadines Marina Ha Long Tower
+À La Carte Ha Long Bay Tower
+TD Plaza
+SHP Plaza
+Vincom Plaza Imperia
+The Minato Residence
+Hoàng Huy Grand Tower
+Hoàng Huy Commerce
+Waterfront City Tower
+Sentosa Sky Park
+Diamond Crown Hai Phong
+Hotel Nikko Hai Phong
+Mercure Hai Phong
+Pullman Hai Phong
+Vinpearl Hotel Imperia Hai Phong
+Somerset Central TD Hai Phong
+Flamingo Cat Ba Beach Resort
+Cat Ba Sunrise Resort
+FLC Sea Tower
+Altara Quy Nhon
+Grand Center Quy Nhon
+Quy Nhon Melody
+The Sailing Quy Nhon
+Anya Premier Hotel Quy Nhon
+FLC Grand Hotel Quy Nhon
+FLC Luxury Hotel Quy Nhon
+Muong Thanh Quy Nhon Hotel
+Hai Au Hotel
+Saigon Quy Nhon Hotel
+Fleur de Lys Hotel Quy Nhon
+Canh Tien Tower
+Quy Nhon Pearl
+The Sóng
+Vũng Tàu Melody
+Sơn Thịnh 2
+Vũng Tàu Intourco Resort
+Imperial Hotel Vung Tau
+Pullman Vung Tau
+Malibu Hotel
+Fusion Suites Vung Tau
+Dic Phoenix
+Dic Phoenix 1
+Dic Phoenix 2
+Vung Tau Centre Point
+Aria Resort Vung Tau
+Mermaid Seaside Hotel
+New Wave Hotel
+Cap Saint Jacques Hotel
+Sora Gardens I
+Sora Gardens II
+Sora Gardens III
+The Canary Heights
+The Habitat Binh Duong
+Midori Park The View
+Midori Park The Glory
+Midori Park Haruka
+Happy One Central
+Happy One Premier
+Phú Đông Sky Garden
+Phú Đông Premier
+Bcons Garden
+Bcons Polygon
+Bcons Bee
+Bcons Sala
+Bcons City
+Bcons Plaza
+Bcons Green View
+Marina Tower
+Astral City Tower A
+Astral City Tower B
+Astral City Tower C
+Astral City Tower D
+Astral City Tower E
+Astral City Tower F
+Astral City Tower G
+Astral City Tower H
+Vincom Plaza Xuân Khánh
+Vinpearl Hotel Can Tho
+Muong Thanh Luxury Can Tho Hotel
+Sheraton Can Tho
+TTC Hotel Premium Can Tho
+Iris Hotel Can Tho
+Ninh Kieu Riverside Hotel
+Azerai Can Tho
+Victoria Can Tho Resort
+Can Tho Eco Resort
+Stella Mega City
+Cara River Park
+Stella Icon
+Happy Home Can Tho
+À La Carte Halong Bay Condotel
+The Ruby Ha Long North Tower
+The Ruby Ha Long South Tower
+Times Garden Ha Long East Tower
+Times Garden Ha Long West Tower
+Sun Grand Marina Town A
+Sun Grand Marina Town B
+Citadines Marina Halong Tower
+Green Bay Premium Tower A
+Green Bay Premium Tower B
+Green Bay Garden Tower A
+Green Bay Garden Tower B
+New Life Tower A
+New Life Tower B
+New Life Tower C
+Citadines Marina Halong Residence Tower A
+Citadines Marina Halong Residence Tower B
+Halong Bay View Tower
+BIM Group Tower
+Mon Bay Tower A
+Mon Bay Tower B
+Mon Bay Tower C
+Dragon Castle Tower A
+Dragon Castle Tower B
+Dragon Castle Tower C
+Dragon Castle Tower D
+FLC Grand Villa Tower
+Halong Marina Tower
+Halong Marina Plaza Tower
+Marina Bay Halong Tower
+Hoang Huy Grand Tower
+TD Plaza Tower A
+TD Plaza Tower B
+SHP Plaza Tower
+Vincom Plaza Imperia Tower A
+Vincom Plaza Imperia Tower B
+The Minato Residence Tower A
+The Minato Residence Tower B
+Waterfront City Tower A
+Waterfront City Tower B
+Waterfront City Tower C
+Waterfront City Tower D
+Sentosa Sky Park Tower A
+Sentosa Sky Park Tower B
+Hoang Huy Commerce Tower A
+Hoang Huy Commerce Tower B
+Hoang Huy Commerce Tower C
+Hoang Huy Commerce Tower D
+Hoang Huy Commerce Tower E
+Hoang Huy Commerce Tower F
+Flamingo Grand Cat Ba Tower A
+Flamingo Grand Cat Ba Tower B
+Flamingo Grand Cat Ba Tower C
+Flamingo Grand Cat Ba Tower D
+Pullman Quy Nhon
+Wyndham The Sailing Quy Nhon
+Quy Nhon Melody Tower A
+Quy Nhon Melody Tower B
+Quy Nhon Melody Tower C
+Quy Nhon Melody Tower D
+TMS Hotel Da Nang?
+Muong Thanh Luxury Quy Nhon Hotel
+Hai Au Hotel Quy Nhon
+The Sailing Quy Nhon Tower
+Quy Nhon Pearl Tower A
+Quy Nhon Pearl Tower B
+Grand Center Quy Nhon Tower
+Vung Tau Melody Tower A
+Vung Tau Melody Tower B
+Vung Tau Melody Tower C
+Vung Tau Melody Tower D
+Sơn Thịnh 2 Tower A
+Sơn Thịnh 2 Tower B
+DIC Phoenix Tower A
+DIC Phoenix Tower B
+DIC Phoenix Tower C
+DIC Phoenix Tower D
+Malibu Hotel Vung Tau
+Aria Resort Vung Tau Tower A
+Aria Resort Vung Tau Tower B
+Intourco Resort Tower
+New Wave Hotel Vung Tau
+Phú Đông Premier A
+Phú Đông Premier B
+Bcons Garden Tower A
+Bcons Garden Tower B
+Bcons Garden Tower C
+Bcons Garden Tower D
+Bcons Plaza Tower A
+Bcons Plaza Tower B
+Bcons Plaza Tower C
+Bcons Plaza Tower D
+Bcons Green View Tower A
+Bcons Green View Tower B
+Bcons Polygon Tower A
+Bcons Polygon Tower B
+Bcons Sala Tower A
+Bcons Sala Tower B
+Bcons Bee Tower A
+Bcons Bee Tower B
+Tecco Tower Bình Dương
+Marina Tower A
+Marina Tower B
+Marina Tower C
+Midori Park The View Tower A
+Midori Park The View Tower B
+Midori Park The Glory Tower A
+Midori Park The Glory Tower B
+Midori Park Haruka Tower A
+Midori Park Haruka Tower B
+Happy One Central Tower A
+Happy One Central Tower B
+Happy One Premier Tower
+The Canary Heights Tower A
+The Canary Heights Tower B
+The Habitat Binh Duong Tower 1
+The Habitat Binh Duong Tower 2
+The Habitat Binh Duong Tower 3
+The Habitat Binh Duong Tower 4
+The Habitat Binh Duong Tower 5
+The Habitat Binh Duong Tower 6
+XSKT Can Tho Building
+Can Tho Radio & Television Building
+Tay Nguyen Plaza
+Mobifone Can Tho Building
+Sheraton Can Tho Hotel
+Victoria Can Tho Resort Tower
+Stella Mega City Tower A
+Stella Mega City Tower B
+Stella Mega City Tower C
+Stella Icon Tower A
+Stella Icon Tower B
+Cara River Park Tower A
+Cara River Park Tower B
+Happy Home Can Tho Tower A
+Happy Home Can Tho Tower B
+Meliá Vinpearl Hue
+The Manor Crown A
+The Manor Crown B
+La Vela Hotel
+Indochine Palace Hotel
+Azerai La Residence Hue Tower
+Century Riverside Hotel Tower
+Imperial Hotel Hue Tower
+Alba Hotel Hue Tower
+TTC Imperial Hotel Hue Tower
+Muong Thanh Holiday Hue Hotel
+Silk Path Grand Hue Hotel Tower
+Vinpearl Hotel Hue Tower
+Hue Plaza Hotel Tower
+Hue Green City Tower A
+Hue Green City Tower B
+Royal Park Hue Tower
+Riverside Complex Hue Tower A
+Riverside Complex Hue Tower B
+Hue Central Tower
