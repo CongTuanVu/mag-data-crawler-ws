@@ -257,7 +257,18 @@ def richness(b: dict) -> int:
     return score
 
 
-def build(csv_dir: Path, template: Path, out: Path, every: bool = False) -> None:
+def name_key(b: dict) -> str:
+    """Khoá gộp theo TÊN toà, chuẩn hoá nhẹ (thường hoá + gộp khoảng trắng).
+
+    Chỉ khớp tên GIỐNG HỆT sau chuẩn hoá — không cắt hậu tố, không so gần đúng.
+    "The Kosugi Tower" và "The Kosugi Tower Musashikosugi" phải nằm riêng, vì
+    không có cách nào biết chắc chúng là một mà không đọc dữ liệu.
+    """
+    return re.sub(r"\s+", " ", (b.get("building_name") or "").strip().lower()).rstrip(" .")
+
+
+def build(csv_dir: Path, template: Path, out: Path, every: bool = False,
+          merge_names: bool = True) -> None:
     files = pick_files(csv_dir, every)
     if not files:
         raise SystemExit(f"Không tìm thấy CSV nào trong {csv_dir}")
@@ -293,6 +304,30 @@ def build(csv_dir: Path, template: Path, out: Path, every: bool = False) -> None
     if dups:
         extra = f", {won_by_data} lần bản đầy hơn thắng bản mới hơn" if won_by_data else ""
         print(f"  · khử {dups} bản trùng → giữ bản nhiều dữ liệu nhất{extra}")
+
+    # ── Gộp lần hai: cùng TÊN nhưng khác building_id ────────────────────────
+    # buildings.txt có những dòng chỉ cùng một toà viết khác đi ("Asakusa Tower"
+    # và "Asakusa Tower, Taito"), bước tìm nguồn sinh ra hai slug khác nhau, và
+    # UI hiện lên hai lần. Khử theo id không bắt được, phải khử theo tên.
+    if merge_names:
+        by_name: dict[str, dict] = {}
+        collapsed: list[tuple[dict, dict]] = []
+        for b in buildings:
+            key = name_key(b) or f"\x00{b['building_id']}"     # không tên → để riêng
+            prev = by_name.get(key)
+            if prev is None:
+                by_name[key] = b
+                continue
+            keep, drop = ((b, prev) if richness(b) > richness(prev) else (prev, b))
+            by_name[key] = keep
+            collapsed.append((keep, drop))
+        buildings = list(by_name.values())
+        if collapsed:
+            print(f"  · gộp {len(collapsed)} toà trùng TÊN (khác building_id) "
+                  f"→ giữ bản nhiều dữ liệu nhất:")
+            for keep, drop in sorted(collapsed, key=lambda kd: kd[0]["building_name"]):
+                print(f"      {keep['building_name']}: giữ {keep['building_id']} "
+                      f"({richness(keep)} ô) · bỏ {drop['building_id']} ({richness(drop)} ô)")
 
     buildings.sort(key=lambda b: (b.get("building_name") or "").lower())
 
@@ -335,9 +370,13 @@ def main() -> None:
     ap.add_argument("--all", dest="every", action="store_true",
                     help="Đọc MỌI CSV trong thư mục (cả mẻ gộp cũ lẫn CSV từng toà), "
                          "khử trùng theo building_id")
+    ap.add_argument("--keep-dupes", dest="merge_names", action="store_false",
+                    help="Giữ nguyên các toà trùng tên nhưng khác building_id "
+                         "(mặc định gộp, giữ bản nhiều dữ liệu nhất)")
     args = ap.parse_args()
 
-    build(args.csv_dir.resolve(), args.template.resolve(), args.out.resolve(), args.every)
+    build(args.csv_dir.resolve(), args.template.resolve(), args.out.resolve(),
+          args.every, args.merge_names)
 
 
 if __name__ == "__main__":
