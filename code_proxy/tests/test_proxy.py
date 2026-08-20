@@ -224,9 +224,9 @@ class ChildEnvironmentTests(unittest.TestCase):
 
     def test_credentials_are_left_alone(self):
         with patch.dict("os.environ",
-                        {"CLAUDE_CODE_OAUTH_TOKEN": "tok", "HOME": "/home/svc"}, clear=True):
+                        {"CLAUDE_CODE_OAUTH_TOKEN_CONGVT": "tok", "HOME": "/home/svc"}, clear=True):
             env = child_environment()
-            self.assertEqual(env["CLAUDE_CODE_OAUTH_TOKEN"], "tok")
+            self.assertEqual(env["CLAUDE_CODE_OAUTH_TOKEN_CONGVT"], "tok")
             self.assertEqual(env["HOME"], "/home/svc")
 
 

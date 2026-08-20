@@ -779,7 +779,7 @@ def _result_status(event: Dict[str, Any]) -> Tuple[int, str]:
     if isinstance(status, str) and status.strip().isdigit():
         status = int(status)
     if isinstance(status, int) and 400 <= status < 500:
-        return status, "claude_api_error"
+        return status, "cCLAUDE_CODE_OAUTH_TOKEN_CONGVT
     return 502, "claude_error"
 
 
