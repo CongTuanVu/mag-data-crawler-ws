@@ -43,6 +43,18 @@ def _phrase(q: str) -> str:
     return '"' + q.replace('"', '""') + '"'
 
 
+ROOT_VI = {"mag": "MAG — nghiên cứu thị trường", "kđt": "KĐT — khu đô thị"}
+
+
+def _top(rows: list, k: int, key="k") -> list[dict]:
+    """top k rồi gom đuôi — cùng cách trang gộp đuôi tỉnh."""
+    head = [dict(r) for r in rows[:k]]
+    rest = rows[k:]
+    if rest:
+        head.append({key: "Còn lại", "n": sum(r["n"] for r in rest), "rest": len(rest)})
+    return head
+
+
 @lru_cache(maxsize=1)
 def stats() -> dict | None:
     d = db()
@@ -52,9 +64,25 @@ def stats() -> dict | None:
         n_docs = d.execute("select count(*) c from docs").fetchone()["c"]
         n_chunks = d.execute("select count(*) c from chunks").fetchone()["c"]
         agg = d.execute("select count(distinct domain) dom, count(distinct root) rt, "
-                        "sum(bytes) b from docs").fetchone()
+                        "count(distinct job) jb, sum(bytes) b, "
+                        "count(url) u, count(title) t from docs").fetchone()
+        dom = d.execute("select domain k, count(*) n from docs where domain <> '' "
+                        "group by 1 order by n desc").fetchall()
+        # `en-US` và `en` là một thứ tiếng — gộp về mã gốc trước khi đếm
+        lang = d.execute(
+            "select substr(lang, 1, case when instr(lang,'-')>0 then instr(lang,'-')-1 "
+            "else length(lang) end) k, count(*) n from docs where lang <> '' "
+            "group by 1 order by n desc").fetchall()
+        job = d.execute("select job k, count(*) n from docs where job <> '' "
+                        "group by 1 order by n desc").fetchall()
+        root = d.execute("select root k, count(*) n from docs group by 1 "
+                         "order by n desc").fetchall()
     return {"n_docs": n_docs, "n_chunks": n_chunks, "n_domains": agg["dom"],
-            "n_roots": agg["rt"], "mb": round((agg["b"] or 0) / 1e6, 1)}
+            "n_roots": agg["rt"], "n_jobs": agg["jb"], "n_langs": len(lang),
+            "mb": round((agg["b"] or 0) / 1e6, 1),
+            "with_url": agg["u"], "with_title": agg["t"],
+            "roots": [{"k": ROOT_VI.get(r["k"], r["k"]), "n": r["n"]} for r in root],
+            "domains": _top(dom, 12), "langs": _top(lang, 10), "jobs": _top(job, 10)}
 
 
 def search(q: str, limit: int, offset: int) -> dict:

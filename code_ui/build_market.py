@@ -419,6 +419,9 @@ def main():
     ap.add_argument("--sample", type=int, default=250, help="số toà mẫu mỗi thị trường")
     ap.add_argument("--out", default=str(HERE / "dist" / "index.html"))
     ap.add_argument("--corpus", default=CORPUS)
+    ap.add_argument("--export", action="store_true",
+                    help="nhúng toàn bộ dữ liệu vào file (bản tự chứa, mở bằng "
+                         "file:// vẫn chạy). Không có cờ này thì trang gọi API.")
     a = ap.parse_args()
     set_corpus(a.corpus.rstrip("/"))
 
@@ -511,8 +514,26 @@ def main():
     enums = enum_map(con)
     for f, rows in jp_enums.items():          # nhãn riêng của nguồn Nhật, không có trong dim_enum
         enums.setdefault(f, {}).update(rows)
-    payload = {"order": order, "markets": markets, "enums": enums,
-               "overview": overview, "n_core": len(CORE), "corpus": CORPUS}
+    # Hình đường biên quốc gia là HÌNH HỌC tĩnh, không phải dữ liệu — nó ở lại
+    # trong trang ở cả hai chế độ. Phần tô màu theo thị trường thì lấy từ API.
+    world = None
+    try:
+        import build_overview as BO
+        geo = json.loads((HERE / "world_geo.json").read_text(encoding="utf-8"))
+        world = {"w": geo["w"], "h": geo["h"], "features": geo["features"],
+                 "dots": geo["dots"], "n_countries": len(geo["features"]),
+                 "iso": BO.ISO}
+    except Exception as e:
+        print(f"  ✗ hình bản đồ: {e}", file=sys.stderr)
+
+    if a.export:
+        payload = {"order": order, "markets": markets, "enums": enums,
+                   "overview": overview, "n_core": len(CORE), "corpus": CORPUS,
+                   "world": world}
+    else:
+        # Trang gọi API: chỉ mang nhãn tối thiểu và hình bản đồ. Mọi con số lấy
+        # lúc chạy, nên sửa parquet là thấy ngay, không phải dựng lại trang.
+        payload = {"n_core": len(CORE), "world": world}
     blob = json.dumps(payload, ensure_ascii=False, default=str, separators=(",", ":"))
     html = tpl.read_text(encoding="utf-8").replace("__DATA__", blob.replace("</", "<\\/"))
 
@@ -520,9 +541,13 @@ def main():
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding="utf-8")
     size = out.stat().st_size
-    print(f"\n{len(order)} thị trường · {size/1024/1024:.1f} MB · {out}")
-    if size > 12 * 1024 * 1024:
+    mode = "tự chứa (nhúng dữ liệu)" if a.export else "gọi API lúc chạy"
+    print(f"\n{len(order)} thị trường · {size/1024/1024:.1f} MB · {mode}\n{out}")
+    if a.export and size > 12 * 1024 * 1024:
         print("  ⚠ file lớn — cân nhắc giảm --sample", file=sys.stderr)
+    if not a.export:
+        print("  trang này cần API sống ở /ws1-data/api/ — "
+              "`docker compose up -d` ở gốc repo")
 
 
 if __name__ == "__main__":

@@ -213,6 +213,69 @@ def vn_tiers():
     return ok({"rows": fn()})
 
 
+@app.get("/vn/metrics")
+def vn_metrics(category: str | None = Query(None, max_length=64)):
+    """Phân bố tính RIÊNG theo loại dự án — trộn mọi loại thì mật độ căn trung vị
+    lệch hơn 5 lần."""
+    if IS_MOCK:
+        return ok({"rows": mock.metrics("vn", category)})
+    try:
+        return ok({"rows": vn.metrics(category)})
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+
+
+@app.get("/vn/coverage")
+def vn_coverage():
+    if IS_MOCK:
+        return ok({"rows": []})
+    return ok({"rows": vn.coverage()})
+
+
+@app.get("/vn/map")
+def vn_map():
+    """Chấm toạ độ THẬT của mọi dự án, gom theo tỉnh. ~110 KB, đổi rất hiếm —
+    client nên nhớ lại thay vì gọi mỗi lần vẽ."""
+    if IS_MOCK:
+        return ok({"w": 430, "h": 560, "n": 0, "total": 0, "prov": {}, "rest": ""})
+    return ok(vn.map_points())
+
+
+@app.get("/enums")
+def enums():
+    """Nhãn hiển thị: mã → cụm từ tiếng Việt. Không hardcode ở client."""
+    if IS_MOCK:
+        return ok({"enums": {}})
+    from . import config as C
+    rows = db_enum()
+    if jp.available():
+        rows.setdefault("amenities", {}).update(jp.enums())
+    return ok({"enums": rows})
+
+
+def db_enum() -> dict:
+    from . import db
+    import json as _json
+    out: dict = {}
+    try:
+        rows = db.q(f"select field, code, label_vi, label_en, definition_vi, "
+                    f"sort_order, attrs from read_parquet('{config.corpus('dim_enum')}') "
+                    f"where status = 'active' order by field, sort_order")
+    except Exception:
+        return out
+    for r in rows:
+        g = None
+        if r["attrs"]:
+            try:
+                g = _json.loads(r["attrs"]).get("group")
+            except Exception:
+                pass
+        out.setdefault(r["field"], {})[r["code"]] = {
+            "vi": r["label_vi"], "en": r["label_en"],
+            "def": r["definition_vi"], "order": r["sort_order"], "group": g}
+    return out
+
+
 # ── tổng quan & tài liệu ────────────────────────────────────────────────────
 
 @app.get("/overview")
@@ -221,8 +284,31 @@ def overview():
         return ok(mock.overview())
     mk = queries.markets()
     t = vn.tiers()
+    from . import db as _db
+
+    def _tbl(name, gran):
+        """Số dòng và số cột đọc thẳng từ parquet — trang tổng quan cộng chúng
+        lại thành tổng bản ghi, nên không được đoán."""
+        try:
+            path = config.corpus(name)
+            n = _db.scalar(f"select count(*) from read_parquet('{path}')")
+            cols = len(_db.q(f"describe select * from read_parquet('{path}') limit 0"))
+            return {"name": name, "n": n, "cols": cols, "gran": gran}
+        except Exception:
+            return None
+
+    tables = [x for x in (
+        _tbl("dim_project", "1 dòng = 1 dự án / khu"),
+        _tbl("fact_building", "1 dòng = 1 toà"),
+        _tbl("corpus_loose", "1 dòng = 1 toà, đã nối sẵn"),
+        _tbl("corpus_strict", "1 dòng = 1 toà ĐẠT CHUẨN")) if x]
+    vn_tables = [x for x in (
+        _tbl("vn_project", "1 dòng = 1 dự án"), _tbl("vn_building", "1 dòng = 1 toà"),
+        _tbl("vn_unit", "1 dòng = 1 căn"), _tbl("vn_listing", "1 dòng = 1 tin rao")) if x]
+
     out = {
         "corpus": {
+            "tables": tables, "vn_tables": vn_tables,
             "loose": sum(m["n_buildings"] for m in mk),
             "strict": sum(m["core"]["n_pass"] for m in mk),
             "n_markets": len(mk),

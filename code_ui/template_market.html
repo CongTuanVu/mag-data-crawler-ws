@@ -301,7 +301,45 @@
 <script id="payload" type="application/json">__DATA__</script>
 <script>
 "use strict";
-const D = JSON.parse(document.getElementById("payload").textContent);
+/* ================= NGUỒN DỮ LIỆU =================
+   Trang chạy ở hai chế độ, cùng một mã:
+
+     nhúng   `payload` có dữ liệu  — bản xuất tự chứa, mở bằng file:// vẫn chạy
+     API     `payload` là null     — gọi /ws1-data/api/, duyệt được cả 618.421 toà
+
+   Chế độ nhúng chỉ mang mẫu dựng sẵn (250 toà mỗi thị trường) nên lọc/sắp xếp
+   làm ở trình duyệt. Chế độ API đẩy hết sang máy chủ: lọc, sắp xếp, phân trang. */
+const D = JSON.parse(document.getElementById("payload").textContent) || {};
+const ONLINE = !D.markets;
+const API = new URL("api/", location.href.replace(/[^/]*$/, "")).href;
+
+async function get(path, params) {
+  const u = new URL(path.replace(/^\//, ""), API);
+  for (const [k, v] of Object.entries(params || {}))
+    if (v !== null && v !== undefined && v !== "") u.searchParams.set(k, v);
+  const r = await fetch(u, { headers: { Accept: "application/json" } });
+  if (!r.ok) {
+    let d = null; try { d = await r.json(); } catch (e) {}
+    const msg = d && d.detail
+      ? (typeof d.detail === "string" ? d.detail : (d.detail.error || JSON.stringify(d.detail)))
+      : `${r.status} ${r.statusText}`;
+    throw new Error(msg);
+  }
+  return r.json();
+}
+
+/* Nhớ lại những thứ đổi rất hiếm: nhãn, hình bản đồ, danh sách tỉnh. */
+const memo = new Map();
+const once = (k, fn) => memo.has(k) ? memo.get(k)
+  : (memo.set(k, fn().catch(e => { memo.delete(k); throw e; })), memo.get(k));
+
+function fail(where, e) {
+  console.error(where, e);
+  const el = document.getElementById("detail") || document.body;
+  el.innerHTML = `<div class="card"><div class="sec-head"><h2>Không lấy được dữ liệu</h2></div>
+    <div class="foot">${esc(where)} — ${esc(e.message || String(e))}.
+    Máy chủ dữ liệu có thể chưa chạy; thử tải lại trang.</div></div>`;
+}
 const E = D.enums || {}, NCORE = D.n_core || 13;
 let MK = null, META = null, MET = [], DEF = {}, ALL = [], cur = null;
 
@@ -311,8 +349,11 @@ const fld = (b, k) => (b[k] !== undefined ? b[k] : DEF[k]);
 /* ---------- tiện ích ---------- */
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const vi = (f, c) => (E[f] && E[f][c] && E[f][c].vi) || c || "";
-const grp = (f, c) => (E[f] && E[f][c] && E[f][c].group) || "";
+let E_LIVE = null;
+const vi = (f, c) => { const T = E_LIVE || E;
+  return (T[f] && T[f][c] && T[f][c].vi) || c || ""; };
+const grp = (f, c) => { const T = E_LIVE || E;
+  return (T[f] && T[f][c] && T[f][c].group) || ""; };
 const num = (n, d) => n == null ? "—" : Number(n).toLocaleString("de-DE",
   { maximumFractionDigits: d != null ? d : (Math.abs(n) < 100 ? 1 : 0) });
 function short(v) {
@@ -431,7 +472,8 @@ function coreBlock() {
 }
 
 function renderBand(b) {
-  const have = MK.coverage.filter(c => c.pct >= 50), miss = MK.coverage.filter(c => c.pct < 50);
+  const cov = MK.coverage || [];
+  const have = cov.filter(c => c.pct >= 50), miss = cov.filter(c => c.pct < 50);
   const auth = vi("id_kind", META.id_kind);
   document.getElementById("band").innerHTML = `<div class="card">
     <div class="sec-head"><h2>Tóm tắt thị trường</h2>
@@ -762,7 +804,13 @@ function vnTierBar() {
   </div>`;
 }
 
-function vnMetrics() { return (MK.metrics_by_cat || {})[VNCAT] || MK.metrics_by_cat[""] || []; }
+/* Bản nhúng dựng sẵn phân bố cho từng loại dự án; chế độ API tính lại theo bộ
+   lọc đang chọn và để thẳng ở `MK.metrics`. */
+function vnMetrics() {
+  if (ONLINE) return MK.metrics || [];
+  const byCat = MK.metrics_by_cat || {};
+  return byCat[VNCAT] || byCat[""] || [];
+}
 
 let MAPBG = null;   /* nền bản đồ ghép một lần, không dựng lại mỗi lần vẽ */
 
@@ -1053,8 +1101,10 @@ function vnDetail(p) {
         n != null ? ` · ${num(n)} tin có` : ""}</div></div>`;
   }
   /* phân bố rời rạc (phòng ngủ, loại giao dịch) dưới dạng thanh ngang */
-  function distBars(lab, pairs, fmtKey, all) {
-    if (!pairs || !pairs.length) return "";
+  function distBars(lab, raw, fmtKey, all) {
+    /* Bản nhúng cho `[[khoá, số]]`, API cho `[{k, n}]` — nhận cả hai. */
+    const pairs = (raw || []).map(x => Array.isArray(x) ? x : [x.k, x.n]);
+    if (!pairs.length) return "";
     const tot = pairs.reduce((a, b) => a + b[1], 0), mx = Math.max(...pairs.map(x => x[1]));
     return `<div style="background:var(--panel);padding:11px 14px;min-width:0">
       <div style="font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.045em;margin-bottom:6px">${esc(lab)}
@@ -1133,36 +1183,81 @@ function vnDetail(p) {
 let FF = null, forms = [];
 const selForm = document.getElementById("form"), selMarket = document.getElementById("market");
 
-function loadMarket(slug) {
-  MK = D.markets[slug]; META = MK.meta; DEF = MK.defaults || {};
-  if (MK.meta.kind === "vn") {
-    VNCAT = "";
-    MET = vnMetrics();
-    ALL = (MK.projects || []).map(p => ({ ...p }));
-    ALL.forEach(p => p._md = 0);
+async function loadMarket(slug) {
+  if (!ONLINE) {
+    MK = D.markets[slug]; META = MK.meta; DEF = MK.defaults || {};
+    if (MK.meta.kind === "vn") {
+      VNCAT = ""; MET = vnMetrics();
+      ALL = (MK.projects || []).map(p => ({ ...p, _md: 0 }));
+    } else {
+      MET = MK.metrics || [];
+      ALL = (MK.buildings || []).map(b => ({ ...b, _md: medDist(b) }));
+    }
   } else {
-    MET = MK.metrics || [];
-    ALL = (MK.buildings || []).map(b => ({ ...b }));
-    ALL.forEach(b => b._md = medDist(b));
+    try {
+      if (slug === "vn") {
+        const [cov, cats, tiers, mets] = await Promise.all([
+          get("vn/coverage"), get("vn/categories"), get("vn/tiers"), get("vn/metrics")]);
+        VNCAT = "";
+        MK = { meta: { market: "vn", label: "Việt Nam", kind: "vn",
+                       n_projects: tiers.rows[0].n, n_buildings: tiers.rows[1].n,
+                       n_units: tiers.rows[2].n, n_listings: tiers.rows[3].n,
+                       tiers: tiers.rows, map: await once("vnmap", () => get("vn/map")) },
+               coverage: cov.rows, categories: cats.rows.map(c => c.slug),
+               catLabels: Object.fromEntries(cats.rows.map(c => [c.slug, c.label])),
+               metrics: mets.rows, by_province: (await once("vnprov",
+                 () => get("vn/provinces"))).rows };
+        META = MK.meta; MET = MK.metrics; DEF = {};
+      } else {
+        const [d, mets] = await Promise.all([
+          get(`markets/${slug}`), get(`markets/${slug}/metrics`)]);
+        MK = { meta: d.meta, core: d.core, coverage: d.coverage,
+               metrics: mets.rows, forms: d.forms || [] };
+        META = d.meta; MET = mets.rows; DEF = {};
+      }
+    } catch (e) { return fail(`nạp thị trường ${slug}`, e); }
   }
-  cur = null;
+  cur = null; PAGE = 0;
   buildFormFilter();
   document.getElementById("sub").textContent = isVN()
     ? `${META.label} · ${num(META.n_projects)} dự án`
     : `${META.label} · ${num(META.n_buildings)} toà`;
   document.title = `${META.label} — Benchmark toà nhà`;
   try { history.replaceState(null, "", "#" + slug); } catch (e) {}
-  renderList();
+  await renderList();
 }
 
 function buildFormFilter() {
+  const lbl = selForm.previousElementSibling;
   if (isVN()) {
     FF = "project_category";
+    if (ONLINE) {
+      forms = MK.categories || [];
+      selForm.parentElement.style.display = "";
+      lbl.textContent = "Loại dự án";
+      selForm.innerHTML = `<option value="">Tất cả</option>` + forms.map(f =>
+        `<option value="${esc(f)}">${esc((MK.catLabels || {})[f] || f)}</option>`).join("");
+      return;
+    }
     forms = (MK.categories || []).filter(k => k !== "(chưa rõ)");
     selForm.parentElement.style.display = "";
-    selForm.previousElementSibling.textContent = "Loại dự án";
+    lbl.textContent = "Loại dự án";
     selForm.innerHTML = `<option value="">Tất cả (${ALL.length})</option>` + forms.map(f =>
       `<option value="${esc(f)}">${esc(f)} (${ALL.filter(p => p.project_category === f).length})</option>`).join("");
+    return;
+  }
+  if (ONLINE) {
+    const fs = MK.forms || [];
+    /* Máy chủ trả loại hình kèm số lượng; nếu thị trường không khai
+       `building_form` thì nó rơi sang `style` — nhãn đổi theo. */
+    FF = (MK.coverage || []).some(c => c.field === "building_form" && c.pct > 0)
+      ? "building_form" : "style";
+    forms = fs.map(f => f.code);
+    if (!fs.length) { selForm.parentElement.style.display = "none"; return; }
+    selForm.parentElement.style.display = "";
+    lbl.textContent = FF === "style" ? "Phong cách" : "Loại hình";
+    selForm.innerHTML = `<option value="">Tất cả (${num(META.n_buildings)})</option>` +
+      fs.map(f => `<option value="${esc(f.code)}">${esc(vi(FF, f.code))} (${num(f.n)})</option>`).join("");
     return;
   }
   FF = ALL.some(b => b.building_form) ? "building_form"
@@ -1171,7 +1266,7 @@ function buildFormFilter() {
     .sort((a, c) => vi(FF, a).localeCompare(vi(FF, c), "vi")) : [];
   if (FF && forms.length) {
     selForm.parentElement.style.display = "";
-    selForm.previousElementSibling.textContent = FF === "style" ? "Phong cách" : "Loại hình";
+    lbl.textContent = FF === "style" ? "Phong cách" : "Loại hình";
     selForm.innerHTML = `<option value="">Tất cả (${ALL.length})</option>` + forms.map(f =>
       `<option value="${esc(f)}">${esc(vi(FF, f))} (${ALL.filter(b => b[FF] === f).length})</option>`).join("");
   } else { selForm.parentElement.style.display = "none"; }
@@ -1198,18 +1293,71 @@ function view() {
   return r.sort(SORTS[document.getElementById("sort").value] || SORTS.full);
 }
 
-function renderList() {
-  const rows = view();
-  document.getElementById("count").textContent =
-    isVN()
-      ? `${num(rows.length)} / ${num(ALL.length)} dự án trong mẫu · kho có ${num(META.n_projects)}`
-      : `${num(rows.length)} / ${num(ALL.length)} toà trong mẫu · kho có ${num(META.n_buildings)}`;
+const PER = 50;
+let PAGE = 0, TOTAL = 0, BUSY = false;
+
+/* Trang chi tiết Việt Nam cần toà thuộc dự án và thống kê tin rao — hai thứ
+   không nằm trong danh sách, phải hỏi thêm. Bản nhúng đã có sẵn trong payload. */
+async function pick(b) {
+  if (!isVN()) return detail(b);
+  if (ONLINE && b.entity_id && !b._full) {
+    try {
+      const d = await get(`vn/projects/${encodeURIComponent(b.entity_id)}`);
+      Object.assign(b, d, { _full: true });
+      MK.buildings_of = { ...(MK.buildings_of || {}), [b.entity_id]: d.buildings || [] };
+      MK.listings_of = { ...(MK.listings_of || {}), [b.entity_id]: d.listings || null };
+    } catch (e) { return fail("nạp chi tiết dự án", e); }
+  }
+  return vnDetail(b);
+}
+
+/* Chế độ API: lọc, sắp xếp, phân trang đều ở máy chủ — nếu làm ở trình duyệt
+   thì phải tải cả 618.421 toà về, đúng cái đang muốn bỏ. */
+async function fetchPage() {
+  const q = document.getElementById("q").value.trim();
+  const form = selForm.value || "";
+  const sort = document.getElementById("sort").value;
+  const params = { q, sort, limit: PER, offset: PAGE * PER };
+  if (isVN()) {
+    if (form) params.category = form;
+    const d = await get("vn/projects", params);
+    TOTAL = d.total;
+    return d.rows.map(r => ({ ...r, _md: 0 }));
+  }
+  params.form = form;
+  const d = await get(`markets/${META.market}/buildings`, params);
+  TOTAL = d.total;
+  return d.rows.map(r => ({ ...r, _md: medDist(r) }));
+}
+
+async function renderList() {
+  const list = document.getElementById("list");
+  let rows;
+  if (ONLINE) {
+    if (BUSY) return;
+    BUSY = true;
+    list.setAttribute("aria-busy", "true");
+    try { rows = ALL = await fetchPage(); }
+    catch (e) { BUSY = false; list.removeAttribute("aria-busy"); return fail("nạp danh sách", e); }
+    BUSY = false; list.removeAttribute("aria-busy");
+  } else {
+    rows = view();
+    TOTAL = rows.length;
+  }
+  const unit = isVN() ? "dự án" : "toà";
+  const shown = PAGE * PER;
+  document.getElementById("count").textContent = ONLINE
+    ? `${num(shown + rows.length)} / ${num(TOTAL)} ${unit}` +
+      (TOTAL ? ` · trang ${PAGE + 1} / ${num(Math.ceil(TOTAL / PER))}` : "")
+    : `${num(rows.length)} / ${num(ALL.length)} ${unit} trong mẫu · kho có ${num(
+        isVN() ? META.n_projects : META.n_buildings)}`;
   if (!rows.length) {
-    document.getElementById("list").innerHTML = '<div class="empty" style="padding:10px">Không có toà nào khớp.</div>';
+    list.innerHTML = `<div class="empty" style="padding:10px">Không có ${unit} nào khớp.</div>`;
+    document.getElementById("detail").innerHTML = "";
     return;
   }
-  if (!cur || !rows.includes(cur)) { cur = rows[0]; (isVN() ? vnDetail : detail)(cur); }
-  document.getElementById("list").innerHTML = rows.slice(0, 200).map((b, i) => {
+  if (!cur || !rows.includes(cur)) { cur = rows[0]; await pick(cur); }
+  list.innerHTML = rows.slice(0, ONLINE ? PER : 200).map((b, i) => {
     if (isVN()) {
       const pc = Math.round(100 * (b._core || 0) / 8);
       return `<button class="tower${b === cur ? " on" : ""}" data-i="${i}">
@@ -1231,30 +1379,61 @@ function renderList() {
         b.year_completed || null].filter(Boolean).join(" · ")}</div>
       <div class="score"><div class="score-bar"><i style="width:${p}%"></i></div>
         <div class="score-pct">${nCore(b)}/6</div></div></button>`;
-  }).join("");
-  const list = document.getElementById("list");
+  }).join("") + pager();
   list.querySelectorAll(".tower").forEach(el => el.onclick = () => {
-    cur = rows[+el.dataset.i]; (isVN() ? vnDetail : detail)(cur);
+    cur = rows[+el.dataset.i]; pick(cur);
     list.querySelectorAll(".tower").forEach(x => x.classList.remove("on"));
     el.classList.add("on");
     if (window.matchMedia("(max-width:900px)").matches)
       document.getElementById("detail").scrollIntoView({ behavior: "smooth", block: "start" });
   });
+  list.querySelectorAll("[data-page]").forEach(el => el.onclick = () => {
+    PAGE = Math.max(0, PAGE + (+el.dataset.page));
+    cur = null;
+    renderList().then(() => { if (list.scrollTo) list.scrollTo({ top: 0 }); });
+  });
 }
 
-selMarket.innerHTML = D.order.map(s => {
-  const m = D.markets[s].meta;
+/* Phân trang chỉ có ở chế độ API — bản nhúng chỉ mang 250 toà mẫu nên không có
+   trang thứ hai để lật. */
+function pager() {
+  if (!ONLINE || TOTAL <= PER) return "";
+  const last = Math.ceil(TOTAL / PER) - 1;
+  const btn = (d, txt, on) => `<button class="tower" data-page="${d}"
+    style="text-align:center;${on ? "" : "opacity:.4;pointer-events:none"}">${txt}</button>`;
+  return `<div style="display:flex;gap:8px;padding-top:2px">
+    ${btn(-1, "← Trước", PAGE > 0)}${btn(1, "Sau →", PAGE < last)}</div>`;
+}
+
+function marketOption(m) {
   if (m.kind === "vn")
-    return `<option value="${esc(s)}">${esc(m.label)} — ${num(m.n_projects)} dự án · ${num(m.n_listings)} tin rao</option>`;
-  const cr = D.markets[s].core;
-  return `<option value="${esc(s)}">${esc(m.label)} — lõi ${cr.n_have}/6 · đạt chuẩn ${num(cr.pct)}% · ${num(m.n_buildings)} toà</option>`;
-}).join("");
+    return `<option value="vn">${esc(m.label)} — ${num(m.n_projects)} dự án · ${num(m.n_listings)} tin rao</option>`;
+  const cr = m.core || {};
+  return `<option value="${esc(m.market)}">${esc(m.label)} — lõi ${cr.n_have || 0}/6` +
+    ` · đạt chuẩn ${num(cr.pct || 0)}% · ${num(m.n_buildings)} toà</option>`;
+}
+
 selMarket.addEventListener("change", () => setView("market", true));
-["q", "sort", "form"].forEach(id =>
-  document.getElementById(id).addEventListener("input", () => {
-    if (isVN()) { VNCAT = selForm.value; MET = vnMetrics(); }
-    renderList();
-  }));
+
+/* Gõ vào ô tìm thì đợi người ta ngừng gõ mới hỏi máy chủ — mỗi phím một truy vấn
+   trên 618k dòng là cách chắc chắn nhất để làm nghẽn. */
+let typing = null;
+function onFilterChange(immediate) {
+  PAGE = 0;
+  if (isVN() && !ONLINE) { VNCAT = selForm.value; MET = vnMetrics(); }
+  if (isVN() && ONLINE) {
+    VNCAT = selForm.value;
+    get("vn/metrics", { category: VNCAT || undefined })
+      .then(d => { MET = MK.metrics = d.rows; if (cur) vnBand(cur); })
+      .catch(e => console.error("phân bố VN", e));
+  }
+  if (!ONLINE || immediate) return renderList();
+  clearTimeout(typing);
+  typing = setTimeout(renderList, 220);
+}
+document.getElementById("q").addEventListener("input", () => onFilterChange(false));
+["sort", "form"].forEach(id =>
+  document.getElementById(id).addEventListener("change", () => onFilterChange(true)));
 document.getElementById("theme").onclick = () => {
   const r = document.documentElement;
   const now = r.getAttribute("data-theme")
@@ -1290,8 +1469,8 @@ function ovBars(title, cnt, rows, unit, tbl, foot) {
 const COREC = c => c >= 6 ? "var(--s5)" : c === 5 ? "var(--s4)"
   : c === 4 ? "var(--s3)" : c === 3 ? "var(--s2)" : c >= 1 ? "var(--s1)" : "var(--track)";
 
-function ovMap() {
-  const M = (D.overview || {}).map;
+function ovMap(O) {
+  const M = (O || {}).map;
   if (!M || !M.features) return "";
   const DA = M.data || {};
   const fill = iso => {
@@ -1381,8 +1560,32 @@ function ovBlock(o) {
     ${o.foot ? `<div class="foot">${o.foot}</div>` : ""}</section>`;
 }
 
-function renderOverview() {
-  const O = D.overview;
+let OV = null;
+
+async function renderOverview() {
+  if (ONLINE && !OV) {
+    try {
+      const [o, mk] = await Promise.all([get("overview"), get("markets")]);
+      /* Hình đường biên quốc gia là HÌNH HỌC tĩnh, không phải dữ liệu — giữ nhúng
+         trong trang. Chỉ phần tô màu theo thị trường mới lấy từ máy chủ. */
+      const geo = D.world || {};
+      const data = {};
+      for (const m of mk.rows) {
+        const iso = (geo.iso || {})[m.market];
+        if (!iso) continue;
+        data[iso] = { slug: m.market, k: m.label,
+                      n: m.kind === "vn" ? m.n_projects : m.n_buildings,
+                      unit: m.kind === "vn" ? "dự án" : "toà",
+                      core: m.kind === "vn" ? null : (m.core || {}).n_have,
+                      off: m.market === "japan" };
+      }
+      OV = { ...o, map: geo.features ? { ...geo, data } : null,
+             corpus: { ...o.corpus,
+                       tables: o.corpus.tables || [], vn_tables: o.corpus.vn_tables || [],
+                       by_market: o.corpus.by_market || [] } };
+    } catch (e) { return fail("nạp tổng quan", e); }
+  }
+  const O = ONLINE ? OV : D.overview;
   const box = document.getElementById("view-overview");
   if (!O) { box.innerHTML = '<div class="card"><div class="foot">Chưa dựng được số tổng quan.</div></div>'; return; }
   const C = O.corpus, doc = O.docs;
@@ -1446,7 +1649,7 @@ function renderOverview() {
     <div class="ovmain">
       <div style="display:flex;flex-direction:column;gap:16px;min-width:0">${bVN}${bWorld}${bDoc}</div>
       <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
-        ${ovMap()}
+        ${ovMap(O)}
         ${ovBars("Toà theo thị trường", `${num(nMarket)} thị trường`,
           (C.by_market || []).map(m => ({ k: m.k, n: m.n })), "toà", "",
           "Thang tuyến tính. Bấm tab <b>Thị trường</b> để mở từng cái.")}
@@ -1457,13 +1660,13 @@ function renderOverview() {
 
   box.querySelectorAll(".wpt").forEach(g => g.onclick = () => {
     const s2 = g.dataset.slug;
-    if (D.markets[s2]) { selMarket.value = s2; setView("market", true); }
+    selMarket.value = s2; setView("market", true);
   });
 }
 
 /* ---------- chuyển trang ---------- */
 let VIEW = "market";
-function setView(v, push) {
+async function setView(v, push) {
   VIEW = v === "overview" ? "overview" : "market";
   document.getElementById("view-overview").hidden = VIEW !== "overview";
   document.getElementById("view-market").hidden = VIEW === "overview";
@@ -1472,9 +1675,9 @@ function setView(v, push) {
   document.querySelectorAll("#nav button").forEach(b =>
     b.classList.toggle("on", b.dataset.view === VIEW));
   if (VIEW === "overview") {
-    renderOverview();
     document.getElementById("sub").textContent = "· tổng quan ba nguồn";
     document.title = "Tổng quan — Benchmark toà nhà";
+    renderOverview();
   } else {
     loadMarket(selMarket.value);
   }
@@ -1483,19 +1686,38 @@ function setView(v, push) {
 document.querySelectorAll("#nav button").forEach(b =>
   b.onclick = () => setView(b.dataset.view, true));
 
-const want = decodeURIComponent((location.hash || "").slice(1));
-const first = D.markets[want] ? want : D.order[0];
-selMarket.value = first;
-if (want === "tong-quan") { loadMarket(first); setView("overview", false); }
-else { setView("market", false); }
-addEventListener("hashchange", () => {
-  const s = decodeURIComponent(location.hash.slice(1));
-  if (s === "tong-quan") { setView("overview", false); return; }
-  if (D.markets[s]) {
-    if (s !== selMarket.value) selMarket.value = s;
-    setView("market", false);
+let KNOWN = new Set();
+
+async function boot() {
+  let order;
+  if (ONLINE) {
+    try {
+      const [mk, en] = await Promise.all([get("markets"), get("enums")]);
+      E_LIVE = en.enums || {};
+      selMarket.innerHTML = mk.rows.map(marketOption).join("");
+      order = mk.rows.map(m => m.market);
+    } catch (e) { return fail("nạp danh sách thị trường", e); }
+  } else {
+    selMarket.innerHTML = D.order.map(sl => marketOption(
+      { ...D.markets[sl].meta, core: D.markets[sl].core })).join("");
+    order = D.order;
   }
-});
+  KNOWN = new Set(order);
+
+  const want = decodeURIComponent((location.hash || "").slice(1));
+  selMarket.value = KNOWN.has(want) ? want : order[0];
+  await setView(want === "tong-quan" ? "overview" : "market", false);
+
+  addEventListener("hashchange", () => {
+    const h = decodeURIComponent(location.hash.slice(1));
+    if (h === "tong-quan") return setView("overview", false);
+    if (KNOWN.has(h)) {
+      if (h !== selMarket.value) selMarket.value = h;
+      setView("market", false);
+    }
+  });
+}
+boot();
 </script>
 </body>
 </html>

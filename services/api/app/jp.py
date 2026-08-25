@@ -176,6 +176,19 @@ def meta() -> dict:
                  "id_kind": "curated_case", "id_authority": "MAG WS1 — hồ sơ dựng tay",
                  "price_unit": "JPY/can", "n_rows": n_rows(),
                  "tables": "output_csv/*.csv — B1·B2·B5·B6·B7"},
+        "coverage": [
+            {"field": f, "label": lb,
+             "pct": round(100.0 * sum(1 for b in rows
+                                      if b.get(f) not in (None, "", "[]", "{}")) / n, 1)}
+            for f, lb in [("n_floors", "số tầng"), ("n_units_building", "số căn"),
+                          ("area_m2", "diện tích căn"), ("price", "giá"),
+                          ("site_area_m2", "diện tích lô"), ("lat", "toạ độ"),
+                          ("mix", "cơ cấu căn"), ("year_completed", "năm hoàn thành"),
+                          ("amenities", "tiện ích"), ("building_form", "loại hình"),
+                          ("style", "phong cách")]],
+        "forms": [{"code": c, "n": sum(1 for b in rows if b.get("building_form") == c)}
+                  for c in sorted({b["building_form"] for b in rows
+                                   if b.get("building_form")})],
         "core": {"fields": core, "n_pass": 0, "pct": 0.0, "registry_pct": 0.0,
                  "n_have": sum(1 for x in core if x["pct"] >= 50.0),
                  "note": "Tập này chưa được merge vào corpus — cổng strict chưa "
