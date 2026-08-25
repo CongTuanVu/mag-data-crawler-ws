@@ -193,11 +193,34 @@ def tiers() -> list[dict]:
                         f"using (building_key)")
     list_up = db.scalar(f"select count(*) from {P('vn_listing')} l "
                         f"join {P('vn_project')} p using (entity_id)")
+    # Số CHA có con — khác với số dòng nối được. Trang hiện cả hai, thiếu là ra
+    # dấu gạch.
+    bld_par = db.scalar(f"""select count(distinct p.entity_id) from {P('vn_project')} p
+        where exists (select 1 from {P('vn_building')} b where b.entity_id = p.entity_id)""")
+    unit_par = db.scalar(f"""select count(distinct u.building_key) from {P('vn_unit')} u
+        join (select distinct building_key from {P('vn_building')}) b using (building_key)""")
+    list_par = db.scalar(f"""select count(distinct p.entity_id) from {P('vn_project')} p
+        where exists (select 1 from {P('vn_listing')} l where l.entity_id = p.entity_id)""")
+    # bao nhiêu dự án chạm được tới cấp CĂN — con số đứt gãy, phải nói ra
+    unit_to_proj = db.scalar(f"""select count(distinct p.entity_id) from {P('vn_project')} p
+        where exists (select 1 from {P('vn_building')} b
+                      join {P('vn_unit')} u on u.building_key = b.building_key
+                      where b.entity_id = p.entity_id)""")
+    unit_provs = db.scalar(f"select count(distinct province) from {P('vn_unit')} "
+                           f"where province is not null")
+    fmt = lambda v: format(v, ",d").replace(",", ".")
     return [
-        {"label": "Dự án", "n": n_proj},
-        {"label": "Toà nhà", "n": n_bld, "up": bld_up, "parent": "dự án"},
-        {"label": "Căn hộ", "n": n_unit, "up": unit_up, "parent": "toà"},
-        {"label": "Tin rao", "n": n_list, "up": list_up, "parent": "dự án"},
+        {"label": "Dự án", "tbl": "vn_project", "n": n_proj,
+         "note": "gốc — mọi cấp khác quy về đây"},
+        {"label": "Toà nhà", "tbl": "vn_building", "n": n_bld, "up": bld_up,
+         "parent": "dự án", "par_n": bld_par, "par_tot": n_proj, "par_unit": "dự án"},
+        {"label": "Căn hộ", "tbl": "vn_unit", "n": n_unit, "up": unit_up,
+         "parent": "toà", "par_n": unit_par, "par_tot": n_bld, "par_unit": "toà",
+         "stop": ("Chuỗi dừng ở đây: nhánh Sở Xây dựng của bảng toà không mang mã "
+                  f"dự án, nên chỉ {unit_to_proj}/{fmt(n_proj)} dự án chạm tới cấp "
+                  f"căn. Toàn bộ căn nằm trong {unit_provs} tỉnh.")},
+        {"label": "Tin rao", "tbl": "vn_listing", "n": n_list, "up": list_up,
+         "parent": "dự án", "par_n": list_par, "par_tot": n_proj, "par_unit": "dự án"},
     ]
 
 
