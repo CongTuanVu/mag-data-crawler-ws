@@ -58,8 +58,9 @@ def _latin_table() -> dict[str, tuple]:
         tra trong bộ nhớ            0,005 ms  ← 50.000 lượt hết 4,8 ms
     """
     def load():
-        return {r["text_raw"]: (r["text_latin"], r["lang"])
-                for r in db.q(f"select text_raw, text_latin, lang from {LATIN()}")}
+        return {r["text_raw"]: (r["text_latin"], r["lang"], r["latin_basis"])
+                for r in db.q(f"select text_raw, text_latin, lang, latin_basis "
+                              f"from {LATIN()}")}
     return cached("latin_tbl", load)
 
 
@@ -71,12 +72,25 @@ def romanize(rows: list[dict]) -> list[dict]:
     Độ phủ Hàn Quốc: tên toà 125.361/125.373 (100%), chủ đầu tư 96,9%.
     """
     tbl = _latin_table()
+    # Không chỉ tên toà và chủ đầu tư: địa bàn và địa chỉ cũng là chữ bản địa, và
+    # kho phủ 100% cả hai cho Hàn Quốc bằng `admin_table` / `address_parse` với
+    # nền `measured@official_romanization` — bỏ qua là để nguyên chữ Hàn trên trang.
+    # Trường nào đòi `measured`: ĐỊA CHỈ. Đã đo trên Hàn Quốc — 123.954 dòng
+    # `measured@official_romanization` sạch 100%, còn 189 dòng `derived` thì hỏng
+    # 100% ("2-2, -dong, Yeon No., Buk -gu, Hap -teukbyeolsi..."). Với TÊN thì
+    # ngược lại: 125.361 tên toà đều là `derived` qua `rr2000` và vẫn đọc tốt,
+    # chặn `derived` ở đó là xoá sạch chuyển tự của cả thị trường.
+    FIELDS = [("building_name", "name_latin", False), ("developer", "dev_latin", False),
+              ("admin", "admin_latin", True), ("address", "addr_latin", True),
+              ("project_name", "proj_latin", False)]
     for r in rows:
+        for src, dst, need_measured in FIELDS:
+            hit = tbl.get(r.get(src))
+            ok = hit and (not need_measured
+                          or str(hit[2] or "").split("@")[0] == "measured")
+            r[dst] = hit[0] if ok else None
         n = tbl.get(r.get("building_name"))
-        d = tbl.get(r.get("developer"))
-        r["name_latin"] = n[0] if n else None
         r["name_lang"] = n[1] if n else None
-        r["dev_latin"] = d[0] if d else None
     return rows
 
 BLD_COLS = [

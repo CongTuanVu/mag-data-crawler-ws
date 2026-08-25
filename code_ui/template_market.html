@@ -407,6 +407,10 @@ const binOf = (m, v) => v == null ? -1 : m.bins.findIndex(
 const SRCTBL = () => (META.tables || "dim_project × fact_building");
 const nameOf = b => b.name_latin || b.building_name || "(chưa có tên)";
 const rawOf = b => (b.name_latin && b.building_name !== b.name_latin) ? b.building_name : "";
+/* Chữ Latin trước, chữ bản địa sau — cùng quy ước với tên toà. Trường nào chưa
+   có bản chuyển tự thì hiện nguyên gốc chứ không bỏ trống. */
+const lat = (b, f, l) => b[l] || b[f] || "";
+const latOrig = (b, f, l) => (b[l] && b[l] !== b[f]) ? b[f] : "";
 const pctFull = b => Math.round(100 * (b._full || 0) / NCORE);
 const nMet = b => b._met || 0;
 const nCore = b => b._core || 0;                 /* sáu trường lõi của kho */
@@ -791,8 +795,12 @@ function detail(b) {
     <div class="card">
       <div class="hero">
         <h1>${esc(nameOf(b))}</h1>
-        <div class="local">${esc(b.project_name && b.project_name !== b.building_name ? b.project_name : "")}${orig(rawOf(b))}</div>
-        <div class="addr">${esc(b.address || b.admin || "")}</div>
+        <div class="local">${b.project_name && b.project_name !== b.building_name
+          ? esc(lat(b, "project_name", "proj_latin")) + orig(latOrig(b, "project_name", "proj_latin"))
+          : ""}${orig(rawOf(b))}</div>
+        <div class="addr">${b.address
+          ? esc(lat(b, "address", "addr_latin")) + orig(latOrig(b, "address", "addr_latin"))
+          : esc(lat(b, "admin", "admin_latin")) + orig(latOrig(b, "admin", "admin_latin"))}</div>
         <div class="badges">${badges}</div>
       </div>
       <div class="stats">${stats.map(([k, v, u]) =>
@@ -800,7 +808,8 @@ function detail(b) {
     </div>` +
     sec("Tổng quan", "", SRCTBL(), kv([
       ["Chủ đầu tư", b.dev_latin ? esc(b.dev_latin) + orig(b.developer) : esc(b.developer || "")],
-      ["Địa bàn", esc(b.admin || "")],
+      ["Địa bàn", b.admin
+        ? esc(lat(b, "admin", "admin_latin")) + orig(latOrig(b, "admin", "admin_latin")) : ""],
       ["Số tầng nổi", b.n_floors != null ? num(b.n_floors) + " tầng" : ""],
       ["Số căn trong toà", b.n_units_building != null ? num(b.n_units_building) + " căn" : ""],
       ["Diện tích căn bình quân", b.area_m2 != null
@@ -1439,7 +1448,7 @@ async function renderList() {
     const p = Math.round(100 * nCore(b) / 6);
     return `<button class="tower${b === cur ? " on" : ""}" data-i="${i}">
       <div class="n">${esc(nameOf(b))}</div>
-      <div class="o">${esc(rawOf(b) || b.admin || "")}</div>
+      <div class="o">${esc(rawOf(b) || lat(b, "admin", "admin_latin") || "")}</div>
       <div class="m">${[b.n_floors != null ? num(b.n_floors) + " tầng" : null,
         b.n_units_building != null ? num(b.n_units_building) + " căn" : null,
         b.year_completed || null].filter(Boolean).join(" · ")}</div>
