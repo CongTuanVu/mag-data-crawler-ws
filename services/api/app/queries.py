@@ -24,6 +24,60 @@ from .corpus_gate import (AMEN_OK, CORE6, CORE_COND, COV_FIELDS, COV_MIN,
                           STRICT_SQL)
 
 LOOSE = lambda: f"read_parquet('{config.corpus('corpus_loose')}')"
+LATIN = lambda: f"read_parquet('{config.corpus('dim_name_latin')}')"
+
+
+def latin_markets() -> set[str]:
+    """Thị trường nào thật sự có tên cần chuyển tự.
+
+    `dim_name_latin` chỉ có ba hệ chữ: zh-Hant (240.984), ko-Hang (179.149),
+    ru-Cyrl (20.360). Nối bảng này cho Anh hay Thuỵ Sĩ là tốn ~200 ms để không
+    tìm được gì. Đo một lần lúc khởi động rồi nhớ theo mtime của parquet.
+    """
+    def scan():
+        rows = db.q(f"""select b.market, count(nl.text_latin) as n
+                        from {LOOSE()} b join {LATIN()} nl
+                          on nl.text_raw = b.building_name
+                        group by 1 having count(nl.text_latin) > 0""")
+        merged = {c: g for g, cs in config.MARKET_GROUPS.items() for c in cs}
+        return {merged.get(r["market"], r["market"]) for r in rows}
+    return cached("latin", scan)
+
+
+def _latin_table() -> dict[str, tuple]:
+    """Bảng chuyển tự nạp hẳn vào bộ nhớ: 440.493 mục, ~104 MB, nạp 0,8 giây.
+
+    Đây là ngoại lệ CÓ LÝ DO của nguyên tắc "không nạp parquet vào bộ nhớ" ghi ở
+    đầu file. Chỗ kia là bảng dữ liệu 618k dòng mà quét vốn đã rẻ; chỗ này là
+    bảng TRA, bị hỏi 100 lần cho mỗi trang và DuckDB không có chỉ mục cho nó.
+    Đã đo cả ba cách trên Hàn Quốc:
+
+        nối trước khi cắt trang     355 ms
+        nối sau, hai lượt           ~200 ms
+        tra bằng danh sách IN       ~250 ms   (quét lại file 5,5 MB mỗi lượt)
+        tra trong bộ nhớ            0,005 ms  ← 50.000 lượt hết 4,8 ms
+    """
+    def load():
+        return {r["text_raw"]: (r["text_latin"], r["lang"])
+                for r in db.q(f"select text_raw, text_latin, lang from {LATIN()}")}
+    return cached("latin_tbl", load)
+
+
+def romanize(rows: list[dict]) -> list[dict]:
+    """Gắn tên Latin cho tên riêng chữ Hàn/Hoa/Nga, SAU khi đã cắt trang.
+
+    Tra trong bảng nhớ — xem `_latin_table()` giải thích vì sao.
+
+    Độ phủ Hàn Quốc: tên toà 125.361/125.373 (100%), chủ đầu tư 96,9%.
+    """
+    tbl = _latin_table()
+    for r in rows:
+        n = tbl.get(r.get("building_name"))
+        d = tbl.get(r.get("developer"))
+        r["name_latin"] = n[0] if n else None
+        r["name_lang"] = n[1] if n else None
+        r["dev_latin"] = d[0] if d else None
+    return rows
 
 BLD_COLS = [
     "building_name", "project_name", "admin", "address", "developer",
@@ -258,11 +312,15 @@ def buildings(slug: str, q: str | None, form: str | None, sort: str,
         total = cached(f"cnt:{slug}:{q}:{form}", lambda: db.scalar(
             f"select count(*) from {LOOSE()} where {cond}", params))
     rows = db.q(page, params + [limit, offset])
+    # Chỉ tra chuyển tự khi thị trường có chữ không phải Latin.
+    if slug in latin_markets():
+        rows = romanize(rows)
     return {"total": total, "limit": limit, "offset": offset, "rows": rows}
 
 
 def building(code: str) -> dict | None:
-    return db.one(f"select * from {LOOSE()} where building_code = ? limit 1", [code])
+    r = db.one(f"select * from {LOOSE()} where building_code = ? limit 1", [code])
+    return romanize([r])[0] if r else None
 
 
 # ── phân bố ─────────────────────────────────────────────────────────────────
