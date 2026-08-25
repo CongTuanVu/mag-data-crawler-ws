@@ -617,6 +617,20 @@ function normMix(raw, kind) {
       const units = it.units != null ? +it.units : (it.n_units != null ? +it.n_units : null);
       const share = it.share != null ? +it.share : null;
       let lab = null;
+      /* HÌNH DẠNG CHÍNH THỨC từ 2026-08-25: `{bucket, bucket_label, units, share}`.
+         Kho đã tự khai nhãn dải — `bucket_label` phủ 100% — nên không còn phải suy
+         ra tên dải rồi kiểm ngược bằng `area_m2` như trước. Mảng cũng đã sắp sẵn
+         thứ tự, giữ nguyên thứ tự nguồn thay vì tự xếp lại.
+         `bucket` vẫn mang hậu tố `_sold`/`_rental` nên tách bán / cho thuê từ đó. */
+      if (it.bucket_label != null || it.bucket != null) {
+        const rk = it.bucket != null ? roomKey(it.bucket) : null;
+        let txt = it.bucket_label || (rk ? rk.text : String(it.bucket));
+        /* Tiêu đề nhóm đã ghi "Căn bán" / "Căn cho thuê" rồi, nên bỏ hậu tố
+           "(bán)" / "(cho thuê)" ở từng dòng cho khỏi lặp. */
+        if (rk) txt = txt.replace(/\s*\((bán|thuê|cho thuê)\)\s*$/, "");
+        out.push({ text: txt, tenure: rk ? rk.tenure : null, units, share, lo: i });
+        return;
+      }
       if (it.band_m2 != null) lab = bandLabel(it.band_m2);
       else if (it.br != null) lab = brLabel(it.br);
       else if (it.unit_kind != null) lab = { lo: i, text: String(it.unit_kind) };
@@ -647,11 +661,14 @@ function mixSection(b) {
   const kind = fld(b, "mix_kind");
   const M = normMix(b.mix, kind);
   const isArr = typeof b.mix === "string" && b.mix.trim().startsWith("[");
+  /* Trước 2026-08-25 kho trả về dãy số trần không kèm tên dải, nên trang phải tự
+     suy tên rồi kiểm ngược bằng `area_m2`. Nay `mix` khai sẵn `bucket_label` cho
+     100% bản ghi — bỏ hẳn phép suy đó, chỉ giữ nhánh cũ để bản xuất cũ vẫn mở được. */
   const mb = MK.mix_bands;
   const inferred = isArr && mb && mb.keys
-    ? ` <span style="color:var(--muted)">Nguồn chỉ trả về dãy số không kèm tên dải;
-        tên dải ở đây suy từ các bản ghi có tên của chính thị trường này và đã đối chiếu với
-        diện tích căn — khớp ${(mb.accuracy * 100).toFixed(1)}% trên ${num(mb.checked)} toà.</span>`
+    ? ` <span style="color:var(--muted)">Bản dựng cũ: tên dải suy từ bản ghi có tên của
+        chính thị trường này, đối chiếu với diện tích căn — khớp
+        ${(mb.accuracy * 100).toFixed(1)}% trên ${num(mb.checked)} toà.</span>`
     : "";
   const note = kind
     ? `Cách phân nhóm của thị trường ${esc(META.label)}: <b>${esc(vi("mix_kind", kind))}</b>.
