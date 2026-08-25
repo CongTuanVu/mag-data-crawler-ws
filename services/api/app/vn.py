@@ -328,5 +328,10 @@ def map_points() -> dict:
         else:
             rest.append(seg)
     total = db.scalar(f"select count(*) from {P('vn_project')} where lat is not null")
+    # Trả luôn THAM SỐ PHÉP CHIẾU: client cần đặt chấm cho dự án đang xem, mà nó
+    # chỉ có lat/lon. Không có mấy số này thì hoặc API phải chiếu sẵn từng dòng
+    # (nhét việc vẽ vào tầng dữ liệu), hoặc client đoán — đoán thì chấm lệch chỗ.
     return {"w": round(MAP_BOX_W, 1), "h": MAP_H, "n": n, "total": total,
+            "proj": {"lon0": LON0, "lon1": LON1, "lat0": LAT0, "lat1": LAT1,
+                     "dx": round(_DX, 3), "land_w": round(_MAP_W, 3)},
             "prov": {k: "".join(v) for k, v in prov.items()}, "rest": "".join(rest)}

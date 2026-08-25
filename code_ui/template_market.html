@@ -13,6 +13,10 @@
     --shadow:0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.06);
     --radius:10px; --track:#eceef1;
     --s1:#dce8fb; --s2:#aac8f3; --s3:#6f9ce7; --s4:#3773da; --s5:#1b4fa8;
+    /* Chấm dự án đang xem. Nền bản đồ là thang xanh một sắc, nên nếu chấm cũng
+       xanh thì nó chìm — phải là màu khác hệ. Cam đối lập với xanh, đọc rõ ở cả
+       hai giao diện, và không trùng nghĩa với đỏ (lỗi) hay xanh lá (tỉnh). */
+    --pin:#e8590c;
   }
   @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
     --bg:#0f1216; --panel:#171b21; --panel-2:#1c2129; --border:#2a313a;
@@ -20,7 +24,7 @@
     --accent:#6ea8fe; --accent-soft:#1b2a44;
     --good:#5fd39a; --warn:#e2b558; --bad:#f08585;
     --shadow:0 1px 2px rgba(0,0,0,.4); --track:#242b34;
-    --s1:#1d2b40; --s2:#274a75; --s3:#356aa8; --s4:#4b8bd8; --s5:#6ea8fe;
+    --s1:#1d2b40; --s2:#274a75; --s3:#356aa8; --s4:#4b8bd8; --s5:#6ea8fe; --pin:#ff922b;
   }}
   :root[data-theme="dark"]{
     --bg:#0f1216; --panel:#171b21; --panel-2:#1c2129; --border:#2a313a;
@@ -28,7 +32,7 @@
     --accent:#6ea8fe; --accent-soft:#1b2a44;
     --good:#5fd39a; --warn:#e2b558; --bad:#f08585;
     --shadow:0 1px 2px rgba(0,0,0,.4); --track:#242b34;
-    --s1:#1d2b40; --s2:#274a75; --s3:#356aa8; --s4:#4b8bd8; --s5:#6ea8fe;
+    --s1:#1d2b40; --s2:#274a75; --s3:#356aa8; --s4:#4b8bd8; --s5:#6ea8fe; --pin:#ff922b;
   }
   *{box-sizing:border-box}
   /* `[hidden]` của trình duyệt là display:none ở UA stylesheet, thua bất kỳ luật
@@ -829,9 +833,23 @@ function vnMap(sel) {
   } else if (VNPIN && mp.prov[provKey(VNPIN)]) {
     hi = mp.prov[provKey(VNPIN)];
   }
-  const mk = (o, col) => o && o._x != null
-    ? `<circle cx="${o._x}" cy="${o._y}" r="8" fill="none" stroke="${col}" stroke-width="2"></circle>
-       <circle cx="${o._x}" cy="${o._y}" r="2.8" fill="${col}"></circle>` : "";
+  /* Bản nhúng đã chiếu sẵn `_x`/`_y` lúc build; chế độ API chỉ có lat/lon nên
+     chiếu tại chỗ bằng tham số máy chủ gửi kèm. */
+  const P = mp.proj;
+  const xy = o => {
+    if (!o) return null;
+    if (o._x != null) return [o._x, o._y];
+    if (!P || o.lat == null || o.lon == null) return null;
+    return [+(P.dx + (o.lon - P.lon0) / (P.lon1 - P.lon0) * P.land_w).toFixed(1),
+            +((P.lat1 - o.lat) / (P.lat1 - P.lat0) * dim.h).toFixed(1)];
+  };
+  const mk = (o, col, r) => {
+    const c = xy(o);
+    if (!c) return "";
+    return `<circle cx="${c[0]}" cy="${c[1]}" r="${r + 4}" fill="${col}" opacity=".18"></circle>
+      <circle cx="${c[0]}" cy="${c[1]}" r="${r}" fill="none" stroke="${col}" stroke-width="2.6"></circle>
+      <circle cx="${c[0]}" cy="${c[1]}" r="${r * 0.42}" fill="${col}"></circle>`;
+  };
   return `<div style="background:var(--panel);padding:12px 14px 10px;display:flex;flex-direction:column;min-width:0">
     <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600">
       Vị trí ${num(mp.n)} dự án</div>
@@ -839,11 +857,11 @@ function vnMap(sel) {
       preserveAspectRatio="xMidYMid meet" role="img" aria-label="Phân bố dự án theo toạ độ thật">
       <path d="${MAPBG}" stroke="var(--s3)" stroke-width="2.2" stroke-linecap="round" fill="none" opacity=".55"></path>
       ${hi ? `<path d="${hi}" stroke="var(--good)" stroke-width="3.4" stroke-linecap="round" fill="none"></path>` : ""}
-      ${mk(sel, "var(--accent)")}</svg>
+      ${mk(sel, "var(--pin)", 11)}</svg>
     <div style="margin-top:8px;font-size:10.5px;color:var(--faint);line-height:1.55">
       Không có file bản đồ — mỗi chấm là toạ độ thật của một dự án; hình đất nước do chính chúng tạo ra.
       Khoảng trống hai bên là lề khung, tỷ lệ chiếu không đổi.
-      ${sel && sel._x != null ? "Vòng xanh dương là dự án đang xem." : ""}
+      ${xy(sel) ? "Vòng cam là dự án đang xem." : ""}
       ${VNPIN ? (hi
         ? ` Chấm xanh lá là ${num((hi.match(/M/g) || []).length)} vị trí ${VNPIN.rest
             ? "của các tỉnh ngoài nhóm đầu" : `ở ${esc(VNPIN.province)}
@@ -1211,7 +1229,8 @@ async function loadMarket(slug) {
                        n_projects: tiers.rows[0].n, n_buildings: tiers.rows[1].n,
                        n_units: tiers.rows[2].n, n_listings: tiers.rows[3].n,
                        tiers: tiers.rows, map: { w: mp.w, h: mp.h } },
-               map: { prov: mp.prov, rest: mp.rest, n: mp.n, total: mp.total },
+               map: { prov: mp.prov, rest: mp.rest, n: mp.n, total: mp.total,
+                      proj: mp.proj },
                coverage: cov.rows, categories: cats.rows.map(c => c.slug),
                catLabels: Object.fromEntries(cats.rows.map(c => [c.slug, c.label])),
                metrics: mets.rows, by_province: pv.rows };
