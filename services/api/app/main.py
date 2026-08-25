@@ -14,6 +14,9 @@ trường, không đổi frontend. Mọi phản hồi mang cờ `mock` và heade
 """
 from __future__ import annotations
 
+import datetime as _dt
+import decimal as _dec
+import json as _json
 import logging
 import os
 import time
@@ -100,12 +103,40 @@ def check_slug(kind: str, value: str | None, table: dict[str, str]) -> None:
         })
 
 
+class SafeJSON(JSONResponse):
+    """JSON không chết vì kiểu lạ.
+
+    `/buildings/{mã}` dùng `select *` nên lấy cả `scraped_at` kiểu datetime, và
+    `JSONResponse` mặc định ném `TypeError: Object of type datetime is not JSON
+    serializable` → 500. Các đường khác thoát nạn chỉ vì chúng liệt kê cột rõ
+    ràng và không cột nào là datetime — tức là may, không phải thiết kế.
+
+    Ngày giờ ra chuỗi ISO, Decimal ra số, còn lại ra `str()` chứ không nổ.
+    """
+
+    def render(self, content: Any) -> bytes:
+        def fallback(o):
+            if isinstance(o, (_dt.datetime, _dt.date, _dt.time)):
+                return o.isoformat()
+            if isinstance(o, _dt.timedelta):
+                return o.total_seconds()
+            if isinstance(o, _dec.Decimal):
+                return float(o)
+            if isinstance(o, (bytes, bytearray)):
+                return o.decode("utf-8", "replace")
+            if isinstance(o, set):
+                return sorted(o)
+            return str(o)
+        return _json.dumps(content, ensure_ascii=False, allow_nan=False,
+                           separators=(",", ":"), default=fallback).encode("utf-8")
+
+
 def ok(payload: Any) -> JSONResponse:
     if isinstance(payload, dict):
         payload = {**payload, "mock": IS_MOCK}
     else:
         payload = {"rows": payload, "mock": IS_MOCK}
-    return JSONResponse(payload)
+    return SafeJSON(payload)
 
 
 # ── hạ tầng ─────────────────────────────────────────────────────────────────
@@ -123,7 +154,7 @@ def health():
         except Exception as e:                       # nói ra, đừng giả vờ khoẻ
             out["status"] = "degraded"
             out["error"] = str(e)[:200]
-    return JSONResponse(out, status_code=200 if out["status"] == "ok" else 503)
+    return SafeJSON(out, status_code=200 if out["status"] == "ok" else 503)
 
 
 # ── thị trường ──────────────────────────────────────────────────────────────
