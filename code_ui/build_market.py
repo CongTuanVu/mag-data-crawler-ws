@@ -64,14 +64,23 @@ N_METRICS, COV_MIN = 6, 50.0
 # ── SÁU TRƯỜNG LÕI ──────────────────────────────────────────────────────────
 # Định nghĩa của kho, không phải lựa chọn của trang này. Nguồn:
 #   similarity_check/SCHEMA-V2.md  §corpus_strict
-#   similarity_check/scripts/build_schema_v2.py  STRICT_SQL
+#   similarity_check/scripts/build_schema_v2.py  _strict_sql()
 # Đã đối chiếu: lọc corpus_loose bằng cổng dưới đây ra đúng 157.384 dòng,
 # khớp tuyệt đối với corpus_strict.parquet.
 CORE6 = [("mix", "cơ cấu căn"), ("area_m2", "diện tích căn"), ("price", "giá"),
          ("amenities", "tiện ích"), ("style", "phong cách"), ("handover", "bàn giao")]
 
 
+# Từ 2026-08-25 15:51, `mix` và `amenities` trong parquet là kiểu LỒNG NHAU thật
+# (`STRUCT(...)[]`, `VARCHAR[]`), không còn chuỗi JSON. Ép về VARCHAR để so với
+# '[]' vẫn ra đúng số nhưng chậm gấp 8 lần (311 ms so với 40 ms trên `mix`), và
+# chỉ đúng nhờ hiện không có mảng rỗng nào. Chọn vị từ theo kiểu cột.
+LIST_COLS = set()
+
+
 def _nz(f):
+    if f.split(".")[-1] in LIST_COLS:
+        return f"{f} IS NOT NULL AND len({f}) > 0"
     return f"{f} IS NOT NULL AND CAST({f} AS VARCHAR) NOT IN ('', '[]', '{{}}')"
 
 
@@ -80,20 +89,29 @@ def _basis(b):
 
 
 # tiện ích đạt nếu có danh sách, HOẶC rỗng nhưng nguồn khai verified_none
-AMEN_OK = f"(({_nz('amenities')}) OR (amenities = '[]' AND amenities_basis = 'verified_none'))"
+def _amen_ok():
+    empty = "len(amenities) = 0" if "amenities" in LIST_COLS else "amenities = '[]'"
+    return (f"(({_nz('amenities')}) OR (amenities IS NOT NULL AND {empty} "
+            f"AND amenities_basis = 'verified_none'))")
 
-CORE_COND = {f: (AMEN_OK if f == "amenities" else _nz(f)) for f, _ in CORE6}
+
+def _core_cond():
+    a = _amen_ok()
+    return {f: (a if f == "amenities" else _nz(f)) for f, _ in CORE6}
 
 # mức bằng chứng CHỈ áp cho bốn trường; style/handover được nới có chủ đích
-STRICT_SQL = " AND ".join([
-    _nz("mix"), "id_kind = 'official_registry'",
-    "building_level IN ('building', 'derived_single')",
-    _nz("area_m2"), _nz("price"), _nz("price_kind"),
-    _nz("style"), _nz("handover"), _nz("sources"),
-    _nz("scraped_at"), _nz("building_name"), AMEN_OK,
-    _basis("mix_basis"), _basis("area_basis"),
-    _basis("price_basis"), _basis("amenities_basis"),
-])
+def _strict_sql():
+    return " AND ".join([
+        _nz("mix"), "id_kind = 'official_registry'",
+        "building_level IN ('building', 'derived_single')",
+        _nz("area_m2"), _nz("price"), _nz("price_kind"),
+        _nz("style"), _nz("handover"), _nz("sources"),
+        _nz("scraped_at"), _nz("building_name"), _amen_ok(),
+        _basis("mix_basis"), _basis("area_basis"),
+        _basis("price_basis"), _basis("amenities_basis"),
+    ])
+
+
 METRIC_FIELD = {"floors": "b.n_floors", "units": "b.n_units_building", "area": "b.area_m2",
                 "price": "b.price", "site": "b.site_area_m2", "year": "b.year_completed",
                 "amen": "b.amenities",
@@ -199,9 +217,9 @@ class Market:
         """Sáu trường lõi của kho, kèm tỷ lệ toà qua được cổng strict."""
         out = []
         for f, label in CORE6:
-            n = self.one(f"select count(*) {self.W} and {CORE_COND[f]}")[0]
+            n = self.one(f"select count(*) {self.W} and {_core_cond()[f]}")[0]
             out.append({"field": f, "label": label, "pct": round(100.0 * n / tot, 1)})
-        st = self.one(f"select count(*) {self.W} and {STRICT_SQL}")[0]
+        st = self.one(f"select count(*) {self.W} and {_strict_sql()}")[0]
         reg = self.one(f"select count(*) {self.W} and id_kind = 'official_registry'")[0]
         return {"fields": out, "n_pass": st, "pct": round(100.0 * st / tot, 1),
                 "registry_pct": round(100.0 * reg / tot, 1),
@@ -226,9 +244,10 @@ class Market:
 
     def buildings(self, k, metric_keys=()):
         full = " + ".join(f"case when b.{f} is null then 0 else 1 end" for f in CORE)
-        core6 = " + ".join(f"case when {CORE_COND[f].replace(f, 'b.' + f, 1)} then 1 else 0 end"
+        cc = _core_cond()
+        core6 = " + ".join(f"case when {cc[f].replace(f, 'b.' + f, 1)} then 1 else 0 end"
                            for f, _ in CORE6)
-        strict = STRICT_SQL
+        strict = _strict_sql()
         met = " + ".join(f"case when {METRIC_FIELD[k]} is null then 0 else 1 end"
                          for k in metric_keys if k in METRIC_FIELD) or "0"
         cols = ", ".join("b." + f for f in BLD)
@@ -266,6 +285,10 @@ class Market:
         của nó phải rơi vào đúng dải đó. Không đạt ngưỡng → trả None, UI quay về
         nhãn trung tính thay vì đặt tên sai trong im lặng.
         """
+        # Kiểu lồng nhau: kho đã khai `bucket_label` cho từng dải, không phải
+        # suy gì nữa. `starts_with` cũng không nhận STRUCT[] nên gọi là nổ.
+        if "mix" in LIST_COLS:
+            return None
         n_arr = self.one(f"select count(*) {self.W} and mix is not null "
                          f"and starts_with(mix, '[')")[0]
         if not n_arr:
@@ -417,13 +440,26 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--market", action="append", help="chỉ dựng thị trường này")
     ap.add_argument("--sample", type=int, default=250, help="số toà mẫu mỗi thị trường")
-    ap.add_argument("--out", default=str(HERE / "dist" / "index.html"))
+    ap.add_argument("--out", default=None,
+                    help="mặc định: dist/index.html cho bản gọi API, "
+                         "dist/export.html cho --export")
     ap.add_argument("--corpus", default=CORPUS)
     ap.add_argument("--export", action="store_true",
                     help="nhúng toàn bộ dữ liệu vào file (bản tự chứa, mở bằng "
                          "file:// vẫn chạy). Không có cờ này thì trang gọi API.")
     a = ap.parse_args()
     set_corpus(a.corpus.rstrip("/"))
+
+    # `dist/index.html` là file mà `ws1-data-sync.path` theo dõi: ghi vào đó là
+    # ĐẨY THẲNG LÊN /ws1-data/. Bản `--export` nhúng cả dữ liệu và không gọi API,
+    # nên đè lên đó là thay luôn trang đang chạy bằng một bản mẫu 250 toà.
+    LIVE = (HERE / "dist" / "index.html").resolve()
+    if a.out is None:
+        a.out = str(HERE / "dist" / ("export.html" if a.export else "index.html"))
+    if a.export and Path(a.out).resolve() == LIVE:
+        sys.exit("từ chối: --export không được ghi vào dist/index.html — đó là "
+                 "file systemd theo dõi và tự đẩy lên /ws1-data/.\n"
+                 "        Bỏ --out để dùng dist/export.html, hoặc chỉ ra đường khác.")
 
     try:
         import duckdb
@@ -436,6 +472,16 @@ def main():
 
     con = duckdb.connect()
     con.execute("PRAGMA memory_limit='4GB'")
+
+    # Dò kiểu cột một lần: quyết định cổng strict dùng vị từ nào.
+    try:
+        cols = con.sql(f"describe select * from "
+                       f"read_parquet('{CORPUS}/corpus_loose.parquet') limit 0").fetchall()
+        LIST_COLS.update(c[0] for c in cols if str(c[1]).rstrip().endswith("]"))
+        if LIST_COLS:
+            print(f"  cột kiểu mảng: {', '.join(sorted(LIST_COLS))}")
+    except Exception as e:
+        print(f"  ✗ không dò được kiểu cột: {e}", file=sys.stderr)
 
     markets, order = {}, []
 
