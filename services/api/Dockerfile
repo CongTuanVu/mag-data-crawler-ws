@@ -22,4 +22,6 @@ EXPOSE 8000
 
 # Một worker là đủ: DuckDB dùng nhiều luồng cho một truy vấn, thêm worker chỉ tổ
 # chia nhau 8 nhân. Cần chịu tải hơn thì tăng ở đây sau khi đo, đừng đoán.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+# `--no-access-log`: app tự ghi log, có giờ và thời lượng — xem `stamp_and_log`.
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", \
+     "--workers", "1", "--no-access-log"]

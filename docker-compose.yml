@@ -46,6 +46,15 @@ services:
       retries: 3
       start_period: 10s
 
+    # Log: để rộng tay. Đĩa còn 104 GB, mà mất lịch sử log lúc cần truy thì đắt
+    # hơn nhiều so với 1 GB chỗ chứa. Không có giới hạn nào thì Docker để lớn vô
+    # hạn — đó mới là rủi ro thật.
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "10"
+
     security_opt:
       - no-new-privileges:true
     read_only: true

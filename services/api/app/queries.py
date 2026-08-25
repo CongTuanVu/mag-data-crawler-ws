@@ -20,8 +20,8 @@ import os
 import time
 
 from . import config, db
-from .corpus_gate import (AMEN_OK, CORE6, CORE_COND, COV_FIELDS, COV_MIN,
-                          STRICT_SQL)
+from . import corpus_gate as G
+from .corpus_gate import CORE6, COV_FIELDS, COV_MIN
 
 LOOSE = lambda: f"read_parquet('{config.corpus('corpus_loose')}')"
 LATIN = lambda: f"read_parquet('{config.corpus('dim_name_latin')}')"
@@ -134,6 +134,32 @@ QS = [0.10, 0.25, 0.30, 0.50, 0.70, 0.75, 0.90]
 CUT_IDX = [0, 2, 3, 4, 6]        # 0,10 · 0,30 · 0,50 · 0,70 · 0,90
 
 
+def _detect_types() -> None:
+    """Dò kiểu cột một lần rồi báo cho cổng strict biết.
+
+    Parquet đổi `mix` và `amenities` sang kiểu lồng nhau lúc 15:51 ngày
+    2026-08-25. Cổng cũ ép chúng về VARCHAR — vẫn ra đúng số nhưng chậm gấp 8 lần
+    và chỉ đúng vì tình cờ không có mảng rỗng nào.
+    """
+    def scan():
+        cols = db.q(f"describe select * from {LOOSE()} limit 0")
+        lst = {c["column_name"] for c in cols
+               if str(c["column_type"]).rstrip().endswith("]")}
+        G.set_list_cols(lst)
+        return lst
+    return cached("types", scan)
+
+
+def CORE_COND() -> dict:
+    _detect_types()
+    return G.core_cond()
+
+
+def STRICT() -> str:
+    _detect_types()
+    return G.strict_sql()
+
+
 def _mtime() -> float:
     """Khoá cache: parquet đổi thì mọi số dẫn xuất phải tính lại."""
     try:
@@ -172,13 +198,14 @@ def _scan_all() -> dict[str, dict]:
     Trước đây chỗ này là ~260 lượt quét 618k dòng. `count(*) filter (...)` cho
     phép đếm mọi điều kiện trong cùng một lượt.
     """
+    cc = CORE_COND()
     core_cols = ", ".join(
-        f"count(*) filter (where {CORE_COND[f]}) as core_{f}" for f, _ in CORE6)
+        f"count(*) filter (where {cc[f]}) as core_{f}" for f, _ in CORE6)
     cov_cols = ", ".join(f"count({f}) as cov_{f}" for f, _ in COV_FIELDS)
     rows = db.q(f"""
         select market, count(*) as n,
                {core_cols}, {cov_cols},
-               count(*) filter (where {STRICT_SQL}) as n_strict,
+               count(*) filter (where {STRICT()}) as n_strict,
                count(*) filter (where id_kind = 'official_registry') as n_reg,
                any_value(id_kind) as id_kind,
                any_value(price_unit) filter (where price_unit is not null) as price_unit
@@ -292,8 +319,9 @@ def buildings(slug: str, q: str | None, form: str | None, sort: str,
         params += [form, form]
     cond = " and ".join(where)
 
-    core6 = " + ".join(f"case when {CORE_COND[f]} then 1 else 0 end" for f, _ in CORE6)
-    strict = f"case when {STRICT_SQL} then 1 else 0 end"
+    cc = CORE_COND()
+    core6 = " + ".join(f"case when {cc[f]} then 1 else 0 end" for f, _ in CORE6)
+    strict = f"case when {STRICT()} then 1 else 0 end"
     cols = ", ".join(BLD_COLS)
     order = SORTS.get(sort, SORTS["full"])
 

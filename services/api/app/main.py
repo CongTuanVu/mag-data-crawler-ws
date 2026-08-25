@@ -14,7 +14,9 @@ trường, không đổi frontend. Mọi phản hồi mang cờ `mock` và heade
 """
 from __future__ import annotations
 
+import logging
 import os
+import time
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query, Request
@@ -37,10 +39,46 @@ app = FastAPI(
 )
 
 
+# ── log ─────────────────────────────────────────────────────────────────────
+# Access log mặc định của uvicorn thiếu hai thứ cần nhất: GIỜ và THỜI LƯỢNG.
+# Không có thời lượng thì không biết đường nào chậm — mà truy vấn ở đây dao động
+# 90–700 ms nên đó chính là con số phải theo dõi. Nên tắt access log của uvicorn
+# (`--no-access-log` trong Dockerfile) và tự ghi một dòng đầy đủ.
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S")
+log = logging.getLogger("ws1")
+
+# Healthcheck chạy 30 giây một lần, chiếm 16% log và dìm hết request thật.
+# Bỏ khi nó BÌNH THƯỜNG; hỏng thì vẫn phải thấy.
+QUIET = {"/health"}
+SLOW_MS = 800.0
+
+
 @app.middleware("http")
-async def stamp_mode(request: Request, call_next):
-    resp = await call_next(request)
+async def stamp_and_log(request: Request, call_next):
+    t0 = time.perf_counter()
+    try:
+        resp = await call_next(request)
+    except Exception:
+        ms = (time.perf_counter() - t0) * 1000
+        log.exception("%s %s NỔ sau %.0fms", request.method,
+                      request.url.path, ms)
+        raise
+    ms = (time.perf_counter() - t0) * 1000
     resp.headers["X-Data-Mode"] = "mock" if IS_MOCK else "real"
+    resp.headers["X-Elapsed-Ms"] = f"{ms:.0f}"
+
+    if request.url.path not in QUIET or resp.status_code != 200:
+        q = f"?{request.url.query}" if request.url.query else ""
+        line = "%s %s%s %d %.0fms"
+        args = (request.method, request.url.path, q, resp.status_code, ms)
+        if resp.status_code >= 500:
+            log.error(line, *args)
+        elif resp.status_code >= 400 or ms >= SLOW_MS:
+            log.warning(line + ("  ← CHẬM" if ms >= SLOW_MS else ""), *args)
+        else:
+            log.info(line, *args)
     return resp
 
 
@@ -132,18 +170,26 @@ def market_buildings(
     offset: int = Query(0, ge=0),
 ):
     if IS_MOCK:
+        if slug not in mock.BY_SLUG:
+            raise HTTPException(404, f"không có thị trường '{slug}'")
         return ok(mock.buildings(slug, q, form, sort, limit, offset))
     if slug == "japan":
         return ok(jp.buildings(q, form, sort, limit, offset))
+    if slug not in queries.all_markets():
+        raise HTTPException(404, f"không có thị trường '{slug}'")
     return ok(queries.buildings(slug, q, form, sort, limit, offset))
 
 
 @app.get("/markets/{slug}/metrics")
 def market_metrics(slug: str, form: str | None = Query(None, max_length=64)):
     if IS_MOCK:
+        if slug not in mock.BY_SLUG:
+            raise HTTPException(404, f"không có thị trường '{slug}'")
         return ok({"rows": mock.metrics(slug, form)})
     if slug == "japan":
-        return ok({"rows": []})          # Nhật chưa dựng phân bố
+        return ok({"rows": [], "note": "Nhật chưa dựng phân bố"})
+    if slug not in queries.all_markets():
+        raise HTTPException(404, f"không có thị trường '{slug}'")
     return ok({"rows": queries.metrics(slug, form)})
 
 
