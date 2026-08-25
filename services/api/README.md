@@ -43,14 +43,39 @@ Tài liệu tương tác: `/docs` (OpenAPI sinh sẵn).
 | `GET /markets/{slug}/metrics` | `?form=` — phân bố tính LẠI theo bộ lọc đang chọn |
 | `GET /buildings/{code}` | một toà |
 | `GET /vn/projects` | `?province= &category= &q= &sort= &limit= &offset=` |
+| `GET /vn/categories` | loại dự án, kèm `slug` để dùng cho `?category=` |
 | `GET /vn/projects/{id}` | dự án + toà thuộc dự án + thống kê tin rao |
 | `GET /vn/provinces` | thống kê từng tỉnh |
 | `GET /vn/tiers` | thang bốn cấp, đo theo **cha trực tiếp** |
 | `GET /overview` | số tổng quan ba kho |
 | `GET /docs/search` | `?q=` — toàn văn 22.559 tài liệu *(chỉ `mock`, xem bên dưới)* |
 
-`sort` nhận: `full · units · floors · year · area · price · name`.
+`sort` nhận: `full · units · floors · year · area · price · name`
+(bảng Việt Nam: `full · units · floors · site · name`).
 `limit` chặn ở `MAX_PAGE_SIZE` (mặc định 200) — vượt thì `422`, không im lặng cắt.
+
+### Định danh là slug ASCII, không phải chữ có dấu
+
+`province` và `category` nhận **slug**, lấy từ `/vn/provinces` và `/vn/categories`:
+
+```
+?province=ha-noi          không phải  ?province=H%C3%A0%20N%E1%BB%99i
+?province=ho-chi-minh
+?category=khu-cong-nghiep
+```
+
+Mỗi bản ghi trả về mang cả `slug` (để lọc) lẫn nhãn có dấu (để hiển thị).
+Nhãn có dấu vẫn được chấp nhận nên client cũ không gãy.
+
+Slug **không tra được thì trả `422`** kèm gợi ý, chứ không lặng lẽ bỏ bộ lọc —
+bỏ qua trong im lặng nghĩa là hỏi Hà Nội mà nhận về cả kho, không có dấu hiệu nào.
+
+Cái bẫy khi tự sinh slug: `strip_accents('đường Đông')` cho ra `đuong Đong` —
+bỏ dấu thanh nhưng **giữ nguyên `đ`**. Thiếu bước thay `đ`→`d` thì `da-nang`
+không khớp `Đà Nẵng`. Xem `app/slugs.py`.
+
+`q` vẫn là chữ tự do người dùng gõ, nên **phải `encodeURIComponent`** ở phía
+client; gửi UTF-8 thô trong URL thì uvicorn trả `400` ngay ở dòng request.
 
 ## Chưa xong ở chế độ `real`
 

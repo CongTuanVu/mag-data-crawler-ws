@@ -5,6 +5,8 @@ import html
 from functools import lru_cache
 
 from . import config, db
+from .slugs import index as slug_index
+from .slugs import resolve as slug_resolve
 
 P = lambda n: f"read_parquet('{config.corpus(n)}')"
 
@@ -36,8 +38,26 @@ def _rows(sql, params=()):
     return [{k: _clean(v) for k, v in r.items()} for r in db.q(sql, params)]
 
 
+@lru_cache(maxsize=1)
+def provinces_index() -> dict[str, str]:
+    """slug → tên tỉnh thật. Dựng từ chính dữ liệu, xếp theo số dự án giảm dần
+    nên tỉnh lớn giữ slug trần khi có đụng độ."""
+    rows = db.q(f"select province, count(*) n from {P('vn_project')} "
+                f"where province is not null group by 1 order by n desc")
+    return slug_index([_clean(r["province"]) for r in rows])
+
+
+@lru_cache(maxsize=1)
+def categories_index() -> dict[str, str]:
+    rows = db.q(f"select project_category k, count(*) n from {P('vn_project')} "
+                f"where project_category is not null group by 1 order by n desc")
+    return slug_index([_clean(r["k"]) for r in rows])
+
+
 def projects(province: str | None, category: str | None, q: str | None,
              sort: str, limit: int, offset: int) -> dict:
+    province = slug_resolve(provinces_index(), province)
+    category = slug_resolve(categories_index(), category)
     where, params = ["1=1"], []
     if province:
         where.append("province = ?"); params.append(province)
@@ -111,7 +131,7 @@ def listings_of(eid: str, per: int = 5) -> dict:
 def provinces() -> list[dict]:
     """Thống kê từng tỉnh — KHÔNG chọn dự án đại diện. Chọn một dự án làm đại diện
     tỉnh là suy đoán; bảng này chỉ báo cáo phân bố thật."""
-    return _rows(f"""
+    rows = _rows(f"""
         with p as (
           select province, lat, n_units, n_floors, site_coverage_pct, site_area_m2,
                  price_per_m2_vnd, entity_id,
@@ -133,12 +153,19 @@ def provinces() -> list[dict]:
                coalesce(any_value(lst.n),0) n_list
         from p left join lst on lst.province = p.province
         group by 1 order by n desc""")
+    inv = {v: k for k, v in provinces_index().items()}
+    for r in rows:
+        r["slug"] = inv.get(r["province"], "")
+    return rows
 
 
 @lru_cache(maxsize=1)
 def categories() -> list[dict]:
-    return db.q(f"select project_category k, count(*) n from {P('vn_project')} "
+    inv = {v: k for k, v in categories_index().items()}
+    rows = db.q(f"select project_category k, count(*) n from {P('vn_project')} "
                 f"where project_category is not null group by 1 order by n desc")
+    return [{"slug": inv.get(_clean(r["k"]), ""), "label": _clean(r["k"]), "n": r["n"]}
+            for r in rows]
 
 
 @lru_cache(maxsize=1)

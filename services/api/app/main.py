@@ -43,6 +43,24 @@ async def stamp_mode(request: Request, call_next):
     return resp
 
 
+def check_slug(kind: str, value: str | None, table: dict[str, str]) -> None:
+    """Slug không tra được thì BÁO LỖI, đừng lặng lẽ bỏ bộ lọc.
+
+    Bỏ qua trong im lặng nghĩa là người dùng hỏi Hà Nội, nhận về cả kho, mà không
+    có dấu hiệu nào cho biết bộ lọc đã rơi mất.
+    """
+    if not value:
+        return
+    from .slugs import resolve
+    if resolve(table, value) is None:
+        near = sorted(k for k in table if k.startswith(value[:3].lower()))[:5]
+        raise HTTPException(422, {
+            "error": f"{kind} '{value}' không có trong dữ liệu",
+            "hint": f"dùng slug từ /vn/{'provinces' if kind == 'province' else 'categories'}",
+            "did_you_mean": near or sorted(table)[:5],
+        })
+
+
 def ok(payload: Any) -> JSONResponse:
     if isinstance(payload, dict):
         payload = {**payload, "mock": IS_MOCK}
@@ -131,13 +149,22 @@ def building(code: str):
 
 @app.get("/vn/projects")
 def vn_projects(
-    province: str | None = Query(None, max_length=64),
-    category: str | None = Query(None, max_length=64),
+    province: str | None = Query(
+        None, max_length=64,
+        description="slug ASCII, ví dụ `ha-noi`, `ho-chi-minh`, `da-nang` — "
+                    "lấy từ /vn/provinces. Vẫn nhận nhãn có dấu để không phá client cũ."),
+    category: str | None = Query(
+        None, max_length=64,
+        description="slug ASCII, ví dụ `chung-cu`, `khu-do-thi` — lấy từ /vn/categories."),
     q: str | None = Query(None, max_length=120),
     sort: str = Query("full"),
     limit: int = Query(50, ge=1, le=config.MAX_LIMIT),
     offset: int = Query(0, ge=0),
 ):
+    pi = mock.provinces_index() if IS_MOCK else vn.provinces_index()
+    ci = mock.categories_index() if IS_MOCK else vn.categories_index()
+    check_slug("province", province, pi)
+    check_slug("category", category, ci)
     fn = mock.vn_projects if IS_MOCK else vn.projects
     return ok(fn(province, category, q, sort, limit, offset))
 
@@ -153,8 +180,17 @@ def vn_project(eid: str):
 
 @app.get("/vn/provinces")
 def vn_provinces():
+    """Thống kê từng tỉnh. Trường `slug` là giá trị dùng cho `?province=`."""
     fn = mock.vn_provinces if IS_MOCK else vn.provinces
     return ok({"rows": fn()})
+
+
+@app.get("/vn/categories")
+def vn_categories():
+    """Loại dự án, kèm slug để dùng làm `?category=`."""
+    if IS_MOCK:
+        return ok({"rows": mock.vn_categories()})
+    return ok({"rows": vn.categories()})
 
 
 @app.get("/vn/tiers")

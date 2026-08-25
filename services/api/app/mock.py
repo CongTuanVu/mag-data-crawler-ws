@@ -13,7 +13,9 @@ cho tới khi `DATA_MODE=real`, nếu không ảnh chụp màn hình sẽ bị �
 from __future__ import annotations
 
 import hashlib
-import math
+
+from .slugs import index as slug_index
+from .slugs import resolve as slug_resolve
 
 MARKETS = [
     ("vn", "Việt Nam", 7765, None), ("korea", "Hàn Quốc", 125373, 6),
@@ -158,7 +160,21 @@ def metrics(slug: str, form) -> list[dict]:
     return out
 
 
+PROV_SLUGS = slug_index(PROVINCES)
+CAT_SLUGS = slug_index(CATEGORIES)
+
+
+def provinces_index() -> dict[str, str]:
+    return PROV_SLUGS
+
+
+def categories_index() -> dict[str, str]:
+    return CAT_SLUGS
+
+
 def vn_projects(province, category, q, sort, limit, offset) -> dict:
+    province = slug_resolve(PROV_SLUGS, province)
+    category = slug_resolve(CAT_SLUGS, category)
     total = 7765
     if province:
         total = 200 + int(_r(province) * 1800)
@@ -226,9 +242,10 @@ def vn_listings(eid: str, per: int = 5) -> dict:
 
 def vn_provinces() -> list[dict]:
     out = []
+    inv = {v: k for k, v in PROV_SLUGS.items()}
     for i, pv in enumerate(PROVINCES):
         n = 100 + int(_r(pv) * 1900)
-        out.append({"province": pv, "n": n, "n_geo": int(n * 0.99),
+        out.append({"slug": inv[pv], "province": pv, "n": n, "n_geo": int(n * 0.99),
                     "med_units": 200 + int(_r(pv, "u") * 400),
                     "med_floors": 8 + round(_r(pv, "f") * 20, 1),
                     "med_cover": round(30 + _r(pv, "c") * 25, 1),
@@ -238,6 +255,12 @@ def vn_provinces() -> list[dict]:
                     "n_list": int(_r(pv, "l") * 20000)})
     out.sort(key=lambda x: -x["n"])
     return out
+
+
+def vn_categories() -> list[dict]:
+    inv = {v: k for k, v in CAT_SLUGS.items()}
+    return [{"slug": inv[c], "label": c, "n": 400 + int(_r(c) * 2500)}
+            for c in CATEGORIES]
 
 
 def vn_tiers() -> list[dict]:
