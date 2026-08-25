@@ -8,8 +8,8 @@ trên 618.421 toà thật).
 
 | `DATA_MODE` | Nguồn | Dùng khi |
 |---|---|---|
-| `mock` *(mặc định)* | `app/mock.py`, số giả sinh từ hạt cố định | dựng hạ tầng, làm frontend |
-| `real` | parquet qua DuckDB (`app/queries.py`, `app/vn.py`) | khi đã nối xong dữ liệu |
+| `mock` | `app/mock.py`, số giả sinh từ hạt cố định | dựng hạ tầng, làm frontend |
+| `real` *(mặc định)* | parquet qua DuckDB + CSV Nhật + FTS5 tài liệu | chạy thật |
 
 Hình dạng phản hồi **giống hệt** ở hai chế độ, nên đổi là đổi một biến môi trường.
 Mọi phản hồi mang `"mock": true|false` và header `X-Data-Mode` — đừng gỡ, nếu không
@@ -48,7 +48,7 @@ Tài liệu tương tác: `/docs` (OpenAPI sinh sẵn).
 | `GET /vn/provinces` | thống kê từng tỉnh |
 | `GET /vn/tiers` | thang bốn cấp, đo theo **cha trực tiếp** |
 | `GET /overview` | số tổng quan ba kho |
-| `GET /docs/search` | `?q=` — toàn văn 22.559 tài liệu *(chỉ `mock`, xem bên dưới)* |
+| `GET /docs/search` | `?q=` — toàn văn 22.559 tài liệu / 207.816 đoạn |
 
 `sort` nhận: `full · units · floors · year · area · price · name`
 (bảng Việt Nam: `full · units · floors · site · name`).
@@ -77,15 +77,58 @@ không khớp `Đà Nẵng`. Xem `app/slugs.py`.
 `q` vẫn là chữ tự do người dùng gõ, nên **phải `encodeURIComponent`** ở phía
 client; gửi UTF-8 thô trong URL thì uvicorn trả `400` ngay ở dòng request.
 
+## Tốc độ
+
+Đo trên máy này (8 nhân, parquet 133 MB), `real`, qua HTTP:
+
+```
+/health                                    4 ms
+/markets            lần đầu 637 ms  →  gọi lại   2 ms   (cache theo mtime parquet)
+/markets/korea                            14 ms
+/markets/korea/buildings?sort=units       54 ms   trên 125.373 toà
+/markets/korea/buildings?sort=full       203 ms   ← chậm nhất, xem dưới
+/markets/korea/metrics                   178 ms
+/vn/projects?province=ha-noi              36 ms
+/vn/provinces                             17 ms
+/overview                                 16 ms
+/docs/search?q=…                           5 ms   trên 207.816 đoạn
+/markets/japan/buildings                   3 ms   (nạp sẵn trong bộ nhớ)
+```
+
+Bốn quyết định, đều đo trước khi chọn:
+
+**Gộp lượt quét.** `/markets` bản đầu lặp 20 thị trường × 13 truy vấn = ~260 lượt
+quét 618k dòng. Giờ là MỘT truy vấn `group by market` với `count(*) filter (...)`.
+`/metrics` từ hơn 100 lượt xuống 2: một lượt lấy bảy phân vị của cả sáu chỉ tiêu
+(`quantile_cont` nhận danh sách mốc nên chỉ sắp xếp một lần), một lượt đếm mọi
+khoảng.
+
+**Chỉ chấm cổng strict cho dòng trả về.** `_core`/`_strict` là 16 vị từ mỗi dòng.
+Chỉ `sort=full` cần chúng để SẮP XẾP; các kiểu khác sắp bằng cột thường rồi mới
+chấm cho đúng 50 dòng. Hàn Quốc: 195 ms → 45–83 ms.
+
+**Không đếm tổng khi không lọc.** Tổng đã có sẵn từ lượt quét gộp. Chỉ khi có
+`q`/`form` mới đếm, và kết quả đếm được cache theo bộ lọc.
+
+**Hai thứ đã thử và BỎ**, ghi lại để khỏi ai thử lại:
+
+- *Nạp parquet vào bảng bộ nhớ*: tốn 912 MiB, truy vấn điểm nhanh hơn 13 ms
+  nhưng truy vấn gộp **chậm hơn** (19,2 so với 15,6 ms). Parquet đã là cột có
+  zone map.
+- *`count(*) over ()` để gộp đếm vào cùng truy vấn*: **chậm gấp đôi**
+  (451 so với 217 ms) vì buộc vật chất hoá toàn bộ dòng trước khi cắt.
+
 ## Chưa xong ở chế độ `real`
 
-- `/overview` và `/docs/search` trả **501**. Truy vấn FTS5 đã thử tay và chạy
-  (6 ms cho join đủ), nhưng bảng `fts` là `content=''` nên `snippet()` trả rỗng —
-  muốn có đoạn trích phải đọc từ `md_file/` theo `chunks.off/len`. Chưa nối.
-- **Đường dẫn bộ tài liệu vừa đổi**: `/srv/ws1/data/vinhhd/` không còn, dữ liệu
-  nay ở `/mnt/data/ws1-data/vinhhd/`. `code_ui/build_overview.py` vẫn trỏ đường cũ
-  nên phần đếm tài liệu ở trang tổng quan sẽ **âm thầm biến mất** ở lần build tới.
-- Nhật Bản (`output_csv/`) chưa có đường đọc trong `real`.
+- **Không có đoạn trích trong kết quả tìm tài liệu.** Bảng FTS5 khai
+  `content=''` nên nó không giữ lại nguyên văn — `snippet()` trả rỗng. Muốn có
+  đoạn quanh từ khoá phải đọc file `.md` theo `chunks.off/len`. Trả về hiện có
+  tiêu đề, tên miền, ngôn ngữ, URL.
+- **Nhật chưa có phân bố**: `/markets/japan/metrics` trả mảng rỗng.
+- **`code_ui/build_overview.py` vẫn trỏ đường dẫn tài liệu cũ.**
+  `/srv/ws1/data/vinhhd/` không còn tồn tại, nay ở `/mnt/data/ws1-data/vinhhd/`.
+  Trang tổng quan tĩnh sẽ mất phần đếm tài liệu ở lần build tới — hàm đó
+  `return None` khi không thấy file, nên hỏng trong im lặng. API đã trỏ đúng.
 
 ## Nợ kỹ thuật
 

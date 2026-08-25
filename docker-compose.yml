@@ -21,7 +21,7 @@ services:
 
     environment:
       # mock = dữ liệu giả, đủ để dựng hạ tầng. Đổi thành `real` khi nối parquet.
-      DATA_MODE: "${DATA_MODE:-mock}"
+      DATA_MODE: "${DATA_MODE:-real}"
       CORPUS_DIR: /data/corpus
       JP_CSV_DIR: /data/output_csv
       DOCS_INDEX: /data/mdindex/index.db

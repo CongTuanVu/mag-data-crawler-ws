@@ -1,20 +1,27 @@
-"""Truy vấn thật trên parquet. Không cache, không nạp trước, trừ hai chỗ ghi rõ.
+"""Truy vấn thật trên parquet.
 
-Quy tắc: mọi giá trị do người dùng gửi lên đều BIND bằng `?`, không nội suy vào
-chuỗi SQL. Chỗ duy nhất ghép chuỗi là tên cột/hướng sắp xếp, và chúng được lấy từ
-danh sách trắng cố định ở dưới.
+Hai quyết định về tốc độ, đo chứ không đoán:
+
+1. KHÔNG nạp parquet vào bảng bộ nhớ. Đã thử: tốn 912 MiB, truy vấn điểm nhanh
+   hơn 13 ms nhưng truy vấn gộp lại CHẬM hơn (19,2 so với 15,6 ms). Parquet đã là
+   định dạng cột có zone map nên quét đã rẻ sẵn.
+
+2. Gộp nhiều lượt quét thành MỘT. Bản đầu tính `/markets` bằng cách lặp 20 thị
+   trường × 13 truy vấn = ~260 lượt quét 618k dòng. Giờ là một truy vấn duy nhất
+   `group by market` với `count(*) filter (...)`, và `/metrics` là hai lượt cho
+   cả sáu chỉ tiêu thay vì hơn một trăm.
+
+Quy tắc an toàn: mọi giá trị người dùng gửi lên đều BIND bằng `?`. Chỗ duy nhất
+ghép chuỗi là tên cột và hướng sắp xếp, lấy từ danh sách trắng cố định.
 """
 from __future__ import annotations
 
-import csv
-import glob
-import json
 import os
-from functools import lru_cache
+import time
 
 from . import config, db
 from .corpus_gate import (AMEN_OK, CORE6, CORE_COND, COV_FIELDS, COV_MIN,
-                          STRICT_SQL, nz)
+                          STRICT_SQL)
 
 LOOSE = lambda: f"read_parquet('{config.corpus('corpus_loose')}')"
 
@@ -23,20 +30,25 @@ BLD_COLS = [
     "n_floors", "n_units_building", "area_m2", "area_kind", "site_area_m2",
     "price", "price_unit", "price_kind", "price_basis", "year_completed",
     "mix", "mix_kind", "building_form", "style", "handover", "amenities",
-    "lat", "lon", "n_buildings", "building_code", "sources", "market",
+    "lat", "lon", "n_buildings", "building_code", "market",
 ]
 
-# danh sách trắng cho ORDER BY — người dùng chỉ gửi được khoá, không gửi SQL
+# Cột mà cổng strict cần nhưng người dùng không xem — lấy vào truy vấn trong rồi
+# loại ra ở ngoài, nếu không `_strict` sẽ không bind được cột.
+GATE_COLS = ["amenities_basis", "mix_basis", "area_basis", "id_kind",
+             "building_level", "scraped_at", "sources"]
+
 SORTS = {
-    "units": "coalesce(b.n_units_building, 0) desc",
-    "floors": "coalesce(b.n_floors, 0) desc",
-    "year": "coalesce(b.year_completed, 0) desc",
-    "area": "coalesce(b.area_m2, 0) desc",
-    "price": "coalesce(b.price, 0) desc",
-    "name": "b.building_name asc",
-    "full": "_core desc, _strict desc, coalesce(b.n_units_building,0) desc",
+    "full": "_core desc, _strict desc, coalesce(n_units_building,0) desc",
+    "units": "coalesce(n_units_building,0) desc",
+    "floors": "coalesce(n_floors,0) desc",
+    "year": "coalesce(year_completed,0) desc",
+    "area": "coalesce(area_m2,0) desc",
+    "price": "coalesce(price,0) desc",
+    "name": "building_name asc",
 }
 
+# key, nhãn, đơn vị, biểu thức, trường quyết định độ phủ
 METRICS = [
     ("floors", "Số tầng", "tầng", "n_floors", "n_floors"),
     ("units", "Số căn mỗi toà", "căn", "n_units_building", "n_units_building"),
@@ -47,166 +59,251 @@ METRICS = [
      "n_units_building/(site_area_m2/10000)", "site_area_m2"),
     ("year", "Năm hoàn thành", "", "year_completed", "year_completed"),
 ]
+QS = [0.10, 0.25, 0.30, 0.50, 0.70, 0.75, 0.90]
+
+
+def _mtime() -> float:
+    """Khoá cache: parquet đổi thì mọi số dẫn xuất phải tính lại."""
+    try:
+        return os.path.getmtime(config.corpus("corpus_loose"))
+    except OSError:
+        return 0.0
+
+
+_cache: dict[str, tuple[float, object]] = {}
+
+
+def cached(key: str, fn):
+    """Cache theo mtime của parquet — không TTL, không cần dọn tay."""
+    m = _mtime()
+    hit = _cache.get(key)
+    if hit and hit[0] == m:
+        return hit[1]
+    val = fn()
+    _cache[key] = (m, val)
+    return val
 
 
 def codes_of(slug: str) -> list[str]:
     return config.MARKET_GROUPS.get(slug, [slug])
 
 
-def _in_clause(codes: list[str]) -> tuple[str, list]:
+def _in(codes: list[str]) -> tuple[str, list]:
     return "market in (" + ",".join("?" * len(codes)) + ")", list(codes)
 
 
-# ── thị trường ──────────────────────────────────────────────────────────────
+# ── một lượt quét cho TOÀN BỘ thị trường ────────────────────────────────────
 
-@lru_cache(maxsize=1)
-def market_list() -> list[str]:
-    """Danh sách mã thị trường đã gộp nhóm. Cache: nó chỉ đổi khi parquet đổi,
-    mà parquet đổi thì service được khởi động lại."""
-    rows = db.q(f"select market, count(*) n from {LOOSE()} group by 1 order by n desc")
+def _scan_all() -> dict[str, dict]:
+    """MỘT truy vấn dựng xong meta + sáu trường lõi + độ phủ cho mọi thị trường.
+
+    Trước đây chỗ này là ~260 lượt quét 618k dòng. `count(*) filter (...)` cho
+    phép đếm mọi điều kiện trong cùng một lượt.
+    """
+    core_cols = ", ".join(
+        f"count(*) filter (where {CORE_COND[f]}) as core_{f}" for f, _ in CORE6)
+    cov_cols = ", ".join(f"count({f}) as cov_{f}" for f, _ in COV_FIELDS)
+    rows = db.q(f"""
+        select market, count(*) as n,
+               {core_cols}, {cov_cols},
+               count(*) filter (where {STRICT_SQL}) as n_strict,
+               count(*) filter (where id_kind = 'official_registry') as n_reg,
+               any_value(id_kind) as id_kind,
+               any_value(price_unit) filter (where price_unit is not null) as price_unit
+        from {LOOSE()} group by 1""")
+
     merged = {c: g for g, cs in config.MARKET_GROUPS.items() for c in cs}
-    out: list[str] = []
+    acc: dict[str, dict] = {}
     for r in rows:
-        k = merged.get(r["market"], r["market"])
-        if k not in out:
-            out.append(k)
+        slug = merged.get(r["market"], r["market"])
+        a = acc.setdefault(slug, {"slug": slug, "n": 0, "n_strict": 0, "n_reg": 0,
+                                  "core": {}, "cov": {}, "id_kind": None,
+                                  "price_unit": None})
+        a["n"] += r["n"]
+        a["n_strict"] += r["n_strict"]
+        a["n_reg"] += r["n_reg"]
+        a["id_kind"] = a["id_kind"] or r["id_kind"]
+        a["price_unit"] = a["price_unit"] or r["price_unit"]
+        for f, _ in CORE6:
+            a["core"][f] = a["core"].get(f, 0) + r[f"core_{f}"]
+        for f, _ in COV_FIELDS:
+            a["cov"][f] = a["cov"].get(f, 0) + r[f"cov_{f}"]
+    return acc
+
+
+def all_markets() -> dict[str, dict]:
+    return cached("all", _scan_all)
+
+
+def _shape(a: dict) -> dict:
+    n = a["n"]
+    fields = [{"field": f, "label": lb, "pct": round(100.0 * a["core"][f] / n, 1)}
+              for f, lb in CORE6]
+    return {
+        "meta": {"market": a["slug"],
+                 "label": config.MARKET_VI.get(a["slug"], a["slug"]),
+                 "n_buildings": n, "id_kind": a["id_kind"],
+                 "price_unit": a["price_unit"]},
+        "core": {"fields": fields, "n_pass": a["n_strict"],
+                 "pct": round(100.0 * a["n_strict"] / n, 1),
+                 "registry_pct": round(100.0 * a["n_reg"] / n, 1),
+                 "n_have": sum(1 for x in fields if x["pct"] >= COV_MIN)},
+        "coverage": [{"field": f, "label": lb,
+                      "pct": round(100.0 * a["cov"][f] / n, 1)}
+                     for f, lb in COV_FIELDS],
+    }
+
+
+def markets() -> list[dict]:
+    out = [{**_shape(a)["meta"], "core": _shape(a)["core"]}
+           for a in all_markets().values()]
+    out.sort(key=lambda m: (-m["core"]["n_have"], -m["core"]["pct"],
+                            -m["n_buildings"]))
     return out
 
 
-def market_meta(slug: str) -> dict | None:
-    codes = codes_of(slug)
-    w, p = _in_clause(codes)
-    n = db.scalar(f"select count(*) from {LOOSE()} where {w}", p)
-    if not n:
+def market_detail(slug: str) -> dict | None:
+    a = all_markets().get(slug)
+    if not a:
         return None
-    auth = db.q(f"select distinct id_authority from {LOOSE()} "
-                f"where {w} and id_authority is not null", p)
-    return {
-        "market": slug,
-        "label": config.MARKET_VI.get(slug, slug),
-        "n_buildings": n,
-        "id_kind": db.scalar(f"select any_value(id_kind) from {LOOSE()} where {w}", p),
-        "id_authority": ", ".join(sorted(r["id_authority"] for r in auth)),
-        "price_unit": db.scalar(
-            f"select any_value(price_unit) from {LOOSE()} where {w} "
-            f"and price_unit is not null", p),
-        "price_basis": db.q(
-            f"select price_basis as code, count(*) n from {LOOSE()} where {w} "
-            f"and price_basis is not null group by 1 order by n desc", p),
-    }
+    d = _shape(a)
+    d["meta"]["price_basis"] = cached(f"pb:{slug}", lambda: _price_basis(slug))
+    d["forms"] = cached(f"fm:{slug}", lambda: _forms(slug))
+    return d
 
 
-def market_core(slug: str, total: int) -> dict:
-    codes = codes_of(slug)
-    w, p = _in_clause(codes)
-    fields = []
-    for f, label in CORE6:
-        n = db.scalar(f"select count(*) from {LOOSE()} where {w} and {CORE_COND[f]}", p)
-        fields.append({"field": f, "label": label, "pct": round(100.0 * n / total, 1)})
-    st = db.scalar(f"select count(*) from {LOOSE()} where {w} and {STRICT_SQL}", p)
-    reg = db.scalar(f"select count(*) from {LOOSE()} where {w} "
-                    f"and id_kind = 'official_registry'", p)
-    return {
-        "fields": fields, "n_pass": st, "pct": round(100.0 * st / total, 1),
-        "registry_pct": round(100.0 * reg / total, 1),
-        "n_have": sum(1 for x in fields if x["pct"] >= COV_MIN),
-    }
+def _price_basis(slug: str) -> list[dict]:
+    w, p = _in(codes_of(slug))
+    return db.q(f"select price_basis as code, count(*) as n from {LOOSE()} "
+                f"where {w} and price_basis is not null group by 1 order by n desc", p)
 
 
-def market_coverage(slug: str, total: int) -> list[dict]:
-    w, p = _in_clause(codes_of(slug))
-    out = []
-    for f, label in COV_FIELDS:
-        n = db.scalar(f"select count({f}) from {LOOSE()} where {w}", p)
-        out.append({"field": f, "label": label, "pct": round(100.0 * n / total, 1)})
-    return out
+def _forms(slug: str) -> list[dict]:
+    w, p = _in(codes_of(slug))
+    a = all_markets()[slug]
+    col = "building_form" if a["cov"].get("building_form", 0) else "style"
+    return db.q(f"select {col} as code, count(*) as n from {LOOSE()} where {w} "
+                f"and {col} is not null group by 1 order by n desc limit 60", p)
 
+
+# ── duyệt toà ───────────────────────────────────────────────────────────────
 
 def buildings(slug: str, q: str | None, form: str | None, sort: str,
               limit: int, offset: int) -> dict:
-    """Duyệt THẬT trên toàn kho, có phân trang — không phải mẫu dựng sẵn."""
-    w, params = _in_clause(codes_of(slug))
+    if slug not in all_markets():
+        return {"total": 0, "limit": limit, "offset": offset, "rows": []}
+    w, params = _in(codes_of(slug))
     where = [w]
     if q:
-        where.append("(b.building_name ilike ? or b.project_name ilike ? "
-                     "or b.admin ilike ? or b.developer ilike ?)")
+        # `q` là chữ NGUYÊN VĂN người dùng gõ, giữ nguyên, chỉ bind chứ không ghép.
+        where.append("(building_name ilike ? or project_name ilike ? "
+                     "or admin ilike ? or developer ilike ?)")
         params += [f"%{q}%"] * 4
     if form:
-        where.append("(b.building_form = ? or b.style = ?)")
+        where.append("(building_form = ? or style = ?)")
         params += [form, form]
     cond = " and ".join(where)
 
-    core6 = " + ".join(
-        f"case when {CORE_COND[f].replace(f, 'b.' + f, 1)} then 1 else 0 end"
-        for f, _ in CORE6)
+    core6 = " + ".join(f"case when {CORE_COND[f]} then 1 else 0 end" for f, _ in CORE6)
+    strict = f"case when {STRICT_SQL} then 1 else 0 end"
+    cols = ", ".join(BLD_COLS)
     order = SORTS.get(sort, SORTS["full"])
-    cols = ", ".join("b." + c for c in BLD_COLS)
 
-    total = db.scalar(f"select count(*) from {LOOSE()} b where {cond}", params)
-    rows = db.q(
-        f"""select {cols}, ({core6}) as _core,
-               case when {STRICT_SQL.replace('mix', 'b.mix')} then 1 else 0 end as _strict
-            from {LOOSE()} b where {cond}
-            order by {order} limit ? offset ?""",
-        params + [limit, offset])
+    # `_core` và `_strict` là cả cổng strict — 16 vị từ trên mỗi dòng. Chỉ
+    # `sort=full` mới cần chúng để SẮP XẾP, nên chỉ khi đó mới tính cho toàn bộ
+    # dòng. Các kiểu khác sắp xếp bằng cột thường rồi mới tính cổng cho đúng 50
+    # dòng trả về. Đo trên Hàn Quốc 125k: 199 ms xuống còn vài chục.
+    if sort == "full" or sort not in SORTS:
+        sub = (f"(select {cols}, ({core6}) as _core, {strict} as _strict "
+               f"from {LOOSE()} where {cond})")
+        page = f"select * from {sub} order by {order} limit ? offset ?"
+        # `cols` không chứa GATE_COLS nên không cần loại gì thêm ở nhánh này
+    else:
+        inner = ", ".join(BLD_COLS + GATE_COLS)
+        drop = ", ".join(GATE_COLS)
+        page = (f"select * exclude ({drop}), ({core6}) as _core, "
+                f"{strict} as _strict from "
+                f"(select {inner} from {LOOSE()} where {cond} "
+                f"order by {order} limit ? offset ?)")
+
+    # Tổng: khi KHÔNG lọc thì lấy thẳng từ lượt quét gộp, không tốn gì. Chỉ khi
+    # có `q`/`form` mới phải đếm, và kết quả đếm đó được cache theo bộ lọc — người
+    # dùng lật trang thì tổng không đổi, đếm lại mỗi lần là phí một lượt quét.
+    #
+    # Đã thử `count(*) over ()` để gộp đếm vào cùng truy vấn: CHẬM GẤP ĐÔI
+    # (451 so với 217 ms) vì nó buộc vật chất hoá toàn bộ dòng trước khi cắt.
+    if not q and not form:
+        total = all_markets()[slug]["n"]
+    else:
+        total = cached(f"cnt:{slug}:{q}:{form}", lambda: db.scalar(
+            f"select count(*) from {LOOSE()} where {cond}", params))
+    rows = db.q(page, params + [limit, offset])
     return {"total": total, "limit": limit, "offset": offset, "rows": rows}
 
 
 def building(code: str) -> dict | None:
-    return db.one(
-        f"select * from {LOOSE()} where building_code = ? limit 1", [code])
+    return db.one(f"select * from {LOOSE()} where building_code = ? limit 1", [code])
 
+
+# ── phân bố ─────────────────────────────────────────────────────────────────
 
 def metrics(slug: str, form: str | None) -> list[dict]:
-    """Phân bố tính LẠI theo bộ lọc đang chọn — bản tĩnh không làm được việc này."""
-    w, base = _in_clause(codes_of(slug))
+    """Phân bố tính LẠI theo bộ lọc đang chọn — hai lượt quét cho cả sáu chỉ tiêu.
+
+    Lượt 1 lấy bảy phân vị của mọi chỉ tiêu cùng lúc (`quantile_cont` nhận danh
+    sách mốc nên chỉ sắp xếp một lần). Lượt 2 đếm sáu khoảng của mọi chỉ tiêu
+    bằng `count(*) filter (...)`. Bản đầu là hơn một trăm lượt.
+    """
+    a = all_markets().get(slug)
+    if not a:
+        return []
+    w, base = _in(codes_of(slug))
     extra, ep = "", []
     if form:
         extra, ep = " and (building_form = ? or style = ?)", [form, form]
-    cov = {c["field"]: c["pct"] for c in market_coverage(
-        slug, db.scalar(f"select count(*) from {LOOSE()} where {w}", base))}
+    params = base + ep
 
-    out = []
-    for key, label, unit, expr, field in METRICS:
-        if cov.get(field, 0) < COV_MIN:
+    use = [m for m in METRICS
+           if 100.0 * a["cov"].get(m[4], 0) / a["n"] >= COV_MIN][:6]
+    if not use:
+        return []
+
+    guard = {m[0]: (f"{m[4]} is not null" +
+                    (" and site_area_m2 > 0 and n_units_building > 0"
+                     if m[0] == "dens" else ""))
+             for m in use}
+    qcols = ", ".join(
+        f"quantile_cont({m[3]}, {QS}) filter (where {guard[m[0]]}) as q_{m[0]}, "
+        f"count(*) filter (where {guard[m[0]]}) as n_{m[0]}" for m in use)
+    agg = db.one(f"select {qcols} from {LOOSE()} where {w}{extra}", params)
+    if not agg:
+        return []
+
+    out, bin_cols = [], []
+    for key, label, unit, expr, _ in use:
+        qs = agg[f"q_{key}"]
+        n = agg[f"n_{key}"]
+        if not n or qs is None:
             continue
-        cond = f"{field} is not null"
-        if key == "dens":
-            cond += " and site_area_m2 > 0 and n_units_building > 0"
-        p = base + ep
-        sub = (f"(select {expr} x from {LOOSE()} where {w}{extra} and {cond})")
-        agg = db.one(
-            f"select count(*) n, quantile_cont(x,0.25) p25, median(x) med, "
-            f"quantile_cont(x,0.75) p75 from {sub}", p)
-        if not agg or not agg["n"] or agg["p25"] is None:
-            continue
-        cuts = sorted({round(db.scalar(
-            f"select quantile_cont(x,{c}) from {sub}", p), 2)
-            for c in (0.10, 0.30, 0.50, 0.70, 0.90)
-            if db.scalar(f"select quantile_cont(x,{c}) from {sub}", p) is not None})
-        bins = []
+        cuts = sorted({round(float(v), 2) for v in qs if v is not None})
+        edges = [None] + cuts + [None] if len(cuts) else []
+        spec = []
         for i in range(len(cuts) + 1):
-            a = cuts[i - 1] if i else None
-            b = cuts[i] if i < len(cuts) else None
-            if a is None:
-                c2 = f"{expr} < {b}"
-            elif b is None:
-                c2 = f"{expr} >= {a}"
-            else:
-                c2 = f"{expr} >= {a} and {expr} < {b}"
-            bins.append({"lo": a, "hi": b, "n": db.scalar(
-                f"select count(*) from {LOOSE()} where {w}{extra} and {cond} and {c2}", p)})
-        out.append({"key": key, "label": label, "unit": unit, "n": agg["n"],
-                    "p25": agg["p25"], "med": agg["med"], "p75": agg["p75"],
-                    "bins": bins})
-        if len(out) >= 6:
-            break
+            lo = cuts[i - 1] if i else None
+            hi = cuts[i] if i < len(cuts) else None
+            c = ([f"{expr} >= {lo}"] if lo is not None else []) + \
+                ([f"{expr} < {hi}"] if hi is not None else [])
+            spec.append((lo, hi, " and ".join(c) or "1=1"))
+            bin_cols.append(f"count(*) filter (where {guard[key]} and {spec[-1][2]}) "
+                            f"as b_{key}_{i}")
+        out.append({"key": key, "label": label, "unit": unit, "n": n,
+                    "p25": qs[1], "med": qs[3], "p75": qs[5], "_spec": spec})
+
+    if bin_cols:
+        counts = db.one(f"select {', '.join(bin_cols)} from {LOOSE()} "
+                        f"where {w}{extra}", params) or {}
+        for m in out:
+            m["bins"] = [{"lo": lo, "hi": hi,
+                          "n": counts.get(f"b_{m['key']}_{i}", 0)}
+                         for i, (lo, hi, _) in enumerate(m.pop("_spec"))]
     return out
-
-
-def forms(slug: str) -> list[dict]:
-    w, p = _in_clause(codes_of(slug))
-    col = "building_form" if db.scalar(
-        f"select count(building_form) from {LOOSE()} where {w}", p) else "style"
-    return db.q(f"select {col} as code, count(*) n from {LOOSE()} where {w} "
-                f"and {col} is not null group by 1 order by n desc", p)

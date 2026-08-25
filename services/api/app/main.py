@@ -26,7 +26,8 @@ MODE = os.environ.get("DATA_MODE", "mock").strip().lower()
 IS_MOCK = MODE != "real"
 
 if not IS_MOCK:                       # nạp muộn: chế độ mock không cần duckdb chạy
-    from . import queries, vn
+    from . import docs as docsdb
+    from . import jp, queries, vn
 
 app = FastAPI(
     title="ws1 data API",
@@ -93,11 +94,14 @@ def health():
 def markets():
     if IS_MOCK:
         return ok({"rows": mock.markets()})
-    rows = []
-    for slug in queries.market_list():
-        meta = queries.market_meta(slug)
-        if meta:
-            rows.append({**meta, "core": queries.market_core(slug, meta["n_buildings"])})
+    rows = queries.markets()
+    if jp.available():
+        m = jp.meta()
+        rows.append({**m["meta"], "core": m["core"]})
+    t = vn.tiers()
+    rows.insert(0, {"market": "vn", "label": "Việt Nam", "kind": "vn",
+                    "n_projects": t[0]["n"], "n_buildings": t[1]["n"],
+                    "n_units": t[2]["n"], "n_listings": t[3]["n"]})
     return ok({"rows": rows})
 
 
@@ -108,13 +112,14 @@ def market_detail(slug: str):
         if not d:
             raise HTTPException(404, f"không có thị trường '{slug}'")
         return ok(d)
-    meta = queries.market_meta(slug)
-    if not meta:
+    if slug == "japan":
+        if not jp.available():
+            raise HTTPException(404, "không đọc được nguồn Nhật")
+        return ok(jp.meta())
+    d = queries.market_detail(slug)
+    if not d:
         raise HTTPException(404, f"không có thị trường '{slug}'")
-    n = meta["n_buildings"]
-    return ok({"meta": meta, "core": queries.market_core(slug, n),
-               "coverage": queries.market_coverage(slug, n),
-               "forms": queries.forms(slug)})
+    return ok(d)
 
 
 @app.get("/markets/{slug}/buildings")
@@ -126,20 +131,26 @@ def market_buildings(
     limit: int = Query(50, ge=1, le=config.MAX_LIMIT),
     offset: int = Query(0, ge=0),
 ):
-    fn = mock.buildings if IS_MOCK else queries.buildings
-    return ok(fn(slug, q, form, sort, limit, offset))
+    if IS_MOCK:
+        return ok(mock.buildings(slug, q, form, sort, limit, offset))
+    if slug == "japan":
+        return ok(jp.buildings(q, form, sort, limit, offset))
+    return ok(queries.buildings(slug, q, form, sort, limit, offset))
 
 
 @app.get("/markets/{slug}/metrics")
 def market_metrics(slug: str, form: str | None = Query(None, max_length=64)):
-    fn = mock.metrics if IS_MOCK else queries.metrics
-    return ok({"rows": fn(slug, form)})
+    if IS_MOCK:
+        return ok({"rows": mock.metrics(slug, form)})
+    if slug == "japan":
+        return ok({"rows": []})          # Nhật chưa dựng phân bố
+    return ok({"rows": queries.metrics(slug, form)})
 
 
 @app.get("/buildings/{code}")
 def building(code: str):
-    fn = mock.building if IS_MOCK else queries.building
-    b = fn(code)
+    b = mock.building(code) if IS_MOCK else (
+        queries.building(code) or (jp.building(code) if jp.available() else None))
     if not b:
         raise HTTPException(404, f"không có toà '{code}'")
     return ok(b)
@@ -166,7 +177,10 @@ def vn_projects(
     check_slug("province", province, pi)
     check_slug("category", category, ci)
     fn = mock.vn_projects if IS_MOCK else vn.projects
-    return ok(fn(province, category, q, sort, limit, offset))
+    try:
+        return ok(fn(province, category, q, sort, limit, offset))
+    except ValueError as e:                    # tầng truy vấn từ chối bộ lọc lạ
+        raise HTTPException(422, str(e))
 
 
 @app.get("/vn/projects/{eid}")
@@ -205,7 +219,29 @@ def vn_tiers():
 def overview():
     if IS_MOCK:
         return ok(mock.overview())
-    raise HTTPException(501, "chế độ real chưa nối trang tổng quan")
+    mk = queries.markets()
+    t = vn.tiers()
+    out = {
+        "corpus": {
+            "loose": sum(m["n_buildings"] for m in mk),
+            "strict": sum(m["core"]["n_pass"] for m in mk),
+            "n_markets": len(mk),
+            "by_market": [{"k": m["label"], "n": m["n_buildings"],
+                           "core": m["core"]["n_have"],
+                           "strict": m["core"]["n_pass"]} for m in mk],
+        },
+        "vn_tiers": t, "vn_provinces": len(vn.provinces()),
+    }
+    out["corpus"]["strict_pct"] = round(
+        100.0 * out["corpus"]["strict"] / max(out["corpus"]["loose"], 1), 1)
+    if jp.available():
+        j = jp.meta()["meta"]
+        out["japan"] = {"n_buildings": j["n_buildings"],
+                        "n_projects": j["n_projects"], "n_rows": j["n_rows"]}
+    d = docsdb.stats()
+    if d:
+        out["docs"] = {"label": "Bộ dữ liệu tài liệu", **d}
+    return ok(out)
 
 
 @app.get("/docs/search")
@@ -216,4 +252,4 @@ def docs_search(
 ):
     if IS_MOCK:
         return ok(mock.docs_search(q, limit, offset))
-    raise HTTPException(501, "chế độ real chưa nối tìm kiếm tài liệu")
+    return ok(docsdb.search(q, limit, offset))

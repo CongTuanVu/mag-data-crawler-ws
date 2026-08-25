@@ -15,6 +15,8 @@ def _p(env: str, default: str) -> str:
 
 CORPUS_DIR = _p("CORPUS_DIR", "/data/corpus")
 JP_CSV_DIR = _p("JP_CSV_DIR", "/data/output_csv")
+# Lưu ý: nguồn tài liệu ĐÃ CHUYỂN CHỖ trên host — `/srv/ws1/data/vinhhd/` không
+# còn, nay ở `/mnt/data/ws1-data/vinhhd/`. Compose trỏ đúng chỗ mới.
 DOCS_INDEX = os.environ.get("DOCS_INDEX", "/data/mdindex/index.db")
 
 MEMORY_LIMIT = os.environ.get("DUCKDB_MEMORY_LIMIT", "4GB")

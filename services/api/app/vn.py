@@ -56,8 +56,18 @@ def categories_index() -> dict[str, str]:
 
 def projects(province: str | None, category: str | None, q: str | None,
              sort: str, limit: int, offset: int) -> dict:
-    province = slug_resolve(provinces_index(), province)
-    category = slug_resolve(categories_index(), category)
+    # Không tra được thì NÉM, đừng lặng lẽ bỏ bộ lọc. Route đã chặn trước bằng 422,
+    # nhưng tầng này cũng không được phép trả cả kho khi người gọi hỏi một tỉnh.
+    def _need(kind, val, table):
+        if val is None:
+            return None
+        got = slug_resolve(table, val)
+        if got is None:
+            raise ValueError(f"{kind} '{val}' không có trong dữ liệu")
+        return got
+
+    province = _need("province", province, provinces_index())
+    category = _need("category", category, categories_index())
     where, params = ["1=1"], []
     if province:
         where.append("province = ?"); params.append(province)
