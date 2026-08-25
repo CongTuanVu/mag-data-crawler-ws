@@ -233,7 +233,11 @@ VN_METRICS = [
     ("site", "Diện tích lô", "m²", "site_area_m2", "site_area_m2 is not null"),
     ("land", "Đất mỗi căn", "m²", "site_area_m2/n_units", "site_area_m2 > 0 and n_units > 0"),
 ]
+# Bảy mốc trong MỘT lượt quét: năm mốc đầu-cuối dùng làm MÉP KHOẢNG của biểu đồ,
+# còn 0,25 và 0,75 chỉ để hiện p25/p75 ở dòng tóm tắt. Lỡ dùng cả bảy làm mép thì
+# ra 8 cột thay vì 6, lệch hẳn với bản dựng sẵn.
 QS = [0.10, 0.25, 0.30, 0.50, 0.70, 0.75, 0.90]
+CUT_IDX = [0, 2, 3, 4, 6]        # 0,10 · 0,30 · 0,50 · 0,70 · 0,90
 
 # khung chiếu, khớp dải đất liền Việt Nam; lề ngang là lề khung, không phải dữ liệu
 LON0, LON1, LAT0, LAT1 = 102.0, 110.0, 8.0, 23.6
@@ -270,7 +274,8 @@ def metrics(category: str | None) -> list[dict]:
         qs, n = agg[f"q_{key}"], agg[f"n_{key}"]
         if not n or n < 40 or qs is None:
             continue
-        cuts = sorted({round(float(v), 2) for v in qs if v is not None})
+        cuts = sorted({round(float(qs[i]), 2) for i in CUT_IDX
+                       if qs[i] is not None})
         spec = []
         for i in range(len(cuts) + 1):
             lo = cuts[i - 1] if i else None

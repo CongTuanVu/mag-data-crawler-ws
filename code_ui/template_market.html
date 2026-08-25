@@ -429,20 +429,58 @@ function chip(label, pct, has) {
     box-shadow:inset 0 0 0 1px ${has ? "var(--good)" : "var(--faint)"}"></i>${esc(label)}
     <span class="p">${num(pct)}%</span></span>`;
 }
+/* Nhãn mép khoảng. Bản nhúng đã kèm `label`; chế độ API chỉ trả `lo`/`hi` nên
+   dựng tại chỗ — cùng cách rút gọn với builder để hai bản đọc giống nhau. */
+function edgeTxt(v) {
+  if (v == null) return "";
+  const a = Math.abs(v);
+  if (a >= 1e9) return num(v / 1e9, 1) + " tỷ";
+  if (a >= 1e6) return num(v / 1e6, 0) + " tr";
+  if (a >= 1e4) return num(v / 1e3, 0) + "k";
+  if (a >= 100) return num(v, 0);
+  return num(v, Number.isInteger(v) ? 0 : 1);
+}
+function binLabel(x, key) {
+  if (x.label) return x.label;
+  /* Năm là nhãn, không phải số đo — `1989` chứ không phải `1.989`. */
+  if (key === "year") {
+    if (x.lo == null) return "< " + Math.round(x.hi);
+    if (x.hi == null) return "≥ " + Math.round(x.lo);
+    return Math.round(x.lo) + "–" + Math.round(x.hi);
+  }
+  if (x.lo == null) return "< " + edgeTxt(x.hi);
+  if (x.hi == null) return "≥ " + edgeTxt(x.lo);
+  return edgeTxt(x.lo) + "–" + edgeTxt(x.hi);
+}
+
 function cell(m, b) {
-  const hi = binOf(m, isVN() ? vnVal(b, m.key) : val(b, m.key));
+  /* `val` đọc trường của corpus (`n_units_building`), `vnVal` đọc trường của
+     Việt Nam (`n_units`) — dùng nhầm thì mọi ô đều ra "—". */
+  let v = isVN() ? vnVal(b, m.key) : val(b, m.key);
+  /* Toà dùng đơn vị giá khác với đơn vị của phân bố thì KHÔNG so được — để trống
+     thay vì ném nó vào một cột mà nó không thuộc về. */
+  const off = m.key === "price" && m.note && fld(b, "price_unit") &&
+              fld(b, "price_unit") !== m.unit;
+  if (off) v = null;
+  const hi = binOf(m, v);
   const mx = Math.max(...m.bins.map(x => x.n)) || 1;
-  const bars = m.bins.map((x, i) => `<div class="${i === hi ? "on" : ""}" title="${esc(x.label)}: ${num(x.n)}">
+  const bars = m.bins.map((x, i) => {
+    const lb = binLabel(x, m.key);
+    return `<div class="${i === hi ? "on" : ""}" title="${esc(lb)}: ${num(x.n)}">
       <div class="bar" style="height:${(x.n / mx * 44).toFixed(1)}px"></div>
-      <div class="lb">${esc(x.label)}</div></div>`).join("");
-  const v = val(b, m.key);
+      <div class="lb">${esc(lb)}</div></div>`;
+  }).join("");
   return `<div class="cell">
     <div class="h"><b>${esc(m.label)}</b><em>n = ${num(m.n)}</em></div>
     <div class="bars">${bars}</div>
+    ${m.note ? `<div style="font-size:10px;color:var(--warn);margin-top:6px;line-height:1.45">${esc(m.note)}</div>` : ""}
     <div class="qrow">
       <span class="q">${short(m.p25)} · <b>${short(m.med)}</b> · ${short(m.p75)}
         <span style="color:var(--faint)">${esc(m.unit)}</span></span>
-      <span class="v">${v == null ? "toà này: —" : short(v) + " " + esc(m.unit)}</span>
+      <span class="v">${v == null
+        ? (off ? `toà này: ${short(val(b, "price"))} ${esc(vi("price_unit", fld(b, "price_unit")))} — khác thang`
+               : `${isVN() ? "dự án" : "toà"} này: —`)
+        : (m.key === "year" ? String(Math.round(v)) : short(v)) + " " + esc(m.unit)}</span>
     </div></div>`;
 }
 function coreBlock() {

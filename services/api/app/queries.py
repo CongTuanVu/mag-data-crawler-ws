@@ -59,7 +59,11 @@ METRICS = [
      "n_units_building/(site_area_m2/10000)", "site_area_m2"),
     ("year", "Năm hoàn thành", "", "year_completed", "year_completed"),
 ]
+# Bảy mốc trong MỘT lượt quét: năm mốc đầu-cuối dùng làm MÉP KHOẢNG của biểu đồ,
+# còn 0,25 và 0,75 chỉ để hiện p25/p75 ở dòng tóm tắt. Lỡ dùng cả bảy làm mép thì
+# ra 8 cột thay vì 6, lệch hẳn với bản dựng sẵn.
 QS = [0.10, 0.25, 0.30, 0.50, 0.70, 0.75, 0.90]
+CUT_IDX = [0, 2, 3, 4, 6]        # 0,10 · 0,30 · 0,50 · 0,70 · 0,90
 
 
 def _mtime() -> float:
@@ -168,6 +172,7 @@ def market_detail(slug: str) -> dict | None:
         return None
     d = _shape(a)
     d["meta"]["price_basis"] = cached(f"pb:{slug}", lambda: _price_basis(slug))
+    d["meta"]["price_units"] = price_units(slug)
     d["forms"] = cached(f"fm:{slug}", lambda: _forms(slug))
     return d
 
@@ -176,6 +181,21 @@ def _price_basis(slug: str) -> list[dict]:
     w, p = _in(codes_of(slug))
     return db.q(f"select price_basis as code, count(*) as n from {LOOSE()} "
                 f"where {w} and price_basis is not null group by 1 order by n desc", p)
+
+
+def price_units(slug: str) -> list[dict]:
+    """Đơn vị giá của thị trường, kèm số dòng.
+
+    Hàn Quốc TRỘN hai đơn vị trong cùng cột `price`: 117.966 dòng KRW tuyệt đối
+    (trung vị 230 triệu) và 2.049 dòng 만원/m² (trung vị 332) — lệch sáu bậc.
+    Gộp chung mà tính phân vị thì biểu đồ giá thực chất chỉ là của nhóm lớn, còn
+    toà thuộc nhóm nhỏ rơi vào cột thấp nhất: đúng về số, vô nghĩa về nghĩa.
+    """
+    w, p = _in(codes_of(slug))
+    return cached(f"pu:{slug}", lambda: db.q(
+        f"select price_unit as code, count(*) as n from {LOOSE()} "
+        f"where {w} and price is not null and price_unit is not null "
+        f"group by 1 order by n desc", p))
 
 
 def _forms(slug: str) -> list[dict]:
@@ -268,10 +288,20 @@ def metrics(slug: str, form: str | None) -> list[dict]:
     if not use:
         return []
 
-    guard = {m[0]: (f"{m[4]} is not null" +
-                    (" and site_area_m2 > 0 and n_units_building > 0"
-                     if m[0] == "dens" else ""))
-             for m in use}
+    # Giá chỉ tính trên ĐƠN VỊ CHIẾM ĐA SỐ. Trộn hai thang trong một biểu đồ là
+    # dựng ra một phân bố không tồn tại — xem `price_units()`.
+    pu = price_units(slug)
+    main_unit = pu[0]["code"] if pu else None
+    mixed = len(pu) > 1
+
+    guard = {}
+    for m in use:
+        g = f"{m[4]} is not null"
+        if m[0] == "dens":
+            g += " and site_area_m2 > 0 and n_units_building > 0"
+        if m[0] == "price" and mixed and main_unit:
+            g += f" and price_unit = '{main_unit}'"
+        guard[m[0]] = g
     qcols = ", ".join(
         f"quantile_cont({m[3]}, {QS}) filter (where {guard[m[0]]}) as q_{m[0]}, "
         f"count(*) filter (where {guard[m[0]]}) as n_{m[0]}" for m in use)
@@ -285,7 +315,8 @@ def metrics(slug: str, form: str | None) -> list[dict]:
         n = agg[f"n_{key}"]
         if not n or qs is None:
             continue
-        cuts = sorted({round(float(v), 2) for v in qs if v is not None})
+        cuts = sorted({round(float(qs[i]), 2) for i in CUT_IDX
+                       if qs[i] is not None})
         edges = [None] + cuts + [None] if len(cuts) else []
         spec = []
         for i in range(len(cuts) + 1):
@@ -296,8 +327,17 @@ def metrics(slug: str, form: str | None) -> list[dict]:
             spec.append((lo, hi, " and ".join(c) or "1=1"))
             bin_cols.append(f"count(*) filter (where {guard[key]} and {spec[-1][2]}) "
                             f"as b_{key}_{i}")
-        out.append({"key": key, "label": label, "unit": unit, "n": n,
-                    "p25": qs[1], "med": qs[3], "p75": qs[5], "_spec": spec})
+        e = {"key": key, "label": label, "unit": unit, "n": n,
+             "p25": qs[1], "med": qs[3], "p75": qs[5], "_spec": spec}
+        if key == "price" and main_unit:
+            e["unit"] = main_unit
+            if mixed:
+                e["note"] = ("Cột giá thị trường này trộn "
+                             + " và ".join(f"{x['n']:,} dòng {x['code']}".replace(",", ".")
+                                           for x in pu)
+                             + f" — lệch thang. Phân bố chỉ tính trên {main_unit}; "
+                               "toà thuộc đơn vị khác không so được vào đây.")
+        out.append(e)
 
     if bin_cols:
         counts = db.one(f"select {', '.join(bin_cols)} from {LOOSE()} "
