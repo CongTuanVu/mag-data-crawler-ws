@@ -1,0 +1,1501 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Benchmark toà nhà</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#ffffff; --panel-2:#fbfbfc; --border:#e3e6ea;
+    --text:#151a20; --muted:#69737f; --faint:#9aa3ad;
+    --accent:#1d5fd0; --accent-soft:#e8f0fe;
+    --good:#1a7f4b; --warn:#9a6a00; --bad:#b03030;
+    --shadow:0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.06);
+    --radius:10px; --track:#eceef1;
+    --s1:#dce8fb; --s2:#aac8f3; --s3:#6f9ce7; --s4:#3773da; --s5:#1b4fa8;
+  }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+    --bg:#0f1216; --panel:#171b21; --panel-2:#1c2129; --border:#2a313a;
+    --text:#e8ecf1; --muted:#9aa5b1; --faint:#6d7883;
+    --accent:#6ea8fe; --accent-soft:#1b2a44;
+    --good:#5fd39a; --warn:#e2b558; --bad:#f08585;
+    --shadow:0 1px 2px rgba(0,0,0,.4); --track:#242b34;
+    --s1:#1d2b40; --s2:#274a75; --s3:#356aa8; --s4:#4b8bd8; --s5:#6ea8fe;
+  }}
+  :root[data-theme="dark"]{
+    --bg:#0f1216; --panel:#171b21; --panel-2:#1c2129; --border:#2a313a;
+    --text:#e8ecf1; --muted:#9aa5b1; --faint:#6d7883;
+    --accent:#6ea8fe; --accent-soft:#1b2a44;
+    --good:#5fd39a; --warn:#e2b558; --bad:#f08585;
+    --shadow:0 1px 2px rgba(0,0,0,.4); --track:#242b34;
+    --s1:#1d2b40; --s2:#274a75; --s3:#356aa8; --s4:#4b8bd8; --s5:#6ea8fe;
+  }
+  *{box-sizing:border-box}
+  /* `[hidden]` của trình duyệt là display:none ở UA stylesheet, thua bất kỳ luật
+     display nào của tác giả — `.ov{display:flex}` từng đè lên nó và trang tổng quan
+     vẫn nằm dưới trang thị trường. Chặn dứt điểm cho mọi phần tử. */
+  [hidden]{display:none !important}
+  body{margin:0; background:var(--bg); color:var(--text);
+    font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans","Hiragino Sans",
+      "Yu Gothic UI",Roboto,"Helvetica Neue",Arial,sans-serif; -webkit-font-smoothing:antialiased}
+  a{color:var(--accent); text-decoration:none} a:hover{text-decoration:underline}
+  .src{color:var(--faint); font-size:11px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow)}
+  .badge{font-size:11.5px; padding:3px 9px; border-radius:999px; border:1px solid var(--border);
+    background:var(--panel-2); color:var(--muted); white-space:nowrap}
+  .badge.accent{background:var(--accent-soft); color:var(--accent); border-color:transparent}
+
+  /* ---------- chrome ---------- */
+  .topbar{position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:12px;
+    padding:11px 20px; background:var(--panel); border-bottom:1px solid var(--border); flex-wrap:wrap}
+  .brand{font-weight:650; font-size:15px; letter-spacing:-.01em; white-space:nowrap}
+  .brand span{color:var(--muted); font-weight:450; margin-left:8px; font-size:12.5px}
+  .grow{flex:1}
+  .search{width:min(280px,42vw); padding:7px 11px; border:1px solid var(--border); border-radius:8px;
+    background:var(--panel-2); color:var(--text); font-size:13px; font-family:inherit; outline:none}
+  .search:focus{border-color:var(--accent)}
+  .icon-btn{border:1px solid var(--border); background:var(--panel-2); color:var(--muted);
+    width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:15px; line-height:1; flex:none}
+  .filterbar{position:sticky; top:53px; z-index:19; display:flex; align-items:center; gap:12px;
+    flex-wrap:wrap; padding:9px 20px; background:var(--panel-2); border-bottom:1px solid var(--border); font-size:12.5px}
+  .fgroup{display:flex; align-items:center; gap:6px}
+  .fgroup label{color:var(--muted)}
+  .sel{height:28px; border-radius:7px; border:1px solid var(--border); background:var(--panel);
+    color:var(--text); font-family:inherit; font-size:12.5px; padding:0 7px; max-width:56vw; cursor:pointer}
+  .count{color:var(--faint); margin-left:auto; white-space:nowrap}
+
+  /* ---------- dải tóm tắt ---------- */
+  .band{padding:16px 20px 0}
+  .sec-head{display:flex; align-items:baseline; gap:9px; padding:13px 18px 11px;
+    border-bottom:1px solid var(--border); flex-wrap:wrap}
+  .sec-head h2{margin:0; font-size:14.5px; font-weight:650; letter-spacing:-.01em}
+  .sec-head .cnt{color:var(--faint); font-size:12px}
+  .sec-head .tbl{color:var(--faint); font-size:11px; margin-left:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .sec-body{padding:14px 18px}
+  .caps{padding:12px 18px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+    border-bottom:1px solid var(--border)}
+  .caps h3{margin:0; font-size:11px; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--muted); font-weight:600}
+  .chip{display:flex; align-items:center; gap:6px; padding:4px 9px; border-radius:999px;
+    border:1px solid var(--border); background:var(--panel-2); white-space:nowrap; font-size:11.5px}
+  .chip i{width:6px; height:6px; border-radius:50%; flex:none}
+  .chip .p{color:var(--muted); font-variant-numeric:tabular-nums}
+  .divider{width:1px; height:20px; background:var(--border); margin:0 4px}
+  .coregrid{display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:1px;
+    background:var(--border); border-top:1px solid var(--border); border-bottom:1px solid var(--border)}
+  .vnrow{display:grid; grid-template-columns:352px 236px minmax(0,1fr); gap:1px;
+    background:var(--border); border-top:1px solid var(--border)}
+  .vnrow svg{max-height:466px}
+  .mgrid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1px;
+    background:var(--border); border-top:1px solid var(--border)}
+  /* 6 chỉ tiêu VN đứng cạnh bản đồ nên hẹp hơn — 2 cột, và nở ra khi dải xuống một cột */
+  .vnmet{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cell{background:var(--panel); padding:13px 16px 12px}
+  .cell .h{display:flex; align-items:baseline; justify-content:space-between; gap:8px}
+  .cell .h b{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; font-weight:600}
+  .cell .h em{font-style:normal; font-size:10px; color:var(--faint); font-variant-numeric:tabular-nums}
+  .bars{display:flex; gap:4px; align-items:flex-end; height:60px; margin-top:9px}
+  .bars>div{display:flex; flex-direction:column; align-items:center; justify-content:flex-end; flex:1; gap:5px; min-width:0}
+  .bars .bar{width:100%; min-height:2px; border-radius:3px 3px 0 0; background:var(--s2)}
+  .bars .on .bar{background:var(--accent)}
+  .bars .lb{font-size:9px; color:var(--faint); font-variant-numeric:tabular-nums;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%}
+  .bars .on .lb{color:var(--accent)}
+  .qrow{display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin-top:9px;
+    padding-top:8px; border-top:1px solid var(--border); flex-wrap:wrap}
+  .qrow .q{font-size:11px; color:var(--muted); font-variant-numeric:tabular-nums}
+  .qrow .q b{color:var(--text); font-weight:600}
+  .qrow .v{font-size:12.5px; font-weight:600; color:var(--accent);
+    font-variant-numeric:tabular-nums; white-space:nowrap}
+
+  /* ---------- vùng làm việc ---------- */
+  .wrap{display:grid; grid-template-columns:290px minmax(0,1fr); gap:18px; padding:16px 20px 40px; align-items:start}
+  .list{display:flex; flex-direction:column; gap:8px; max-height:calc(100vh - 190px); overflow:auto; padding-right:2px}
+  .tower{display:block; width:100%; text-align:left; padding:10px 12px; cursor:pointer;
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    color:inherit; font-family:inherit; font-size:13px; transition:border-color .12s}
+  .tower:hover{border-color:var(--accent)}
+  .tower.on{border-color:var(--accent); background:var(--accent-soft)}
+  .tower .n{font-weight:600; font-size:13px; line-height:1.3}
+  .tower .o{color:var(--muted); font-size:11.5px; margin-top:1px}
+  .tower .m{color:var(--faint); font-size:11.5px; margin-top:4px}
+  .score{display:flex; align-items:center; gap:6px; margin-top:6px}
+  .score-bar{flex:1; min-width:40px; height:4px; border-radius:2px; background:var(--track); overflow:hidden}
+  .score-bar i{display:block; height:100%; border-radius:2px; background:var(--s4)}
+  .score-pct{font-size:11px; color:var(--muted); font-variant-numeric:tabular-nums; min-width:34px; text-align:right}
+
+  .hero{padding:17px 20px}
+  .hero h1{margin:0; font-size:21px; letter-spacing:-.02em; line-height:1.22; overflow-wrap:anywhere}
+  .hero .local{color:var(--muted); font-size:13.5px; margin-top:3px; overflow-wrap:anywhere}
+  .hero .addr{color:var(--muted); font-size:12.5px; margin-top:7px; overflow-wrap:anywhere}
+  .badges{display:flex; flex-wrap:wrap; gap:6px; margin-top:11px}
+  .stats{display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:1px;
+    background:var(--border); border-top:1px solid var(--border)}
+  .stat{background:var(--panel); padding:11px 13px; min-width:0}
+  .stat .k{color:var(--muted); font-size:10.5px; text-transform:uppercase; letter-spacing:.045em}
+  .stat .v{font-size:17px; font-weight:600; margin-top:3px; font-variant-numeric:tabular-nums;
+    letter-spacing:-.012em; overflow-wrap:anywhere}
+  .stat .v small{font-size:11px; font-weight:450; color:var(--muted); margin-left:2px}
+  section{margin-top:16px}
+  .kv{display:grid; grid-template-columns:180px minmax(0,1fr); gap:10px 16px; font-size:13px; margin:0}
+  .kv dt{color:var(--muted); margin:0}
+  .kv dd{margin:0; overflow-wrap:anywhere}
+  .items{display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:8px}
+  .item{border:1px solid var(--border); border-radius:8px; padding:9px 11px; background:var(--panel-2); font-size:13px}
+  .empty{color:var(--faint); font-size:13px; font-style:italic}
+  .brow{display:grid; grid-template-columns:118px minmax(0,1fr) 62px 54px; gap:11px; align-items:center; padding:6px 0}
+  .brow .t{height:10px; border-radius:5px; background:var(--track); overflow:hidden}
+  .brow .t i{display:block; height:100%; border-radius:5px; background:var(--s4)}
+  .brow .n{font-size:13px; font-weight:600; font-variant-numeric:tabular-nums; text-align:right}
+  .brow .p{font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; text-align:right}
+  .srcrow{display:grid; grid-template-columns:132px minmax(0,1fr); gap:12px; align-items:baseline;
+    padding:7px 0; border-top:1px solid var(--border); font-size:12.5px}
+  .foot{padding:11px 18px; border-top:1px solid var(--border); font-size:12px; color:var(--muted); line-height:1.65}
+
+  /* ---------- nav ---------- */
+  .nav{display:flex; gap:2px; padding:2px; background:var(--panel-2); border:1px solid var(--border);
+    border-radius:9px; flex:none}
+  .nav button{border:none; background:none; color:var(--muted); font-family:inherit; font-size:12.5px;
+    padding:5px 13px; border-radius:7px; cursor:pointer; white-space:nowrap}
+  .nav button:hover{color:var(--text)}
+  .nav button.on{background:var(--panel); color:var(--text); font-weight:600; box-shadow:var(--shadow)}
+
+  /* ---------- trang tổng quan ---------- */
+  .ov{padding:16px 20px 40px; display:flex; flex-direction:column; gap:16px}
+  .ovhero{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1px;
+    background:var(--border); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden}
+  .ovhero>div{background:var(--panel); padding:16px 18px; min-width:0}
+  .ovhero .lb{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; font-weight:600}
+  .ovhero .big{font-size:30px; font-weight:650; letter-spacing:-.025em; margin-top:6px;
+    font-variant-numeric:tabular-nums; line-height:1.05}
+  .ovhero .u{font-size:12.5px; color:var(--muted); font-weight:450; margin-left:5px}
+  .ovhero .sub{font-size:11.5px; color:var(--faint); margin-top:7px; line-height:1.6}
+  /* ba khối bộ dữ liệu bên trái, bản đồ bên phải */
+  .ovmain{display:grid; grid-template-columns:400px minmax(0,1fr); gap:16px; align-items:start}
+  .ov .n{font-variant-numeric:tabular-nums}
+  .funnel{display:flex; flex-direction:column; gap:7px; padding:14px 18px}
+  .funnel .fr{display:grid; grid-template-columns:132px minmax(0,1fr) 96px; gap:10px; align-items:center}
+  .funnel .fr .nm{font-size:12px; color:var(--muted)}
+  .funnel .fr .bar{height:22px; border-radius:5px; background:var(--track); overflow:hidden}
+  .funnel .fr .bar i{display:block; height:100%; border-radius:5px; background:var(--s3)}
+  .funnel .fr.hi .bar i{background:var(--accent)}
+  .funnel .fr .v{font-size:12.5px; font-weight:600; text-align:right; font-variant-numeric:tabular-nums}
+  @media (max-width:900px){
+    .ovhero{grid-template-columns:1fr}
+    .ovmain{grid-template-columns:1fr}
+    .funnel .fr{grid-template-columns:96px minmax(0,1fr) 78px; gap:8px}
+  }
+
+  /* ---------- thanh ngang: một dòng một tỉnh ---------- */
+  #provbars{display:flex; flex-direction:column; justify-content:space-between; flex:1; min-height:0}
+  #provbars.all{justify-content:flex-start; overflow:auto; padding-right:2px}
+  .pbar{display:grid; grid-template-columns:82px minmax(0,1fr) 38px; gap:7px; align-items:center;
+    padding:2px 4px; border-radius:4px; cursor:pointer; flex:0 0 auto}
+  #provbars:not(.all) .pbar{flex:1 1 0; min-height:17px; max-height:44px}
+  .pbar:hover{background:var(--panel-2)}
+  .pbar.on{background:var(--accent-soft)}
+  .pbar.dead{cursor:default; opacity:.55}
+  .pbar .nm{font-size:11px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .pbar.on .nm{color:var(--accent); font-weight:600}
+  .pbar .t{height:7px; border-radius:4px; background:var(--track); overflow:hidden}
+  #provbars:not(.all) .pbar .t{height:min(48%, 16px)}
+  .pbar .t i{display:block; height:100%; border-radius:4px; background:var(--s4); min-width:2px}
+  .pbar.on .t i{background:var(--accent)}
+  .pbar .v{font-size:10.5px; text-align:right; color:var(--muted); font-variant-numeric:tabular-nums}
+  /* "Còn lại" là tổng gộp, không phải một tỉnh — tô khác để không đọc nhầm thành một địa phương */
+  .pbar.rest{margin-top:3px; padding-top:5px; border-top:1px dashed var(--border)}
+  .pbar.rest .nm{font-style:italic}
+  .pbar.rest .t i{background:var(--s2)}
+  .pbar.rest.on .t i{background:var(--accent)}
+  #provmore{margin-top:7px; align-self:flex-start; background:none; border:none; padding:2px 0;
+    color:var(--accent); font-family:inherit; font-size:10.5px; cursor:pointer}
+  #provmore:hover{text-decoration:underline}
+
+  /* ---------- bảng ---------- */
+  table{width:100%; border-collapse:collapse; font-size:12.5px}
+  thead th{position:sticky; top:0; z-index:1; background:var(--panel-2); text-align:left;
+    font-weight:600; font-size:10.5px; text-transform:uppercase; letter-spacing:.045em;
+    color:var(--muted); padding:8px 10px; border-bottom:1px solid var(--border); white-space:nowrap}
+  tbody td{padding:7px 10px; border-bottom:1px solid var(--border); vertical-align:top}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:var(--panel-2)}
+  td.num,th.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
+  tbody tr.on{background:var(--accent-soft)}
+  tbody tr.on td:first-child{box-shadow:inset 2px 0 0 var(--accent)}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:1180px){
+    .ovmain{grid-template-columns:330px minmax(0,1fr); gap:14px}
+    .mgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .vnrow{grid-template-columns:292px 208px minmax(0,1fr)}
+    .coregrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .wrap{grid-template-columns:250px minmax(0,1fr); gap:14px}
+  }
+  @media (max-width:900px){
+    .vnrow{grid-template-columns:1fr}
+    .vnmet{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .vnrow svg{max-height:52vh}
+    .topbar,.filterbar,.band,.wrap{padding-left:14px; padding-right:14px}
+    .filterbar{top:49px}
+    .wrap{grid-template-columns:1fr; padding-top:14px}
+    .list{flex-direction:row; overflow-x:auto; overflow-y:hidden; max-height:none;
+      padding-bottom:4px; scroll-snap-type:x mandatory}
+    .tower{min-width:212px; scroll-snap-align:start}
+    .kv{grid-template-columns:1fr; gap:3px 0}
+    .kv dt{color:var(--faint); font-size:11px; text-transform:uppercase; letter-spacing:.04em; margin-top:8px}
+    .brow{grid-template-columns:96px minmax(0,1fr) 56px 46px; gap:8px}
+    .srcrow{grid-template-columns:1fr; gap:2px}
+  }
+  @media (max-width:640px){
+    .mgrid{grid-template-columns:1fr}
+    .vnmet{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .vnrow{grid-template-columns:1fr}
+    .vnrow svg{max-height:64vh}
+    .coregrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .hero h1{font-size:19px}
+    .search{width:100%; order:9}
+    .count{margin-left:0; width:100%}
+    .bars{height:52px}
+    .bars .lb{font-size:8.5px}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">Benchmark toà nhà <span id="sub"></span></div>
+  <nav class="nav" id="nav">
+    <button type="button" data-view="overview">Tổng quan</button>
+    <button type="button" data-view="market" class="on">Thị trường</button>
+  </nav>
+  <div class="grow"></div>
+  <input class="search" id="q" type="search" placeholder="Tìm toà, dự án, địa bàn…" autocomplete="off">
+  <button class="icon-btn" id="theme" title="Đổi giao diện sáng/tối">◐</button>
+</div>
+
+<div class="filterbar">
+  <div class="fgroup"><label for="market">Thị trường</label>
+    <select class="sel" id="market"></select></div>
+  <div class="fgroup"><label for="sort">Sắp xếp</label>
+    <select class="sel" id="sort">
+      <option value="full">Đủ trường lõi nhất</option>
+      <option value="median">Gần trung vị nhất</option>
+      <option value="units">Số căn nhiều nhất</option>
+      <option value="year">Mới nhất</option>
+      <option value="name">Tên A→Z</option>
+    </select></div>
+  <div class="fgroup"><label for="form">Loại hình</label><select class="sel" id="form"></select></div>
+  <span class="count" id="count"></span>
+</div>
+
+<div id="view-market">
+  <div class="band" id="band"></div>
+  <div class="wrap"><div class="list" id="list"></div><div id="detail"></div></div>
+</div>
+<div id="view-overview" class="ov" hidden></div>
+
+<script id="payload" type="application/json">__DATA__</script>
+<script>
+"use strict";
+const D = JSON.parse(document.getElementById("payload").textContent);
+const E = D.enums || {}, NCORE = D.n_core || 13;
+let MK = null, META = null, MET = [], DEF = {}, ALL = [], cur = null;
+
+/* đọc trường của toà, rơi về mặc định cấp thị trường khi đã hoist */
+const fld = (b, k) => (b[k] !== undefined ? b[k] : DEF[k]);
+
+/* ---------- tiện ích ---------- */
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const vi = (f, c) => (E[f] && E[f][c] && E[f][c].vi) || c || "";
+const grp = (f, c) => (E[f] && E[f][c] && E[f][c].group) || "";
+const num = (n, d) => n == null ? "—" : Number(n).toLocaleString("de-DE",
+  { maximumFractionDigits: d != null ? d : (Math.abs(n) < 100 ? 1 : 0) });
+function short(v) {
+  if (v == null) return "—";
+  const a = Math.abs(v);
+  if (a >= 1e9) return (v / 1e9).toFixed(1).replace(".", ",") + " tỷ";
+  if (a >= 1e6) return Math.round(v / 1e6) + " tr";
+  if (a >= 1e4) return Math.round(v / 1e3) + "k";
+  return num(v);
+}
+const orig = s => s ? ` <span class="src">${esc(s)}</span>` : "";
+/* `price_basis` chưa có trong dim_enum — nhãn tạm, nên chuyển về tầng dữ liệu */
+const BASIS = { measured: "đo thật", derived: "suy ra", policy: "hằng số thị trường",
+  listing: "giá chào", transactions: "giá giao dịch", verified_none: "nguồn xác nhận không có",
+  imputed_national: "gán theo mức quốc gia", mixed: "trộn nhiều nền" };
+const basisVi = c => !c ? "" : (BASIS[String(c).split("@")[0]] || String(c));
+/* nhãn NHÓM tiện ích — dim_enum mới có mã nhóm trong attrs.group, chưa có dòng định nghĩa */
+const AGROUP = { tre_em: "Trẻ em", quan_ly: "Quản lý vận hành", cong_dong: "Cộng đồng",
+  do_xe: "Đỗ xe", canh_quan: "Cảnh quan", ha_tang: "Hạ tầng kỹ thuật",
+  thuong_mai: "Thương mại", dich_vu: "Dịch vụ", the_thao: "Thể thao",
+  suc_khoe: "Sức khoẻ & spa", thu_cung: "Thú cưng", lam_viec: "Không gian làm việc",
+  khac: "Khác" };
+const groupVi = g => AGROUP[g] || g;
+/* `deal_type` của vn_listing cũng chưa có trong dim_enum — chỉ hai mã */
+const DEAL = { ban: "Bán", cho_thue: "Cho thuê" };
+const dealVi = c => DEAL[c] || c || "";
+function parseJSON(s) { try { return typeof s === "string" ? JSON.parse(s) : s; } catch (e) { return null; } }
+
+/* giá trị của một toà theo key chỉ tiêu */
+function val(b, k) {
+  switch (k) {
+    case "floors": return b.n_floors;
+    case "units": return b.n_units_building;
+    case "area": return b.area_m2;
+    case "price": return b.price;
+    case "site": return b.site_area_m2;
+    case "year": return b.year_completed;
+    case "dens": return (b.site_area_m2 > 0 && b.n_units_building > 0)
+      ? b.n_units_building / (b.site_area_m2 / 10000) : null;
+    case "amen": { const a = parseJSON(b.amenities); return a ? a.length : null; }
+  }
+  return null;
+}
+const binOf = (m, v) => v == null ? -1 : m.bins.findIndex(
+  b => (b.lo == null || v >= b.lo) && (b.hi == null || v < b.hi));
+
+const SRCTBL = () => (META.tables || "dim_project × fact_building");
+const nameOf = b => b.name_latin || b.building_name || "(chưa có tên)";
+const rawOf = b => (b.name_latin && b.building_name !== b.name_latin) ? b.building_name : "";
+const pctFull = b => Math.round(100 * (b._full || 0) / NCORE);
+const nMet = b => b._met || 0;
+const nCore = b => b._core || 0;                 /* sáu trường lõi của kho */
+const isStrict = b => !!b._strict;
+
+/* khoảng cách chuẩn hoá tới trung vị, dùng cho sắp xếp */
+function medDist(b) {
+  let s = 0, k = 0;
+  for (const m of MET) {
+    const v = isVN() ? vnVal(b, m.key) : val(b, m.key); if (v == null) continue;
+    const sp = (m.p75 - m.p25) || Math.abs(m.med) || 1;
+    s += Math.abs(v - m.med) / sp; k++;
+  }
+  return k ? s / k : 99;
+}
+
+/* ---------- dải tóm tắt ---------- */
+function chip(label, pct, has) {
+  return `<span class="chip"><i style="background:${has ? "var(--good)" : "transparent"};
+    box-shadow:inset 0 0 0 1px ${has ? "var(--good)" : "var(--faint)"}"></i>${esc(label)}
+    <span class="p">${num(pct)}%</span></span>`;
+}
+function cell(m, b) {
+  const hi = binOf(m, isVN() ? vnVal(b, m.key) : val(b, m.key));
+  const mx = Math.max(...m.bins.map(x => x.n)) || 1;
+  const bars = m.bins.map((x, i) => `<div class="${i === hi ? "on" : ""}" title="${esc(x.label)}: ${num(x.n)}">
+      <div class="bar" style="height:${(x.n / mx * 44).toFixed(1)}px"></div>
+      <div class="lb">${esc(x.label)}</div></div>`).join("");
+  const v = val(b, m.key);
+  return `<div class="cell">
+    <div class="h"><b>${esc(m.label)}</b><em>n = ${num(m.n)}</em></div>
+    <div class="bars">${bars}</div>
+    <div class="qrow">
+      <span class="q">${short(m.p25)} · <b>${short(m.med)}</b> · ${short(m.p75)}
+        <span style="color:var(--faint)">${esc(m.unit)}</span></span>
+      <span class="v">${v == null ? "toà này: —" : short(v) + " " + esc(m.unit)}</span>
+    </div></div>`;
+}
+function coreBlock() {
+  const cr = MK.core; if (!cr) return "";
+  const cells = cr.fields.map(f => {
+    const ok = f.pct >= 50;
+    return `<div style="background:var(--panel);padding:10px 13px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <i style="width:6px;height:6px;border-radius:50%;flex:none;background:${ok ? "var(--good)" : "transparent"};
+          box-shadow:inset 0 0 0 1px ${ok ? "var(--good)" : "var(--faint)"}"></i>
+        <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.045em">${esc(f.label)}</span></div>
+      <div style="font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:3px;
+        color:${ok ? "var(--text)" : "var(--faint)"}">${num(f.pct)}%</div>
+      ${f.shape ? `<div style="font-size:10px;color:var(--warn);margin-top:2px;line-height:1.4">${esc(f.shape)}</div>` : ""}</div>`;
+  }).join("");
+  const reg = cr.registry_pct >= 50;
+  return `<div style="padding:11px 18px 5px;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600">Sáu trường lõi của kho</span>
+      <span style="font-size:11px;color:var(--faint)">tiêu chuẩn để vào <span class="mono">corpus_strict</span></span>
+    </div>
+    <div class="coregrid">${cells}</div>
+    <div style="padding:11px 18px;border-bottom:1px solid var(--border);display:flex;gap:14px;
+      align-items:baseline;flex-wrap:wrap;font-size:12.5px">
+      <span style="color:var(--muted)">Toà đạt chuẩn</span>
+      <span style="font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.012em">${num(cr.pct)}%</span>
+      <span style="color:var(--faint)">${num(cr.n_pass)} / ${num(META.n_buildings)} toà</span>
+      ${cr.note ? `<span style="color:var(--muted)">${cr.note}</span>`
+        : (reg ? "" : `<span style="color:var(--muted)">Nguồn là cổng thương mại, không phải sổ đăng ký —
+        cổng strict đòi <span class="mono">official_registry</span> nên thị trường này đóng góp 0 toà.</span>`)}
+    </div>`;
+}
+
+function renderBand(b) {
+  const have = MK.coverage.filter(c => c.pct >= 50), miss = MK.coverage.filter(c => c.pct < 50);
+  const auth = vi("id_kind", META.id_kind);
+  document.getElementById("band").innerHTML = `<div class="card">
+    <div class="sec-head"><h2>Tóm tắt thị trường</h2>
+      <span class="cnt">${num(META.n_buildings)} toà · ${num(META.n_projects)} dự án · ${esc(auth)}</span>
+      <span class="tbl">${esc(SRCTBL())}</span></div>
+    <div class="caps"><h3>Có</h3>${have.map(c => chip(c.label, c.pct, true)).join("")}
+      ${miss.length ? '<span class="divider"></span><h3>Chưa có</h3>' : ""}
+      ${miss.map(c => chip(c.label, c.pct, false)).join("")}</div>
+    ${coreBlock()}
+    <div style="padding:10px 18px 4px;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600">Phân bố · p25 · trung vị · p75</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;font-size:10.5px;color:var(--faint)">
+        <i style="width:9px;height:9px;border-radius:2px;background:var(--accent);display:inline-block"></i>
+        khoảng chứa toà đang xem</span>
+    </div>
+    <div class="mgrid">${MET.map(m => cell(m, b)).join("")}</div>
+    <div class="foot">Sáu trường lõi là <b>tiêu chuẩn của kho</b> — thiếu một trường là toà không vào được
+      <span class="mono">corpus_strict</span>. Sáu ô phân bố là <b>chuyện khác</b>: chúng chọn theo độ phủ
+      của chính thị trường này, để đặt một toà cạnh mặt bằng chung.</div>
+  </div>`;
+}
+
+/* ---------- chi tiết ---------- */
+function sec(title, cnt, tbl, body, foot) {
+  return `<section class="card">
+    <div class="sec-head"><h2>${title}</h2>${cnt ? `<span class="cnt">${cnt}</span>` : ""}
+      <span class="tbl">${esc(tbl)}</span></div>
+    <div class="sec-body">${body}</div>
+    ${foot ? `<div class="foot">${foot}</div>` : ""}</section>`;
+}
+function kv(rows) {
+  return `<dl class="kv">${rows.map(([k, v]) =>
+    `<dt>${esc(k)}</dt><dd>${v == null || v === "" ? '<span class="empty">chưa thu thập</span>' : v}</dd>`).join("")}</dl>`;
+}
+/* ---------- cơ cấu căn: gom mọi hình dạng về một danh sách đọc được ---------- */
+const BAND_RE = /^(le|m|gt)?(\d+)(?:[_-](\d+))?$/;
+
+function bandLabel(k) {                    /* le60 · m60_85 · gt135 · 0-40 · >=150 · 150+ */
+  const s = String(k).trim();
+  let m = s.match(/^(\d+)\s*[-–]\s*(\d+)$/);
+  if (m) return { lo: +m[1], text: `${m[1]} – ${m[2]} m²` };
+  m = s.match(/^(?:>=|≥)\s*(\d+)$/) || s.match(/^(\d+)\s*\+$/);
+  if (m) return { lo: +m[1], text: `≥ ${m[1]} m²` };
+  m = s.match(/^(?:<=|≤)\s*(\d+)$/);
+  if (m) return { lo: 0, text: `≤ ${m[1]} m²` };
+  m = s.match(/^<\s*(\d+)$/);
+  if (m) return { lo: 0, text: `< ${m[1]} m²` };
+  m = s.match(/^>\s*(\d+)$/);
+  if (m) return { lo: +m[1] + 1, text: `> ${m[1]} m²` };
+  m = s.match(/^le(\d+)$/);
+  if (m) return { lo: 0, text: `≤ ${m[1]} m²` };
+  m = s.match(/^gt(\d+)$/);
+  if (m) return { lo: +m[1] + 1, text: `> ${m[1]} m²` };
+  m = s.match(/^m(\d+)_(\d+)$/);
+  if (m) return { lo: +m[1], text: `${m[1]} – ${m[2]} m²` };
+  return null;
+}
+
+function brLabel(n) {
+  const v = Number(n);
+  if (!isFinite(v)) return { lo: 99, text: String(n) };
+  return { lo: v, text: v === 0 ? "Studio" : `${v} phòng ngủ` };
+}
+
+function roomKey(k) {                      /* 3room_sold · 1room_rental · exec_sold */
+  const m = String(k).match(/^(.+?)_(sold|rental)$/);
+  if (!m) return null;
+  const ten = m[2] === "sold" ? "bán" : "cho thuê";
+  const head = m[1];
+  let lo = 50, text = head;
+  const r = head.match(/^(\d+)room$/);
+  if (r) { lo = +r[1]; text = `${r[1]} phòng`; }
+  else if (head === "studio_apartment") { lo = 0; text = "Studio"; }
+  else if (head === "exec") { lo = 90; text = "Executive"; }
+  else if (head === "multigen") { lo = 91; text = "Đa thế hệ"; }
+  else if (head === "other_room") { lo = 92; text = "Loại khác"; }
+  return { lo: lo + (m[2] === "rental" ? 1000 : 0), text, tenure: ten };
+}
+
+/* → [{text, tenure, units, share, lo}]  ·  units = số căn, share = tỷ trọng 0..1 */
+function normMix(raw, kind) {
+  const v = parseJSON(raw);
+  if (v == null) return null;
+  const out = [];
+  if (Array.isArray(v)) {
+    v.forEach((it, i) => {
+      if (it == null) return;
+      if (typeof it === "number") {         /* [0.52, 0.48, 0, 0] — chỉ có tỷ trọng */
+        const key = ((MK.mix_bands && MK.mix_bands.keys) || [])[i];
+        const lab = key ? bandLabel(key) : null;
+        out.push({ text: lab ? lab.text : (key ? String(key) : `Dải ${i + 1}`),
+                   units: null, share: it, lo: lab ? lab.lo : i });
+        return;
+      }
+      const units = it.units != null ? +it.units : (it.n_units != null ? +it.n_units : null);
+      const share = it.share != null ? +it.share : null;
+      let lab = null;
+      if (it.band_m2 != null) lab = bandLabel(it.band_m2);
+      else if (it.br != null) lab = brLabel(it.br);
+      else if (it.unit_kind != null) lab = { lo: i, text: String(it.unit_kind) };
+      out.push({ text: lab ? lab.text : `Nhóm ${i + 1}`, units, share, lo: lab ? lab.lo : i });
+    });
+  } else if (typeof v === "object") {
+    Object.entries(v).forEach(([k, val], i) => {
+      if (val == null) return;
+      const rk = roomKey(k), bd = rk ? null : bandLabel(k);
+      out.push({
+        text: rk ? rk.text : (bd ? bd.text : String(k)),
+        tenure: rk ? rk.tenure : null,
+        units: +val, share: null, lo: rk ? rk.lo : (bd ? bd.lo : i),
+      });
+    });
+  }
+  if (!out.length) return null;
+  const tot = out.reduce((s, x) => s + (x.units != null ? x.units : 0), 0);
+  out.forEach(x => {
+    if (x.share == null && tot) x.share = (x.units || 0) / tot;
+    if (x.units == null && x.share != null) x.units = null;
+  });
+  out.sort((a, c) => a.lo - c.lo);
+  return { rows: out, total: tot || null, kind };
+}
+
+function mixSection(b) {
+  const kind = fld(b, "mix_kind");
+  const M = normMix(b.mix, kind);
+  const isArr = typeof b.mix === "string" && b.mix.trim().startsWith("[");
+  const mb = MK.mix_bands;
+  const inferred = isArr && mb && mb.keys
+    ? ` <span style="color:var(--muted)">Nguồn chỉ trả về dãy số không kèm tên dải;
+        tên dải ở đây suy từ các bản ghi có tên của chính thị trường này và đã đối chiếu với
+        diện tích căn — khớp ${(mb.accuracy * 100).toFixed(1)}% trên ${num(mb.checked)} toà.</span>`
+    : "";
+  const note = kind
+    ? `Cách phân nhóm của thị trường ${esc(META.label)}: <b>${esc(vi("mix_kind", kind))}</b>.
+       ${esc((E.mix_kind && E.mix_kind[kind] && E.mix_kind[kind].def) || "")}${inferred}`
+    : "";
+  if (!M) return sec("Cơ cấu căn hộ", "", "mix",
+    `<div class="empty">Bản ghi này chưa có cơ cấu căn.</div>`,
+    kind ? note : `Thị trường ${esc(META.label)} chưa thu thập trường <span class="mono">mix</span>.`);
+
+  const uw = kind === "br_type_counts" ? "loại căn" : "căn";   /* xem def của mix_kind */
+  const anyTenure = M.rows.some(r => r.tenure);
+  const mx = Math.max(...M.rows.map(r => r.share || 0)) || 1;
+  const draw = rows => rows.map(r => {
+    const pc = r.share != null ? (r.share * 100) : null;
+    const zero = !r.units && !r.share;
+    return `<div class="brow">
+      <div style="${zero ? "color:var(--faint)" : ""}">${esc(r.text)}</div>
+      <div class="t"><i style="width:${(((r.share || 0) / mx) * 100).toFixed(1)}%"></i></div>
+      <div class="n">${r.units != null
+        ? (r.units ? num(r.units) : '<span style="color:var(--faint)">0</span>')
+        : '<span style="color:var(--faint)">—</span>'}</div>
+      <div class="p">${pc != null ? pc.toFixed(1) + "%" : "—"}</div></div>`;
+  }).join("");
+
+  let body;
+  if (anyTenure) {
+    const g = [["Căn bán", "bán"], ["Căn cho thuê", "cho thuê"]].map(([title, t]) => {
+      const rs = M.rows.filter(r => r.tenure === t);
+      if (!rs.length) return "";
+      const sub = rs.reduce((s, x) => s + (x.units || 0), 0);
+      return `<div style="margin-top:6px"><div style="display:flex;align-items:baseline;gap:9px;margin-bottom:3px">
+        <span style="font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600">${title}</span>
+        <span style="font-size:13px;font-weight:600;font-variant-numeric:tabular-nums">${num(sub)} căn</span>
+        <span style="font-size:12px;color:var(--muted)">${M.total ? (sub / M.total * 100).toFixed(1) + "%" : ""}</span>
+        <span style="flex:1;height:1px;background:var(--border)"></span></div>${draw(rs)}</div>`;
+    }).join("");
+    body = g;
+  } else {
+    body = draw(M.rows);
+  }
+  const foot = M.total
+    ? `<div style="margin-top:11px;padding-top:10px;border-top:1px solid var(--border);
+        display:flex;gap:12px;align-items:baseline;flex-wrap:wrap">
+        <span style="font-size:12.5px;color:var(--muted)">Tổng cộng</span>
+        <span style="font-size:15px;font-weight:600;font-variant-numeric:tabular-nums">${num(M.total)} ${uw}</span></div>`
+    : `<div style="margin-top:9px;font-size:11.5px;color:var(--faint)">
+        Nguồn chỉ công bố tỷ trọng, không có số căn từng nhóm.</div>`;
+  return sec("Cơ cấu căn hộ",
+    `${M.rows.length} nhóm${M.total ? " · " + num(M.total) + " " + uw : ""}`,
+    "mix", body + foot, note);
+}
+
+/* Nhãn nhóm hạng mục bàn giao — chỉ nguồn Nhật có `handover_items`, và
+   `item_category` của nó cũng chưa có dòng định nghĩa trong dim_enum. */
+const HGROUP = { an_ninh_pccc: "An ninh & PCCC", thiet_bi_dien: "Thiết bị điện",
+  bep: "Bếp", thiet_bi_ve_sinh: "Thiết bị vệ sinh", dieu_hoa_thong_gio: "Điều hoà & thông gió",
+  san: "Sàn", cua: "Cửa", tuong_tran: "Tường & trần", khac: "Khác" };
+
+function handoverSection(b) {
+  const it = b.handover_items;
+  if (it && it.length) {
+    const byc = {};
+    it.forEach(x => { (byc[x.c || "khac"] ||= []).push(x); });
+    const body = Object.entries(byc).map(([g, list]) =>
+      `<div style="margin-bottom:10px"><div style="font-size:11px;text-transform:uppercase;
+        letter-spacing:.05em;color:var(--muted);font-weight:600;margin-bottom:6px">${esc(HGROUP[g] || g)}</div>
+       <div class="items">${list.map(x => `<div class="item">${esc(x.n)}</div>`).join("")}</div></div>`).join("");
+    return sec("Tiêu chuẩn bàn giao", `${it.length} hạng mục`, "handover_item", body,
+      "Nguồn này khai <b>từng hạng mục</b> chứ không khai một mức bàn giao. " +
+      "Suy ngược ra mức thô / cơ bản / full là đoán, nên trường <span class=\"mono\">handover</span> để trống.");
+  }
+  return sec("Tiêu chuẩn bàn giao", "", "handover",
+    fld(b, "handover") ? kv([["Mức bàn giao", esc(vi("handover", fld(b, "handover")))]])
+      : '<div class="empty">Bản ghi này chưa có mức bàn giao.</div>');
+}
+
+function amenSection(b) {
+  const a = parseJSON(b.amenities);
+  if (!a || !a.length) return sec("Tiện ích nội khu", "", "amenities",
+    '<div class="empty">Bản ghi này chưa có tiện ích.</div>');
+  const byg = {};
+  a.forEach(c => { (byg[grp("amenities", c) || "khac"] ||= []).push(c); });
+  const body = Object.entries(byg).map(([g, list]) =>
+    `<div style="margin-bottom:10px"><div style="font-size:11px;text-transform:uppercase;
+      letter-spacing:.05em;color:var(--muted);font-weight:600;margin-bottom:6px">${esc(groupVi(g))}</div>
+     <div class="items">${list.map(c => {
+        const e = (E.amenities || {})[c] || {}, lb = vi("amenities", c);
+        return `<div class="item">${esc(lb)}${e.local && e.local !== lb ? orig(e.local) : ""}</div>`;
+       }).join("")}</div></div>`).join("");
+  return sec("Tiện ích nội khu", `${a.length} tiện ích`, "amenities", body);
+}
+function srcSection(b) {
+  const s = parseJSON(fld(b, "sources"));
+  const rows = s ? Object.entries(s).filter(([, v]) => v).map(([k, v]) =>
+    `<div class="srcrow"><div style="color:var(--muted)">${esc(k === "_default" ? "Mặc định" : k)}</div>
+     <div><a href="${esc(v)}" target="_blank" rel="noopener">${esc(v)}</a></div></div>`).join("") : "";
+  const head = `<div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:4px">
+    <span class="badge accent">${esc(vi("id_kind", META.id_kind))}</span>
+    <span style="font-size:12px;color:var(--muted)">định danh <span class="mono">${esc(META.id_authority || "—")}</span></span></div>`;
+  return sec("Nguồn dữ liệu", rows ? "" : "0 nguồn", "sources",
+    head + (rows || '<div class="empty">Bản ghi này chưa gắn đường dẫn nguồn.</div>'));
+}
+function priceSection(b) {
+  if (b.price == null) return sec("Giá", "", "price",
+    '<div class="empty">Bản ghi này chưa có giá.</div>');
+  const pb = META.price_basis || [];
+  const tot = pb.reduce((s, x) => s + x.n, 0) || 1;
+  const mixNote = pb.length > 1
+    ? "Cột giá của thị trường này trộn nhiều loại nền: " + pb.map(x =>
+      `<b>${num(x.n)}</b> ${esc(basisVi(x.code))} (${(x.n / tot * 100).toFixed(0)}%)`).join(" · ") +
+      '. Tách bằng <span class="mono">price_basis</span> trước khi lấy phân vị.' : "";
+  return sec("Giá", "1 quan sát", "price",
+    `<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span style="font-size:26px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums">${num(b.price)}</span>
+      <span style="font-size:13px;color:var(--muted)">${esc(vi("price_unit", fld(b, "price_unit")))}</span>
+      <span class="badge">${esc(vi("price_kind", b.price_kind))}</span></div>` +
+    kv([["Nền của giá", esc(basisVi(b.price_basis) || "—")],
+        ["Quy đổi", '<span class="empty">kho không lưu tỷ giá — giá giữ nguyên đơn vị bản địa</span>']]),
+    mixNote);
+}
+function detail(b) {
+  const dens = val(b, "dens");
+  const stats = [
+    ["Số tầng", num(b.n_floors), ""], ["Số căn", num(b.n_units_building), ""],
+    ["Diện tích căn", num(b.area_m2), " m²"],
+    b.site_area_m2 != null ? ["Diện tích lô", num(b.site_area_m2), " m²"]
+      : ["Năm hoàn thành", num(b.year_completed), ""],
+    dens != null ? ["Mật độ căn", num(dens), " căn/ha"]
+      : ["Số toà dự án", num(b.n_buildings), ""],
+    ["Giá", short(b.price), " " + esc(vi("price_unit", fld(b, "price_unit")))],
+  ];
+  const badges = [
+    b.building_form ? `<span class="badge">${esc(vi("building_form", b.building_form))}</span>` : "",
+    b.style ? `<span class="badge">${esc(vi("style", b.style))}</span>` : "",
+    b.dev_latin || b.developer ? `<span class="badge">${esc(b.dev_latin || b.developer)}${orig(b.dev_latin && b.developer !== b.dev_latin ? b.developer : "")}</span>` : "",
+    b.n_buildings ? `<span class="badge">${num(b.n_buildings)} toà trong dự án</span>` : "",
+    `<span class="badge">${nCore(b)} / 6 trường lõi</span>`,
+    isStrict(b) ? `<span class="badge accent">Đạt chuẩn corpus_strict</span>` : "",
+  ].join("");
+  document.getElementById("detail").innerHTML = `
+    <div class="card">
+      <div class="hero">
+        <h1>${esc(nameOf(b))}</h1>
+        <div class="local">${esc(b.project_name && b.project_name !== b.building_name ? b.project_name : "")}${orig(rawOf(b))}</div>
+        <div class="addr">${esc(b.address || b.admin || "")}</div>
+        <div class="badges">${badges}</div>
+      </div>
+      <div class="stats">${stats.map(([k, v, u]) =>
+        `<div class="stat"><div class="k">${esc(k)}</div><div class="v">${v}${u ? `<small>${u}</small>` : ""}</div></div>`).join("")}</div>
+    </div>` +
+    sec("Tổng quan", "", SRCTBL(), kv([
+      ["Chủ đầu tư", b.dev_latin ? esc(b.dev_latin) + orig(b.developer) : esc(b.developer || "")],
+      ["Địa bàn", esc(b.admin || "")],
+      ["Số tầng nổi", b.n_floors != null ? num(b.n_floors) + " tầng" : ""],
+      ["Số căn trong toà", b.n_units_building != null ? num(b.n_units_building) + " căn" : ""],
+      ["Diện tích căn bình quân", b.area_m2 != null
+        ? num(b.area_m2) + " m² — " + esc(vi("area_kind", fld(b, "area_kind"))) : ""],
+      ["Diện tích lô", b.site_area_m2 != null ? num(b.site_area_m2) + " m²" : ""],
+      ["Năm hoàn thành", b.year_completed != null ? num(b.year_completed) : ""],
+      ["Loại hình công trình", b.building_form ? esc(vi("building_form", b.building_form)) : ""],
+      ["Phong cách kiến trúc", b.style ? esc(vi("style", b.style)) : ""],
+      ["Toạ độ", b.lat != null ? `<span class="mono">${num(b.lat)} · ${num(b.lon)}</span>` : ""],
+      ["Mã toà", b.building_code ? `<span class="mono">${esc(b.building_code)}</span>` : ""],
+    ])) +
+    mixSection(b) +
+    handoverSection(b) +
+    amenSection(b) + priceSection(b) + srcSection(b);
+  renderBand(b);
+}
+
+
+/* ================= VIỆT NAM — bốn cấp, có toạ độ ================= */
+const isVN = () => MK && MK.meta && MK.meta.kind === "vn";
+let VNCAT = "";
+
+function vnTierBar() {
+  const tiers = META.tiers || [];
+  return `<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;
+    background:var(--border);border-bottom:1px solid var(--border)" class="coregrid">
+    ${tiers.map(t => {
+      const pct = t.up != null ? t.up / t.n * 100 : null;
+      return `<div style="background:var(--panel);padding:11px 14px;min-width:0">
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.045em">${esc(t.label)}</div>
+      <div style="font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.015em;margin-top:2px">${num(t.n)}</div>
+      ${pct == null ? `<div style="font-size:10.5px;color:var(--faint);margin-top:5px">${esc(t.note || "")}</div>` : `
+        <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
+          <span style="flex:1;min-width:26px;height:4px;border-radius:2px;background:var(--track);overflow:hidden">
+            <i style="display:block;height:100%;border-radius:2px;width:${pct.toFixed(1)}%;
+               background:${pct >= 95 ? "var(--good)" : "var(--s4)"}"></i></span>
+          <span style="font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums">${pct.toFixed(0)}%</span>
+        </div>
+        <div style="font-size:10.5px;color:var(--faint);margin-top:4px;line-height:1.5">
+          nối lên ${esc(t.parent)} — ${num(t.par_n)} / ${num(t.par_tot)} ${esc(t.par_unit)} có</div>`}
+      ${t.stop ? `<div style="font-size:10.5px;color:var(--warn);margin-top:5px;line-height:1.5">${esc(t.stop)}</div>` : ""}
+    </div>`; }).join("")}
+  </div>`;
+}
+
+function vnMetrics() { return (MK.metrics_by_cat || {})[VNCAT] || MK.metrics_by_cat[""] || []; }
+
+let MAPBG = null;   /* nền bản đồ ghép một lần, không dựng lại mỗi lần vẽ */
+
+function vnMap(sel) {
+  const mp = MK.map, dim = META.map;
+  if (!mp || !mp.prov) return "";
+  if (MAPBG == null) MAPBG = Object.values(mp.prov).join("") + (mp.rest || "");
+  let hi = "";
+  if (VNPIN && VNPIN.rest) {                       /* thanh gộp: tô mọi tỉnh ngoài nhóm đầu */
+    hi = Object.keys(mp.prov).filter(k => !VNPIN.names.has(k)).map(k => mp.prov[k]).join("");
+  } else if (VNPIN && mp.prov[VNPIN.province]) {
+    hi = mp.prov[VNPIN.province];
+  }
+  const mk = (o, col) => o && o._x != null
+    ? `<circle cx="${o._x}" cy="${o._y}" r="8" fill="none" stroke="${col}" stroke-width="2"></circle>
+       <circle cx="${o._x}" cy="${o._y}" r="2.8" fill="${col}"></circle>` : "";
+  return `<div style="background:var(--panel);padding:12px 14px 10px;display:flex;flex-direction:column;min-width:0">
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600">
+      Vị trí ${num(mp.n)} dự án</div>
+    <svg viewBox="0 0 ${dim.w} ${dim.h}" width="100%" style="display:block;margin-top:8px;flex:1;min-height:0"
+      preserveAspectRatio="xMidYMid meet" role="img" aria-label="Phân bố dự án theo toạ độ thật">
+      <path d="${MAPBG}" stroke="var(--s3)" stroke-width="2.2" stroke-linecap="round" fill="none" opacity=".55"></path>
+      ${hi ? `<path d="${hi}" stroke="var(--good)" stroke-width="3.4" stroke-linecap="round" fill="none"></path>` : ""}
+      ${mk(sel, "var(--accent)")}</svg>
+    <div style="margin-top:8px;font-size:10.5px;color:var(--faint);line-height:1.55">
+      Không có file bản đồ — mỗi chấm là toạ độ thật của một dự án; hình đất nước do chính chúng tạo ra.
+      Khoảng trống hai bên là lề khung, tỷ lệ chiếu không đổi.
+      ${sel && sel._x != null ? "Vòng xanh dương là dự án đang xem." : ""}
+      ${VNPIN ? (hi
+        ? ` Chấm xanh lá là ${num((hi.match(/M/g) || []).length)} vị trí ${VNPIN.rest
+            ? "của các tỉnh ngoài nhóm đầu" : `ở ${esc(VNPIN.province)}
+              (${num(VNPIN.n_geo)} dự án có toạ độ`}${VNPIN.rest ? "" : ", trùng chỗ thì gộp một chấm)"}.`
+        : ` ${esc(VNPIN.province)} không có dự án nào rơi vào khung bản đồ.`) : ""}</div></div>`;
+}
+
+function vnBand(sel) {
+  const cov = MK.coverage || [];
+  const have = cov.filter(c => c.pct >= 50), miss = cov.filter(c => c.pct < 50);
+  const MTS = vnMetrics();
+  const catLabel = VNCAT || "tất cả loại dự án";
+  document.getElementById("band").innerHTML = `<div class="card">
+    <div class="sec-head"><h2>Tóm tắt Việt Nam</h2>
+      <span class="cnt">${num(META.n_projects)} dự án · toạ độ ${num((cov.find(c => c.field === "lat") || {}).pct || 0)}%</span>
+      <span class="tbl">vn_project · vn_building · vn_unit · vn_listing</span></div>
+    ${vnTierBar()}
+    <div class="caps"><h3>Có</h3>${have.map(c => chip(c.label, c.pct, true)).join("")}
+      ${miss.length ? '<span class="divider"></span><h3>Thưa</h3>' : ""}
+      ${miss.map(c => chip(c.label, c.pct, false)).join("")}</div>
+    <div class="vnrow">
+      ${vnMap(sel)}
+      ${vnProvBars()}
+      <div style="background:var(--panel);min-width:0;display:flex;flex-direction:column">
+        <div style="padding:12px 15px 0;display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600">
+            Phân bố — ${esc(catLabel)}</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:10.5px;color:var(--faint)">
+            <i style="width:9px;height:9px;border-radius:2px;background:var(--accent);display:inline-block"></i>
+            khoảng chứa dự án đang xem</span>
+        </div>
+        <div class="mgrid vnmet" style="border-top:none;margin-top:10px;flex:1">${MTS.map(m => cell(m, sel)).join("")}</div>
+      </div>
+    </div>
+    <div class="foot">Phân bố tính <b>riêng theo loại dự án</b> — đổi bộ lọc Loại ở trên thì cả dải này đổi theo.
+      Trộn mọi loại lại, mật độ căn trung vị là 108,6 căn/ha; riêng chung cư là 568,5. Chênh hơn 5 lần,
+      nên đừng đọc con số trộn.</div>
+  </div>`;
+}
+
+/* giá trị dự án theo key chỉ tiêu */
+function vnVal(p, k) {
+  switch (k) {
+    case "dens": return (p.site_area_m2 > 0 && p.n_units > 0) ? p.n_units / (p.site_area_m2 / 10000) : null;
+    case "land": return (p.site_area_m2 > 0 && p.n_units > 0) ? p.site_area_m2 / p.n_units : null;
+    case "cover": return p.site_coverage_pct;
+    case "floors": return p.n_floors;
+    case "units": return p.n_units;
+    case "site": return p.site_area_m2;
+  }
+  return null;
+}
+
+let VNPIN = null;   /* tỉnh đang chọn trên biểu đồ thanh */
+
+const PROVTOP = 8;      /* số tỉnh hiện tên; phần đuôi gom vào "Còn lại" */
+let PROVALL = false;
+
+function vnProvBars() {
+  const bp = (MK.by_province || []).slice().sort((a, b) => b.n - a.n);
+  if (!bp.length) return "";
+  const tot = bp.reduce((a, x) => a + x.n, 0);
+  const hasPts = pv => !!((MK.map || {}).prov || {})[pv];
+  /* trung vị của tỉnh không mất đi — chuyển xuống tooltip, không chiếm chỗ */
+  const tip = x => [`${num(x.n)} dự án (${num(x.n / tot * 100, 1)}% kho)`,
+    x.n_geo != null ? `${num(x.n_geo)} có toạ độ` : null,
+    x.med_units != null ? `TV ${num(x.med_units)} căn` : null,
+    x.med_floors != null ? `${num(x.med_floors)} tầng` : null,
+    x.med_cover != null ? `MĐXD ${num(x.med_cover)}%` : null,
+    x.med_site_ha != null ? `lô ${num(x.med_site_ha)} ha` : null,
+    x.med_dens != null ? `${num(x.med_dens)} căn/ha` : null,
+    x.med_px != null ? `${num(x.med_px)} tr/m²` : null,
+    x.n_list ? `${num(x.n_list)} tin rao` : null].filter(Boolean).join(" · ");
+
+  const head = PROVALL ? bp : bp.slice(0, PROVTOP);
+  const rest = PROVALL ? [] : bp.slice(PROVTOP);
+  const restN = rest.reduce((a, x) => a + x.n, 0);
+  /* thang lấy theo thanh dài nhất ĐANG VẼ, kể cả thanh gộp */
+  const mx = Math.max(head[0].n, restN);
+  const tail = bp.filter(x => x.n <= 2), tailN = tail.reduce((a, x) => a + x.n, 0);
+
+  const row = x => `<div class="pbar${VNPIN && VNPIN.province === x.province ? " on" : ""}${
+      hasPts(x.province) ? "" : " dead"}" data-prov="${esc(x.province)}" title="${esc(tip(x))}">
+    <span class="nm">${esc(x.province)}</span>
+    <span class="t"><i style="width:${(x.n / mx * 100).toFixed(2)}%"></i></span>
+    <span class="v">${num(x.n)}</span></div>`;
+
+  return `<div style="background:var(--panel);padding:12px 14px 10px;display:flex;flex-direction:column;min-width:0">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex:none">
+      <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600">
+        Dự án theo tỉnh</span>
+      <span style="font-size:10.5px;color:var(--faint)">${num(bp.length)} giá trị</span></div>
+    <div id="provbars" class="${PROVALL ? "all" : ""}" style="margin-top:9px">
+      ${head.map(row).join("")}
+      ${rest.length ? `<div class="pbar rest" data-rest="1"
+          title="${esc(`${num(rest.length)} giá trị · ${num(restN)} dự án · ${num(restN / tot * 100, 1)}% kho`)}">
+        <span class="nm">Còn lại ${num(rest.length)}</span>
+        <span class="t"><i style="width:${(restN / mx * 100).toFixed(2)}%"></i></span>
+        <span class="v">${num(restN)}</span></div>` : ""}
+    </div>
+    <button id="provmore" type="button">${PROVALL
+      ? "↑ Thu gọn" : `↓ Xem hết ${num(bp.length)} giá trị`}</button>
+    <div style="margin-top:8px;font-size:10.5px;color:var(--faint);line-height:1.55">
+      Thang tuyến tính nên đọc ra ngay độ lệch thật:
+      ${esc(bp[0].province)} và ${esc(bp[1].province)} chiếm
+      ${(((bp[0].n + bp[1].n) / tot) * 100).toFixed(0)}% cả kho.
+      Bấm một thanh để tô lên bản đồ.
+      ${tail.length ? `<b>${num(tail.length)}/${num(bp.length)} giá trị chỉ có 1–2 dự án</b>
+        (${num(tailN)}, ${num(tailN / tot * 100, 1)}%) — phần lớn là quận, phường hoặc mô tả vị trí lọt vào
+        cột <span class="mono" style="font-size:10px">province</span>, chưa chuẩn hoá.` : ""}
+    </div></div>`;
+}
+
+function wireProvTable() {
+  const box = document.getElementById("provbars");
+  if (box) box.querySelectorAll(".pbar").forEach(el => {
+    if (el.classList.contains("dead")) return;
+    el.onclick = () => {
+      if (el.dataset.rest) {
+        const head = (MK.by_province || []).slice().sort((a, b) => b.n - a.n).slice(0, PROVTOP);
+        const names = new Set(head.map(x => x.province));
+        VNPIN = (VNPIN && VNPIN.rest) ? null : { rest: true, names, province: null };
+      } else {
+        const pv = el.dataset.prov;
+        VNPIN = (VNPIN && VNPIN.province === pv)
+          ? null : (MK.by_province || []).find(x => x.province === pv) || null;
+      }
+      const top = box.scrollTop;
+      vnBand(cur); wireProvTable();
+      const b2 = document.getElementById("provbars");
+      if (b2) b2.scrollTop = top;
+    };
+  });
+  const more = document.getElementById("provmore");
+  if (more) more.onclick = () => { PROVALL = !PROVALL; vnBand(cur); wireProvTable(); };
+}
+
+function vnDetail(p) {
+  const dens = vnVal(p, "dens"), land = vnVal(p, "land");
+  const blds = (MK.buildings_of || {})[p.entity_id] || [];
+  const lst = (MK.listings_of || {})[p.entity_id] || null;
+  const stats = [
+    ["Diện tích lô", num(p.site_area_m2), " m²"],
+    ["Số căn", num(p.n_units), ""],
+    ["Số tầng", num(p.n_floors), ""],
+    ["Mật độ XD", num(p.site_coverage_pct), "%"],
+    ["Mật độ căn", num(dens), " căn/ha"],
+    ["Số toà", num(p.n_buildings), ""],
+  ];
+  const loc = [p.ward, p.district, p.province].filter(Boolean).join(" · ");
+  const badges = [
+    p.project_category ? `<span class="badge accent">${esc(p.project_category)}</span>` : "",
+    p.developer ? `<span class="badge">${esc(p.developer)}</span>` : "",
+    p.legal ? `<span class="badge">${esc(p.legal)}</span>` : "",
+    p._n_list ? `<span class="badge">${num(p._n_list)} tin rao</span>` : "",
+    p.n_conflicts ? `<span class="badge">${num(p.n_conflicts)} xung đột nguồn</span>` : "",
+  ].join("");
+
+  const plan = kv([
+    ["Diện tích khu đất", p.site_area_m2 != null ? num(p.site_area_m2) + " m²" : ""],
+    ["Diện tích chiếm đất", p.footprint_area_m2 != null ? num(p.footprint_area_m2) + " m²" : ""],
+    ["Tổng diện tích sàn", p.gross_floor_area_m2 != null ? num(p.gross_floor_area_m2) + " m²" : ""],
+    ["Mật độ xây dựng", p.site_coverage_pct != null
+      ? num(p.site_coverage_pct) + "% công bố" +
+        (p.site_coverage_computed_pct != null
+          ? ` <span style="color:var(--muted)">· ${num(p.site_coverage_computed_pct)}% tính lại từ diện tích chiếm đất</span>` : "")
+      : ""],
+    ["Hệ số sử dụng đất", p.far != null ? num(p.far) : ""],
+    ["Số tầng nổi", p.n_floors != null ? num(p.n_floors) + " tầng" : ""],
+    ["Số tầng hầm", p.n_basements != null ? num(p.n_basements) : ""],
+    ["Thang máy", p.n_elevators_min != null
+      ? num(p.n_elevators_min) + (p.n_elevators_max && p.n_elevators_max !== p.n_elevators_min ? "–" + num(p.n_elevators_max) : "") + " thang mỗi toà" : ""],
+    ["Căn mỗi tầng", p.units_per_floor_min != null
+      ? num(p.units_per_floor_min) + (p.units_per_floor_max && p.units_per_floor_max !== p.units_per_floor_min ? "–" + num(p.units_per_floor_max) : "") : ""],
+    ["Đất trên mỗi căn", land != null ? num(land) + " m²" : ""],
+    ["Dân số dự kiến", p.population != null ? num(p.population) + " người" : ""],
+    ["Toạ độ", p.lat != null ? `<span class="mono">${num(p.lat)} · ${num(p.lon)}</span>` : ""],
+  ]);
+
+  const lift = (p.n_units && p.n_elevators_min)
+    ? `<div class="foot">Chia thô: ${num(p.n_units)} căn ÷ ${num(p.n_elevators_min)} thang =
+       <b>${num(p.n_units / p.n_elevators_min)}</b> căn/thang.
+       ${p.n_buildings > 1 ? `Nhưng dự án có ${num(p.n_buildings)} toà — số thang là của <em>một</em> toà,
+       số căn là của <em>cả</em> dự án, nên chia đúng ra ${num(p.n_units / p.n_buildings / p.n_elevators_min)}.` : ""}
+       QCVN 04:2021 đòi tối thiểu 1 thang cho 70 căn.</div>` : "";
+
+  const ut = parseJSON(p.unit_types) || p.unit_types;
+  let mixHtml = '<div class="empty">Dự án này chưa có cơ cấu căn.</div>';
+  if (Array.isArray(ut) && ut.length) {
+    const rows = ut.map(u => ({
+      br: u.n_bedrooms, n: u.n_units == null ? null : Number(u.n_units),
+      cmin: u.carpet_area_min_m2, cmax: u.carpet_area_max_m2,
+      bmin: u.builtup_area_min_m2, bmax: u.builtup_area_max_m2,
+    }));
+    const tot = rows.reduce((s, r) => s + (r.n || 0), 0);
+    const mx = Math.max(...rows.map(r => r.n || 0)) || 1;
+    mixHtml = rows.map(r => `<div class="brow">
+      <div>${r.br == null ? "—" : (Number(r.br) === 0 ? "Studio" : num(r.br) + " phòng ngủ")}</div>
+      <div class="t"><i style="width:${((r.n || 0) / mx * 100).toFixed(1)}%"></i></div>
+      <div class="n">${r.n == null ? '<span style="color:var(--faint)">—</span>' : num(r.n)}</div>
+      <div class="p">${r.n && tot ? (r.n / tot * 100).toFixed(1) + "%" : "—"}</div></div>`).join("")
+      + (tot ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);
+          display:flex;gap:12px;align-items:baseline"><span style="font-size:12.5px;color:var(--muted)">Tổng cộng</span>
+          <span style="font-size:15px;font-weight:600;font-variant-numeric:tabular-nums">${num(tot)} căn</span>
+          ${p.n_units && Math.abs(tot - p.n_units) > 1
+            ? `<span style="font-size:12px;color:var(--muted)">so với ${num(p.n_units)} căn khai ở cấp dự án —
+               lệch ${num(Math.abs(tot - p.n_units))}</span>` : ""}</div>` : "");
+  }
+
+  const am = parseJSON(p.amenities) || p.amenities;
+  let amHtml = '<div class="empty">Dự án này chưa có tiện ích.</div>';
+  if (Array.isArray(am) && am.length) {
+    const byScope = {};
+    am.forEach(a => { (byScope[a.scope || "khac"] ||= []).push(a); });
+    amHtml = Object.entries(byScope).map(([sc, list]) =>
+      `<div style="margin-bottom:10px"><div style="font-size:11px;text-transform:uppercase;
+        letter-spacing:.05em;color:var(--muted);font-weight:600;margin-bottom:6px">${esc(sc === "noi_khu" ? "Nội khu" : sc)}</div>
+       <div class="items">${list.map(a => `<div class="item">${esc(a.amenity || a.amenity_code)}</div>`).join("")}</div></div>`).join("");
+  }
+
+  const lu = parseJSON(p.land_use) || p.land_use;
+  let luHtml = "";
+  if (Array.isArray(lu) && lu.length) {
+    const rows = lu.map(x => ({ k: x.land_use, v: Number(x.area_m2) || 0 }));
+    const tot = rows.reduce((s, r) => s + r.v, 0) || 1;
+    const mx = Math.max(...rows.map(r => r.v)) || 1;
+    luHtml = sec("Phân bổ sử dụng đất", `${rows.length} loại`, "land_use",
+      rows.map(r => `<div class="brow"><div>${esc(r.k)}</div>
+        <div class="t"><i style="width:${(r.v / mx * 100).toFixed(1)}%"></i></div>
+        <div class="n">${num(r.v)}</div><div class="p">${(r.v / tot * 100).toFixed(1)}%</div></div>`).join(""),
+      "Chỉ một nguồn công bố trường này — độ phủ 5,9% toàn kho.");
+  }
+
+  let bldHtml = "";
+  if (blds.length) {
+    bldHtml = sec("Toà thuộc dự án", `${blds.length} toà`, "vn_building",
+      `<div style="overflow-x:auto"><table><thead><tr><th>Toà</th>
+        <th style="text-align:right">Tầng</th><th style="text-align:right">Căn</th>
+        <th style="text-align:right">Hầm</th><th style="text-align:right">Sàn m²</th>
+        <th>Công văn</th></tr></thead><tbody>
+        ${blds.map(b => `<tr><td>${esc(b.name || "")}</td>
+          <td class="num">${num(b.n_floors)}</td><td class="num">${num(b.n_units)}</td>
+          <td class="num">${num(b.n_basements)}</td><td class="num">${num(b.gfa)}</td>
+          <td style="font-size:12px;color:var(--muted)">${esc(b.notice || "")}</td></tr>`).join("")}
+      </tbody></table></div>`,
+      `Chỉ ${num(META.link_buildings)} / ${num(META.n_projects)} dự án nối được xuống cấp toà.`);
+  }
+
+  /* một ô thống kê ba phân vị: p25 · trung vị · p75 */
+  function q3(lab, tri, unit, scale, dec, n) {
+    if (!tri || tri[1] == null) return "";
+    const f = v => v == null ? "—" : num(scale ? v / scale : v, dec);
+    return `<div style="background:var(--panel);padding:11px 14px;min-width:0">
+      <div style="font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.045em">${esc(lab)}</div>
+      <div style="display:flex;align-items:baseline;gap:7px;margin-top:3px;font-variant-numeric:tabular-nums">
+        <span style="font-size:11.5px;color:var(--faint)">${f(tri[0])}</span>
+        <span style="font-size:18px;font-weight:600;letter-spacing:-.015em">${f(tri[1])}</span>
+        <span style="font-size:11.5px;color:var(--faint)">${f(tri[2])}</span></div>
+      <div style="font-size:10.5px;color:var(--faint);margin-top:2px">${esc(unit)}${
+        n != null ? ` · ${num(n)} tin có` : ""}</div></div>`;
+  }
+  /* phân bố rời rạc (phòng ngủ, loại giao dịch) dưới dạng thanh ngang */
+  function distBars(lab, pairs, fmtKey, all) {
+    if (!pairs || !pairs.length) return "";
+    const tot = pairs.reduce((a, b) => a + b[1], 0), mx = Math.max(...pairs.map(x => x[1]));
+    return `<div style="background:var(--panel);padding:11px 14px;min-width:0">
+      <div style="font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.045em;margin-bottom:6px">${esc(lab)}
+        ${all && tot < all ? `<span style="color:var(--faint);text-transform:none;letter-spacing:0">
+          — ${num(tot)}/${num(all)} tin khai</span>` : ""}</div>
+      ${pairs.slice(0, 5).map(([k, n]) => `<div style="display:grid;grid-template-columns:74px minmax(0,1fr) 46px;
+        gap:8px;align-items:center;padding:2px 0">
+        <span style="font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(fmtKey(k))}</span>
+        <span style="height:7px;border-radius:4px;background:var(--track);overflow:hidden">
+          <i style="display:block;height:100%;border-radius:4px;background:var(--s4);width:${(n / mx * 100).toFixed(1)}%"></i></span>
+        <span style="font-size:11px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums">${(n / tot * 100).toFixed(0)}%</span>
+      </div>`).join("")}</div>`;
+  }
+
+  let lstHtml = "";
+  if (lst && lst.n) {
+    const cells = [
+      q3("Đơn giá", lst.px, "triệu/m²", 1e6, 1, lst.n_px),
+      q3("Diện tích", lst.ar, "m²", 1, 1, lst.n_ar),
+      lst.pr ? `<div style="background:var(--panel);padding:11px 14px;min-width:0">
+        <div style="font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.045em">Giá trung vị</div>
+        <div style="font-size:18px;font-weight:600;margin-top:3px;font-variant-numeric:tabular-nums;letter-spacing:-.015em">${num(lst.pr / 1e9, 2)}</div>
+        <div style="font-size:10.5px;color:var(--faint);margin-top:2px">tỷ đồng mỗi tin</div></div>` : "",
+      distBars("Phòng ngủ", (lst.br || []).slice().sort((a, b) => a[0] - b[0]),
+        k => Number(k) === 0 ? "Studio" : num(k) + " PN", lst.n),
+      distBars("Giao dịch", lst.deal, dealVi, lst.n),
+    ].filter(Boolean);
+
+    const rows = lst.rows || [];
+    lstHtml = sec("Tin rao của dự án", `${num(lst.n)} tin`, "vn_listing",
+      `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:1px;
+        background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden">${cells.join("")}</div>
+      ${rows.length ? `<div style="margin-top:14px;font-size:10.5px;color:var(--muted);text-transform:uppercase;
+        letter-spacing:.05em;font-weight:600">${num(rows.length)} tin lấy ngẫu nhiên</div>
+      <div style="overflow-x:auto;margin-top:6px"><table><thead><tr><th>Tin</th>
+        <th class="num">m²</th><th class="num">PN</th>
+        <th class="num">Giá</th><th class="num">Đơn giá</th></tr></thead><tbody>
+        ${rows.map(l => `<tr><td style="max-width:340px">${esc((l.title || "").slice(0, 96))}</td>
+          <td class="num">${num(l.area)}</td><td class="num">${num(l.br)}</td>
+          <td class="num">${l.price ? num(l.price / 1e9, 2) + " tỷ" : "—"}</td>
+          <td class="num">${l.unit_price ? num(l.unit_price / 1e6, 1) : "—"}</td></tr>`).join("")}
+      </tbody></table></div>` : ""}`,
+      `Đây là <b>giá chào</b>, không phải giá giao dịch — tin rao chỉ thấy phần đang bán.
+       Thống kê tính trên cả ${num(lst.n)} tin; bảng dưới là lát cắt ngẫu nhiên, không phải tin lớn nhất hay mới nhất.`);
+  }
+
+  document.getElementById("detail").innerHTML = `
+    <div class="card">
+      <div class="hero">
+        <h1>${esc(p.name || "(chưa có tên)")}</h1>
+        <div class="local">${esc(loc)}</div>
+        <div class="addr">${esc(p.address || "")}</div>
+        <div class="badges">${badges}</div>
+      </div>
+      <div class="stats">${stats.map(([k, v, u]) =>
+        `<div class="stat"><div class="k">${esc(k)}</div><div class="v">${v}${u ? `<small>${u}</small>` : ""}</div></div>`).join("")}</div>
+    </div>
+    ${sec("Chỉ tiêu quy hoạch", "", "vn_project", plan, lift)}
+    ${sec("Cơ cấu căn hộ", "", "unit_types", mixHtml)}
+    ${sec("Tiện ích", "", "amenities", amHtml)}
+    ${luHtml}${bldHtml}${lstHtml}
+    ${sec("Nguồn dữ liệu", p.n_sources ? `${num(p.n_sources)} nguồn` : "", "sources",
+      kv([["Số nguồn đã hợp nhất", p.n_sources != null ? num(p.n_sources) : ""],
+          ["Số trường xung đột", p.n_conflicts != null ? num(p.n_conflicts) : ""],
+          ["Khởi công", p.start_raw ? esc(p.start_raw) : ""],
+          ["Hoàn thành", p.finish_raw ? esc(p.finish_raw) : ""],
+          ["Tiến độ", p.progress ? esc(p.progress) : ""]]),
+      p.n_conflicts ? "Giá trị bị loại khi phân xử nằm ở cột <span class=\"mono\">diagnostics</span>." : "")}
+`;
+  vnBand(p);
+  wireProvTable();
+}
+
+
+/* ---------- danh sách, lọc, sắp xếp ---------- */
+let FF = null, forms = [];
+const selForm = document.getElementById("form"), selMarket = document.getElementById("market");
+
+function loadMarket(slug) {
+  MK = D.markets[slug]; META = MK.meta; DEF = MK.defaults || {};
+  if (MK.meta.kind === "vn") {
+    VNCAT = "";
+    MET = vnMetrics();
+    ALL = (MK.projects || []).map(p => ({ ...p }));
+    ALL.forEach(p => p._md = 0);
+  } else {
+    MET = MK.metrics || [];
+    ALL = (MK.buildings || []).map(b => ({ ...b }));
+    ALL.forEach(b => b._md = medDist(b));
+  }
+  cur = null;
+  buildFormFilter();
+  document.getElementById("sub").textContent = isVN()
+    ? `${META.label} · ${num(META.n_projects)} dự án`
+    : `${META.label} · ${num(META.n_buildings)} toà`;
+  document.title = `${META.label} — Benchmark toà nhà`;
+  try { history.replaceState(null, "", "#" + slug); } catch (e) {}
+  renderList();
+}
+
+function buildFormFilter() {
+  if (isVN()) {
+    FF = "project_category";
+    forms = (MK.categories || []).filter(k => k !== "(chưa rõ)");
+    selForm.parentElement.style.display = "";
+    selForm.previousElementSibling.textContent = "Loại dự án";
+    selForm.innerHTML = `<option value="">Tất cả (${ALL.length})</option>` + forms.map(f =>
+      `<option value="${esc(f)}">${esc(f)} (${ALL.filter(p => p.project_category === f).length})</option>`).join("");
+    return;
+  }
+  FF = ALL.some(b => b.building_form) ? "building_form"
+     : (ALL.some(b => b.style) ? "style" : null);
+  forms = FF ? [...new Set(ALL.map(b => b[FF]).filter(Boolean))]
+    .sort((a, c) => vi(FF, a).localeCompare(vi(FF, c), "vi")) : [];
+  if (FF && forms.length) {
+    selForm.parentElement.style.display = "";
+    selForm.previousElementSibling.textContent = FF === "style" ? "Phong cách" : "Loại hình";
+    selForm.innerHTML = `<option value="">Tất cả (${ALL.length})</option>` + forms.map(f =>
+      `<option value="${esc(f)}">${esc(vi(FF, f))} (${ALL.filter(b => b[FF] === f).length})</option>`).join("");
+  } else { selForm.parentElement.style.display = "none"; }
+}
+
+const SORTS = {
+  full: (a, b) => (b._core || 0) - (a._core || 0) || (b._n_list || 0) - (a._n_list || 0)
+    || nCore(b) - nCore(a) || isStrict(b) - isStrict(a)
+    || nMet(b) - nMet(a) || (b.n_units_building || 0) - (a.n_units_building || 0),
+  median: (a, b) => a._md - b._md,
+  units: (a, b) => ((b.n_units_building ?? b.n_units) || 0) - ((a.n_units_building ?? a.n_units) || 0),
+  year: (a, b) => (b.year_completed || 0) - (a.year_completed || 0),
+  name: (a, b) => (isVN() ? (a.name || "") : nameOf(a)).localeCompare(isVN() ? (b.name || "") : nameOf(b), "vi"),
+};
+
+function view() {
+  const q = document.getElementById("q").value.trim().toLowerCase();
+  const f = selForm.value;
+  let r = ALL.filter(b => !f || (FF && b[FF] === f));
+  if (q) r = r.filter(b => (isVN()
+    ? [b.name, b.province, b.district, b.ward, b.address, b.developer, b.project_category]
+    : [b.building_name, b.name_latin, b.project_name, b.admin, b.address, b.developer, b.dev_latin]
+  ).some(x => x && String(x).toLowerCase().includes(q)));
+  return r.sort(SORTS[document.getElementById("sort").value] || SORTS.full);
+}
+
+function renderList() {
+  const rows = view();
+  document.getElementById("count").textContent =
+    isVN()
+      ? `${num(rows.length)} / ${num(ALL.length)} dự án trong mẫu · kho có ${num(META.n_projects)}`
+      : `${num(rows.length)} / ${num(ALL.length)} toà trong mẫu · kho có ${num(META.n_buildings)}`;
+  if (!rows.length) {
+    document.getElementById("list").innerHTML = '<div class="empty" style="padding:10px">Không có toà nào khớp.</div>';
+    return;
+  }
+  if (!cur || !rows.includes(cur)) { cur = rows[0]; (isVN() ? vnDetail : detail)(cur); }
+  document.getElementById("list").innerHTML = rows.slice(0, 200).map((b, i) => {
+    if (isVN()) {
+      const pc = Math.round(100 * (b._core || 0) / 8);
+      return `<button class="tower${b === cur ? " on" : ""}" data-i="${i}">
+        <div class="n">${esc(b.name || "(chưa có tên)")}</div>
+        <div class="o">${esc([b.district, b.province].filter(Boolean).join(" · "))}</div>
+        <div class="m">${[b.n_units != null ? num(b.n_units) + " căn" : null,
+          b.n_floors != null ? num(b.n_floors) + " tầng" : null,
+          b.site_area_m2 != null ? num(b.site_area_m2 / 10000) + " ha" : null,
+          b._n_list ? num(b._n_list) + " tin" : null].filter(Boolean).join(" · ")}</div>
+        <div class="score"><div class="score-bar"><i style="width:${pc}%"></i></div>
+          <div class="score-pct">${b._core || 0}/8</div></div></button>`;
+    }
+    const p = Math.round(100 * nCore(b) / 6);
+    return `<button class="tower${b === cur ? " on" : ""}" data-i="${i}">
+      <div class="n">${esc(nameOf(b))}</div>
+      <div class="o">${esc(rawOf(b) || b.admin || "")}</div>
+      <div class="m">${[b.n_floors != null ? num(b.n_floors) + " tầng" : null,
+        b.n_units_building != null ? num(b.n_units_building) + " căn" : null,
+        b.year_completed || null].filter(Boolean).join(" · ")}</div>
+      <div class="score"><div class="score-bar"><i style="width:${p}%"></i></div>
+        <div class="score-pct">${nCore(b)}/6</div></div></button>`;
+  }).join("");
+  const list = document.getElementById("list");
+  list.querySelectorAll(".tower").forEach(el => el.onclick = () => {
+    cur = rows[+el.dataset.i]; (isVN() ? vnDetail : detail)(cur);
+    list.querySelectorAll(".tower").forEach(x => x.classList.remove("on"));
+    el.classList.add("on");
+    if (window.matchMedia("(max-width:900px)").matches)
+      document.getElementById("detail").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
+
+selMarket.innerHTML = D.order.map(s => {
+  const m = D.markets[s].meta;
+  if (m.kind === "vn")
+    return `<option value="${esc(s)}">${esc(m.label)} — ${num(m.n_projects)} dự án · ${num(m.n_listings)} tin rao</option>`;
+  const cr = D.markets[s].core;
+  return `<option value="${esc(s)}">${esc(m.label)} — lõi ${cr.n_have}/6 · đạt chuẩn ${num(cr.pct)}% · ${num(m.n_buildings)} toà</option>`;
+}).join("");
+selMarket.addEventListener("change", () => setView("market", true));
+["q", "sort", "form"].forEach(id =>
+  document.getElementById(id).addEventListener("input", () => {
+    if (isVN()) { VNCAT = selForm.value; MET = vnMetrics(); }
+    renderList();
+  }));
+document.getElementById("theme").onclick = () => {
+  const r = document.documentElement;
+  const now = r.getAttribute("data-theme")
+    || (matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light");
+  r.setAttribute("data-theme", now === "dark" ? "light" : "dark");
+};
+/* ================= TRANG TỔNG QUAN ================= */
+/* Ba nguồn nằm ở ba nơi và CHƯA ráp vào nhau — trang này đếm riêng từng nguồn,
+   không cộng dồn thành một con số gộp không có nghĩa. */
+
+function ovBars(title, cnt, rows, unit, tbl, foot) {
+  if (!rows || !rows.length) return "";
+  const mx = Math.max(...rows.map(r => r.n));
+  return `<section class="card">
+    <div class="sec-head"><h2>${esc(title)}</h2>
+      ${cnt ? `<span class="cnt">${esc(cnt)}</span>` : ""}
+      ${tbl ? `<span class="tbl">${esc(tbl)}</span>` : ""}</div>
+    <div style="padding:12px 18px">
+      ${rows.map(r => `<div class="pbar" style="cursor:default">
+        <span class="nm" title="${esc(r.k)}">${esc(r.k)}${r.rest
+          ? ` <span style="color:var(--faint)">(${num(r.rest)})</span>` : ""}</span>
+        <span class="t"><i style="width:${(r.n / mx * 100).toFixed(2)}%;${
+          r.rest ? "background:var(--s2)" : ""}"></i></span>
+        <span class="v">${num(r.n)}</span></div>`).join("")}
+    </div>
+    ${foot ? `<div class="foot">${foot}</div>` : ""}</section>`;
+}
+
+/* ---------- bản đồ thế giới ---------- */
+/* Tô đậm nhạt theo số trường lõi đạt (thang một sắc). Việt Nam nằm ở họ bảng
+   khác, chưa ráp vào corpus nên không có điểm sáu-trường — tô riêng, không
+   nhét vào thang. */
+const COREC = c => c >= 6 ? "var(--s5)" : c === 5 ? "var(--s4)"
+  : c === 4 ? "var(--s3)" : c === 3 ? "var(--s2)" : c >= 1 ? "var(--s1)" : "var(--track)";
+
+function ovMap() {
+  const M = (D.overview || {}).map;
+  if (!M || !M.features) return "";
+  const DA = M.data || {};
+  const fill = iso => {
+    const r = DA[iso];
+    if (!r) return "var(--panel-2)";
+    return r.core == null ? "var(--accent-soft)" : COREC(r.core);
+  };
+  const tip = iso => {
+    const r = DA[iso];
+    return r ? `${r.k} — ${num(r.n)} ${r.unit}` +
+      (r.core == null ? " · thang riêng" : ` · lõi ${r.core}/6`) +
+      (r.off ? " · ngoài corpus" : "") : "";
+  };
+
+  const tiers = [[6, "6 / 6 trường"], [5, "5 / 6"], [4, "4 / 6"], [3, "3 / 6"], [1, "1–2 / 6"]];
+  const named = c => Object.values(DA).filter(r =>
+    r.core != null && (c === 1 ? r.core <= 2 && r.core >= 0 : r.core === c))
+    .sort((a, b) => b.n - a.n).map(r => r.k).join(" · ");
+  const legend = tiers.map(([c, lb]) => {
+    const who = named(c);
+    if (!who) return "";
+    return `<div style="display:flex;align-items:center;gap:8px;padding:2px 0">
+      <i style="width:13px;height:13px;border-radius:3px;flex:none;background:${COREC(c)};
+        box-shadow:inset 0 0 0 1px rgba(0,0,0,.10)"></i>
+      <span style="width:76px;flex:none;font-size:11px;color:var(--muted)">${esc(lb)}</span>
+      <span style="font-size:11px;color:var(--faint);overflow:hidden;text-overflow:ellipsis;
+        white-space:nowrap">${esc(who)}</span></div>`;
+  }).join("") +
+  `<div style="display:flex;align-items:center;gap:8px;padding:2px 0">
+      <i style="width:13px;height:13px;border-radius:3px;flex:none;background:var(--accent-soft);
+        box-shadow:inset 0 0 0 1px var(--accent)"></i>
+      <span style="width:76px;flex:none;font-size:11px;color:var(--muted)">thang riêng</span>
+      <span style="font-size:11px;color:var(--faint)">Việt Nam — họ bảng khác, không chấm chung</span></div>
+   <div style="display:flex;align-items:center;gap:8px;padding:2px 0">
+      <i style="width:13px;height:13px;border-radius:3px;flex:none;background:var(--panel-2);
+        box-shadow:inset 0 0 0 1px var(--border)"></i>
+      <span style="width:76px;flex:none;font-size:11px;color:var(--muted)">ngoài kho</span>
+      <span style="font-size:11px;color:var(--faint)">${num(M.n_countries - Object.keys(DA).length + 2)} quốc gia</span></div>`;
+
+  return `<section class="card" style="min-width:0">
+    <div class="sec-head"><h2>Độ chi tiết theo quốc gia</h2>
+      <span class="cnt">${num(Object.keys(DA).length)} / ${num(M.n_countries)} nước có dữ liệu</span></div>
+    <div style="padding:10px 14px 2px">
+      <svg viewBox="0 0 ${M.w} ${M.h}" width="100%" style="display:block"
+        preserveAspectRatio="xMidYMid meet" role="img"
+        aria-label="Bản đồ thế giới, đậm nhạt theo số trường lõi đạt">
+        ${M.features.map(f => f.i && DA[f.i]
+          ? `<path class="wpt" data-slug="${esc(DA[f.i].slug)}" d="${f.d}" fill="${fill(f.i)}"
+               stroke="var(--panel)" stroke-width="0.5" style="cursor:pointer"><title>${esc(tip(f.i))}</title></path>`
+          : `<path d="${f.d}" fill="var(--panel-2)" stroke="var(--border)" stroke-width="0.4"></path>`).join("")}
+        ${M.dots.filter(d => DA[d.i]).map(d => `<g class="wpt" data-slug="${esc(DA[d.i].slug)}" style="cursor:pointer">
+          <title>${esc(tip(d.i))}</title>
+          <circle cx="${d.x}" cy="${d.y}" r="4.2" fill="${fill(d.i)}"
+            stroke="var(--panel)" stroke-width="1"></circle>
+          <text x="${d.x}" y="${d.y - 6.5}" font-size="8.5" text-anchor="middle"
+            fill="var(--muted)" style="pointer-events:none">${esc(DA[d.i].k)}</text></g>`).join("")}
+      </svg>
+    </div>
+    <div style="padding:8px 18px 2px">${legend}</div>
+    <div class="foot">Đậm nhạt theo <b>số trường lõi đạt ≥50% độ phủ</b> trong sáu trường
+      cơ cấu căn · diện tích · giá · tiện ích · phong cách · bàn giao — đủ cả sáu thì đem hai toà
+      ra so trực tiếp được. Singapore và Hong Kong nhỏ hơn một pixel ở tỷ lệ này nên vẽ thành chấm.
+      Đài Loan gộp ba mã nguồn, Ba Lan gộp hai. Phép chiếu plate carrée.
+      Bấm một nước để mở thị trường đó.</div></section>`;
+}
+
+/* ---------- ba khối bộ dữ liệu ---------- */
+function ovBlock(o) {
+  return `<section class="card">
+    <div class="sec-head"><h2>${esc(o.title)}</h2>
+      <span class="cnt">${esc(o.cnt)}</span></div>
+    <div style="padding:15px 18px 4px">
+      <div style="display:flex;align-items:baseline;gap:9px">
+        <span class="n" style="font-size:34px;font-weight:660;letter-spacing:-.025em;
+          font-variant-numeric:tabular-nums;line-height:1">${num(o.big)}</span>
+        <span style="font-size:13px;color:var(--muted)">${esc(o.unit)}</span></div>
+      <div style="font-size:12.5px;color:var(--muted);margin-top:9px;line-height:1.6">${o.desc}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(${o.stats.length},minmax(0,1fr));gap:1px;
+      background:var(--border);border-top:1px solid var(--border);margin-top:14px">
+      ${o.stats.map(x => `<div style="background:var(--panel);padding:10px 12px;min-width:0">
+        <div style="font-size:15.5px;font-weight:620;font-variant-numeric:tabular-nums;
+          letter-spacing:-.012em">${num(x[1])}</div>
+        <div style="font-size:10.5px;color:var(--faint);margin-top:2px;line-height:1.35">${esc(x[0])}</div>
+      </div>`).join("")}
+    </div>
+    ${o.foot ? `<div class="foot">${o.foot}</div>` : ""}</section>`;
+}
+
+function renderOverview() {
+  const O = D.overview;
+  const box = document.getElementById("view-overview");
+  if (!O) { box.innerHTML = '<div class="card"><div class="foot">Chưa dựng được số tổng quan.</div></div>'; return; }
+  const C = O.corpus, doc = O.docs;
+  const t = {}; (C.tables || []).forEach(x => t[x.name] = x.n);
+  const v = {}; (C.vn_tables || []).forEach(x => v[x.name] = x.n);
+  const tier = l => ((O.vn_tiers || []).find(x => x.label === l) || {}).n || 0;
+  const jpN = (O.japan || {}).n_buildings || 0;
+  const nMarket = (C.by_market || []).length;
+  const totalRows = (t.dim_project || 0) + (t.fact_building || 0)
+    + Object.values(v).reduce((a, b) => a + b, 0)
+    + ((O.japan || {}).n_rows || jpN) + (doc ? doc.n_docs : 0);
+
+  /* ── dải số trên cùng ── */
+  const hero = `<div class="ovhero">
+    <div><div class="lb">Tổng số bản ghi</div>
+      <div class="big">${num(totalRows)}</div>
+      <div class="sub">cộng số dòng của <b>ba kho tách bạch</b> — chưa ráp vào nhau,
+        nên đây là phép cộng, không phải một bảng gộp</div></div>
+    <div><div class="lb">Toà nhà</div>
+      <div class="big">${num((C.loose || 0) + jpN)}</div>
+      <div class="sub">${num(nMarket + (jpN ? 1 : 0))} thị trường · ${num(C.strict)} toà
+        đủ sáu trường lõi (${num(C.strict_pct, 1)}%)</div></div>
+    ${doc ? `<div><div class="lb">Tài liệu</div>
+      <div class="big">${num(doc.n_docs)}</div>
+      <div class="sub">${num(doc.mb)} MB chữ · ${num(doc.n_domains)} nguồn web
+        · ${num(doc.n_langs)} ngôn ngữ</div></div>` : ""}
+  </div>`;
+
+  /* ── ba khối, cột trái ── */
+  const bVN = ovBlock({
+    title: "Thị trường Việt Nam", cnt: "bốn cấp",
+    big: tier("Dự án"), unit: "dự án",
+    desc: `Kho duy nhất đi đủ <b>bốn cấp</b> — dự án → toà → căn → tin rao — và là kho duy nhất
+      có toạ độ thật cho gần như mọi dự án.`,
+    stats: [["toà nhà", tier("Toà nhà")], ["căn hộ", tier("Căn hộ")],
+            ["tin rao", tier("Tin rao")], ["tỉnh thành", O.vn_provinces || 0]],
+    foot: `Nằm riêng một họ bảng, <b>chưa ráp vào corpus thế giới</b> nên không có mặt trong
+      con số sáu trường lõi.`,
+  });
+  const bWorld = ovBlock({
+    title: "Thị trường thế giới", cnt: `${num(nMarket + (jpN ? 1 : 0))} thị trường`,
+    big: (C.loose || 0) + jpN, unit: "toà nhà",
+    desc: `${num(nMarket)} thị trường trong corpus, cộng <b>${num(jpN)} toà Nhật Bản</b> dựng tay
+      trong repo — Nhật chi tiết hơn hẳn nhưng chưa qua đường ống hợp nhất.`,
+    stats: [["dự án / khu", t.dim_project || 0], ["đủ sáu trường lõi", C.strict || 0],
+            ["toà Nhật", jpN]],
+    foot: `Sáu trường lõi là <b>cơ cấu căn · diện tích · giá · tiện ích · phong cách · bàn giao</b> —
+      đủ cả sáu thì đem hai toà ra so trực tiếp được. Nhật đếm riêng vì chưa hợp nhất.`,
+  });
+  const bDoc = doc ? ovBlock({
+    title: doc.label, cnt: `${num(doc.n_jobs)} đợt thu thập`,
+    big: doc.n_docs, unit: "tài liệu",
+    desc: `Dữ liệu dạng <b>chữ</b>, không phải bảng số: bài báo, hồ sơ, trang bách khoa về
+      bất động sản, gom từ ${num(doc.n_domains)} nguồn web.`,
+    stats: [["MB chữ", doc.mb], ["nguồn web", doc.n_domains],
+            ["ngôn ngữ", doc.n_langs], ["có URL gốc", doc.with_url]],
+    foot: doc.roots.map(r => `<b>${num(r.n)}</b> ${esc(r.k)}`).join(" · ") + ".",
+  }) : "";
+
+  box.innerHTML = hero + `
+    <div class="ovmain">
+      <div style="display:flex;flex-direction:column;gap:16px;min-width:0">${bVN}${bWorld}${bDoc}</div>
+      <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        ${ovMap()}
+        ${ovBars("Toà theo thị trường", `${num(nMarket)} thị trường`,
+          (C.by_market || []).map(m => ({ k: m.k, n: m.n })), "toà", "",
+          "Thang tuyến tính. Bấm tab <b>Thị trường</b> để mở từng cái.")}
+        ${doc ? ovBars(`Tài liệu theo nguồn`, `${num(doc.n_domains)} nguồn`, doc.domains, "", "",
+          "Bách khoa toàn thư bốn thứ tiếng chiếm phần lớn nhóm đầu — đáng biết trước khi dùng làm nền tri thức.") : ""}
+      </div>
+    </div>`;
+
+  box.querySelectorAll(".wpt").forEach(g => g.onclick = () => {
+    const s2 = g.dataset.slug;
+    if (D.markets[s2]) { selMarket.value = s2; setView("market", true); }
+  });
+}
+
+/* ---------- chuyển trang ---------- */
+let VIEW = "market";
+function setView(v, push) {
+  VIEW = v === "overview" ? "overview" : "market";
+  document.getElementById("view-overview").hidden = VIEW !== "overview";
+  document.getElementById("view-market").hidden = VIEW === "overview";
+  document.querySelector(".filterbar").hidden = VIEW === "overview";
+  document.getElementById("q").style.display = VIEW === "overview" ? "none" : "";
+  document.querySelectorAll("#nav button").forEach(b =>
+    b.classList.toggle("on", b.dataset.view === VIEW));
+  if (VIEW === "overview") {
+    renderOverview();
+    document.getElementById("sub").textContent = "· tổng quan ba nguồn";
+    document.title = "Tổng quan — Benchmark toà nhà";
+  } else {
+    loadMarket(selMarket.value);
+  }
+  if (push) { try { history.replaceState(null, "", VIEW === "overview" ? "#tong-quan" : "#" + selMarket.value); } catch (e) {} }
+}
+document.querySelectorAll("#nav button").forEach(b =>
+  b.onclick = () => setView(b.dataset.view, true));
+
+const want = decodeURIComponent((location.hash || "").slice(1));
+const first = D.markets[want] ? want : D.order[0];
+selMarket.value = first;
+if (want === "tong-quan") { loadMarket(first); setView("overview", false); }
+else { setView("market", false); }
+addEventListener("hashchange", () => {
+  const s = decodeURIComponent(location.hash.slice(1));
+  if (s === "tong-quan") { setView("overview", false); return; }
+  if (D.markets[s]) {
+    if (s !== selMarket.value) selMarket.value = s;
+    setView("market", false);
+  }
+});
+</script>
+</body>
+</html>
