@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Benchmark toà nhà — chọn thị trường</title>
+<style>
+  :root{--bg:#f6f7f9;--panel:#fff;--panel-2:#fbfbfc;--border:#e3e6ea;--text:#151a20;
+    --muted:#69737f;--faint:#9aa3ad;--accent:#1d5fd0;--accent-soft:#e8f0fe;
+    --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.06);--radius:10px}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --bg:#0f1216;--panel:#171b21;--panel-2:#1c2129;--border:#2a313a;--text:#e8ecf1;
+    --muted:#9aa5b1;--faint:#6d7883;--accent:#6ea8fe;--accent-soft:#1b2a44;
+    --shadow:0 1px 2px rgba(0,0,0,.4)}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  header{padding:26px 20px 18px;border-bottom:1px solid var(--border);background:var(--panel)}
+  h1{margin:0;font-size:22px;letter-spacing:-.02em}
+  header p{margin:6px 0 0;color:var(--muted);font-size:13px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+    gap:12px;padding:20px;max-width:1400px;margin:0 auto}
+  .mk{display:flex;flex-direction:column;gap:4px;padding:14px 16px;background:var(--panel);
+    border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
+    color:inherit;text-decoration:none;transition:border-color .12s}
+  .mk:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .mk .n{font-weight:600;font-size:14.5px;letter-spacing:-.01em}
+  .mk .s{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+  footer{padding:18px 20px 40px;color:var(--faint);font-size:12px;text-align:center}
+  @media (max-width:640px){.grid{grid-template-columns:1fr;padding:14px}header{padding:20px 14px 16px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Benchmark toà nhà</h1>
+  <p>Chọn thị trường. Mỗi trang tự chứa — mở được không cần mạng, không cần server.</p>
+</header>
+<div class="grid">__ROWS__</div>
+<footer>Dựng từ corpus <span style="font-family:ui-monospace,Menlo,monospace">/mnt/data/ws1-data/lanch</span></footer>
+</body>
+</html>

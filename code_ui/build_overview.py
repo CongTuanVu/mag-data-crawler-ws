@@ -21,7 +21,23 @@ import os
 
 # Tên hiển thị: nguồn thứ ba đặt theo NỘI DUNG nó chứa, không theo tên người tạo.
 DOC_LABEL = "Bộ dữ liệu tài liệu"
-DOC_MANIFEST = "/srv/ws1/data/vinhhd/mdindex/manifest.jsonl"
+
+# Nguồn này ĐÃ CHUYỂN CHỖ một lần (`/srv/ws1/data/vinhhd/` biến mất, nay ở
+# `/mnt/data/ws1-data/vinhhd/`) và lần đó trang lặng lẽ mất phần đếm tài liệu vì
+# hàm đọc chỉ `return None` khi không thấy file. Nên thử theo danh sách, và nếu
+# không thấy ở đâu cả thì KÊU LÊN chứ không im.
+DOC_PATHS = [
+    os.environ.get("DOC_MANIFEST", ""),
+    "/mnt/data/ws1-data/vinhhd/mdindex/manifest.jsonl",
+    "/srv/ws1/data/vinhhd/mdindex/manifest.jsonl",
+]
+
+
+def doc_manifest() -> str | None:
+    for c in DOC_PATHS:
+        if c and os.path.exists(c):
+            return c
+    return None
 
 ROOT_VI = {"mag": "MAG — nghiên cứu thị trường", "kđt": "KĐT — khu đô thị"}
 
@@ -130,8 +146,12 @@ def corpus_stats(con, corpus, markets):
             "strict_pct": round(100.0 * strict / loose, 1) if loose else 0.0}
 
 
-def docs_stats(path=DOC_MANIFEST):
-    if not os.path.exists(path):
+def docs_stats(path=None):
+    path = path or doc_manifest()
+    if not path:
+        import sys
+        print("  ⚠ không thấy manifest tài liệu ở: "
+              + " · ".join(c for c in DOC_PATHS if c), file=sys.stderr)
         return None
     n = 0
     total_bytes = 0

@@ -13,6 +13,10 @@
     --shadow:0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.06);
     --radius:10px; --track:#eceef1;
     --s1:#dce8fb; --s2:#aac8f3; --s3:#6f9ce7; --s4:#3773da; --s5:#1b4fa8;
+    /* Chấm dự án đang xem. Nền bản đồ là thang xanh một sắc, nên nếu chấm cũng
+       xanh thì nó chìm — phải là màu khác hệ. Cam đối lập với xanh, đọc rõ ở cả
+       hai giao diện, và không trùng nghĩa với đỏ (lỗi) hay xanh lá (tỉnh). */
+    --pin:#e8590c;
   }
   @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
     --bg:#0f1216; --panel:#171b21; --panel-2:#1c2129; --border:#2a313a;
@@ -20,7 +24,7 @@
     --accent:#6ea8fe; --accent-soft:#1b2a44;
     --good:#5fd39a; --warn:#e2b558; --bad:#f08585;
     --shadow:0 1px 2px rgba(0,0,0,.4); --track:#242b34;
-    --s1:#1d2b40; --s2:#274a75; --s3:#356aa8; --s4:#4b8bd8; --s5:#6ea8fe;
+    --s1:#1d2b40; --s2:#274a75; --s3:#356aa8; --s4:#4b8bd8; --s5:#6ea8fe; --pin:#ff922b;
   }}
   :root[data-theme="dark"]{
     --bg:#0f1216; --panel:#171b21; --panel-2:#1c2129; --border:#2a313a;
@@ -28,7 +32,7 @@
     --accent:#6ea8fe; --accent-soft:#1b2a44;
     --good:#5fd39a; --warn:#e2b558; --bad:#f08585;
     --shadow:0 1px 2px rgba(0,0,0,.4); --track:#242b34;
-    --s1:#1d2b40; --s2:#274a75; --s3:#356aa8; --s4:#4b8bd8; --s5:#6ea8fe;
+    --s1:#1d2b40; --s2:#274a75; --s3:#356aa8; --s4:#4b8bd8; --s5:#6ea8fe; --pin:#ff922b;
   }
   *{box-sizing:border-box}
   /* `[hidden]` của trình duyệt là display:none ở UA stylesheet, thua bất kỳ luật
@@ -174,19 +178,11 @@
   .ovhero .sub{font-size:11.5px; color:var(--faint); margin-top:7px; line-height:1.6}
   /* ba khối bộ dữ liệu bên trái, bản đồ bên phải */
   .ovmain{display:grid; grid-template-columns:400px minmax(0,1fr); gap:16px; align-items:start}
+  /* Số ô thay đổi theo khối (3 hoặc 4). Trên điện thoại 4 ô còn ~80px mỗi ô —
+     chữ "MB chữ", "có URL gốc" bị vỡ dòng, nên xuống 2 ô. */
+  .ovstats{display:grid; grid-template-columns:repeat(var(--n), minmax(0,1fr)); gap:1px}
+  @media (max-width:520px){ .ovstats{grid-template-columns:repeat(2, minmax(0,1fr))} }
   .ov .n{font-variant-numeric:tabular-nums}
-  .funnel{display:flex; flex-direction:column; gap:7px; padding:14px 18px}
-  .funnel .fr{display:grid; grid-template-columns:132px minmax(0,1fr) 96px; gap:10px; align-items:center}
-  .funnel .fr .nm{font-size:12px; color:var(--muted)}
-  .funnel .fr .bar{height:22px; border-radius:5px; background:var(--track); overflow:hidden}
-  .funnel .fr .bar i{display:block; height:100%; border-radius:5px; background:var(--s3)}
-  .funnel .fr.hi .bar i{background:var(--accent)}
-  .funnel .fr .v{font-size:12.5px; font-weight:600; text-align:right; font-variant-numeric:tabular-nums}
-  @media (max-width:900px){
-    .ovhero{grid-template-columns:1fr}
-    .ovmain{grid-template-columns:1fr}
-    .funnel .fr{grid-template-columns:96px minmax(0,1fr) 78px; gap:8px}
-  }
 
   /* ---------- thanh ngang: một dòng một tỉnh ---------- */
   #provbars{display:flex; flex-direction:column; justify-content:space-between; flex:1; min-height:0}
@@ -225,7 +221,6 @@
   tbody tr.on{background:var(--accent-soft)}
   tbody tr.on td:first-child{box-shadow:inset 2px 0 0 var(--accent)}
 
-  /* ---------- responsive ---------- */
   @media (max-width:1180px){
     .ovmain{grid-template-columns:330px minmax(0,1fr); gap:14px}
     .mgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -235,6 +230,11 @@
     .wrap{grid-template-columns:250px minmax(0,1fr); gap:14px}
   }
   @media (max-width:900px){
+    /* Trang tổng quan: khối 900px này PHẢI nằm sau khối 1180px, nếu không
+       `.ovmain` bị 1180px kéo về `330px + cột` và tràn ngang trên điện thoại. */
+    .ovhero{grid-template-columns:1fr}
+    .ovmain{grid-template-columns:1fr}
+    .ov{padding-left:14px; padding-right:14px}
     .vnrow{grid-template-columns:1fr}
     .vnmet{grid-template-columns:repeat(3,minmax(0,1fr))}
     .vnrow svg{max-height:52vh}
@@ -301,7 +301,45 @@
 <script id="payload" type="application/json">__DATA__</script>
 <script>
 "use strict";
-const D = JSON.parse(document.getElementById("payload").textContent);
+/* ================= NGUỒN DỮ LIỆU =================
+   Trang chạy ở hai chế độ, cùng một mã:
+
+     nhúng   `payload` có dữ liệu  — bản xuất tự chứa, mở bằng file:// vẫn chạy
+     API     `payload` là null     — gọi /ws1-data/api/, duyệt được cả 618.421 toà
+
+   Chế độ nhúng chỉ mang mẫu dựng sẵn (250 toà mỗi thị trường) nên lọc/sắp xếp
+   làm ở trình duyệt. Chế độ API đẩy hết sang máy chủ: lọc, sắp xếp, phân trang. */
+const D = JSON.parse(document.getElementById("payload").textContent) || {};
+const ONLINE = !D.markets;
+const API = new URL("api/", location.href.replace(/[^/]*$/, "")).href;
+
+async function get(path, params) {
+  const u = new URL(path.replace(/^\//, ""), API);
+  for (const [k, v] of Object.entries(params || {}))
+    if (v !== null && v !== undefined && v !== "") u.searchParams.set(k, v);
+  const r = await fetch(u, { headers: { Accept: "application/json" } });
+  if (!r.ok) {
+    let d = null; try { d = await r.json(); } catch (e) {}
+    const msg = d && d.detail
+      ? (typeof d.detail === "string" ? d.detail : (d.detail.error || JSON.stringify(d.detail)))
+      : `${r.status} ${r.statusText}`;
+    throw new Error(msg);
+  }
+  return r.json();
+}
+
+/* Nhớ lại những thứ đổi rất hiếm: nhãn, hình bản đồ, danh sách tỉnh. */
+const memo = new Map();
+const once = (k, fn) => memo.has(k) ? memo.get(k)
+  : (memo.set(k, fn().catch(e => { memo.delete(k); throw e; })), memo.get(k));
+
+function fail(where, e) {
+  console.error(where, e);
+  const el = document.getElementById("detail") || document.body;
+  el.innerHTML = `<div class="card"><div class="sec-head"><h2>Không lấy được dữ liệu</h2></div>
+    <div class="foot">${esc(where)} — ${esc(e.message || String(e))}.
+    Máy chủ dữ liệu có thể chưa chạy; thử tải lại trang.</div></div>`;
+}
 const E = D.enums || {}, NCORE = D.n_core || 13;
 let MK = null, META = null, MET = [], DEF = {}, ALL = [], cur = null;
 
@@ -311,8 +349,11 @@ const fld = (b, k) => (b[k] !== undefined ? b[k] : DEF[k]);
 /* ---------- tiện ích ---------- */
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const vi = (f, c) => (E[f] && E[f][c] && E[f][c].vi) || c || "";
-const grp = (f, c) => (E[f] && E[f][c] && E[f][c].group) || "";
+let E_LIVE = null;
+const vi = (f, c) => { const T = E_LIVE || E;
+  return (T[f] && T[f][c] && T[f][c].vi) || c || ""; };
+const grp = (f, c) => { const T = E_LIVE || E;
+  return (T[f] && T[f][c] && T[f][c].group) || ""; };
 const num = (n, d) => n == null ? "—" : Number(n).toLocaleString("de-DE",
   { maximumFractionDigits: d != null ? d : (Math.abs(n) < 100 ? 1 : 0) });
 function short(v) {
@@ -324,6 +365,15 @@ function short(v) {
   return num(v);
 }
 const orig = s => s ? ` <span class="src">${esc(s)}</span>` : "";
+/* `price_unit` bị tách thành `price_currency` + `price_per` ở corpus 23:40.
+   Ghép lại để hiển thị; bản dựng cũ vẫn còn `price_unit` nên nhận cả hai. */
+function priceUnit(b) {
+  const u = fld(b, "price_unit");
+  if (u) return vi("price_unit", u);
+  const c = fld(b, "price_currency"), p = fld(b, "price_per");
+  if (!c) return "";
+  return c + (p === "m2" ? "/m²" : "");
+}
 /* `price_basis` chưa có trong dim_enum — nhãn tạm, nên chuyển về tầng dữ liệu */
 const BASIS = { measured: "đo thật", derived: "suy ra", policy: "hằng số thị trường",
   listing: "giá chào", transactions: "giá giao dịch", verified_none: "nguồn xác nhận không có",
@@ -362,6 +412,10 @@ const binOf = (m, v) => v == null ? -1 : m.bins.findIndex(
 const SRCTBL = () => (META.tables || "dim_project × fact_building");
 const nameOf = b => b.name_latin || b.building_name || "(chưa có tên)";
 const rawOf = b => (b.name_latin && b.building_name !== b.name_latin) ? b.building_name : "";
+/* Chữ Latin trước, chữ bản địa sau — cùng quy ước với tên toà. Trường nào chưa
+   có bản chuyển tự thì hiện nguyên gốc chứ không bỏ trống. */
+const lat = (b, f, l) => b[l] || b[f] || "";
+const latOrig = (b, f, l) => (b[l] && b[l] !== b[f]) ? b[f] : "";
 const pctFull = b => Math.round(100 * (b._full || 0) / NCORE);
 const nMet = b => b._met || 0;
 const nCore = b => b._core || 0;                 /* sáu trường lõi của kho */
@@ -384,20 +438,58 @@ function chip(label, pct, has) {
     box-shadow:inset 0 0 0 1px ${has ? "var(--good)" : "var(--faint)"}"></i>${esc(label)}
     <span class="p">${num(pct)}%</span></span>`;
 }
+/* Nhãn mép khoảng. Bản nhúng đã kèm `label`; chế độ API chỉ trả `lo`/`hi` nên
+   dựng tại chỗ — cùng cách rút gọn với builder để hai bản đọc giống nhau. */
+function edgeTxt(v) {
+  if (v == null) return "";
+  const a = Math.abs(v);
+  if (a >= 1e9) return num(v / 1e9, 1) + " tỷ";
+  if (a >= 1e6) return num(v / 1e6, 0) + " tr";
+  if (a >= 1e4) return num(v / 1e3, 0) + "k";
+  if (a >= 100) return num(v, 0);
+  return num(v, Number.isInteger(v) ? 0 : 1);
+}
+function binLabel(x, key) {
+  if (x.label) return x.label;
+  /* Năm là nhãn, không phải số đo — `1989` chứ không phải `1.989`. */
+  if (key === "year") {
+    if (x.lo == null) return "< " + Math.round(x.hi);
+    if (x.hi == null) return "≥ " + Math.round(x.lo);
+    return Math.round(x.lo) + "–" + Math.round(x.hi);
+  }
+  if (x.lo == null) return "< " + edgeTxt(x.hi);
+  if (x.hi == null) return "≥ " + edgeTxt(x.lo);
+  return edgeTxt(x.lo) + "–" + edgeTxt(x.hi);
+}
+
 function cell(m, b) {
-  const hi = binOf(m, isVN() ? vnVal(b, m.key) : val(b, m.key));
+  /* `val` đọc trường của corpus (`n_units_building`), `vnVal` đọc trường của
+     Việt Nam (`n_units`) — dùng nhầm thì mọi ô đều ra "—". */
+  let v = isVN() ? vnVal(b, m.key) : val(b, m.key);
+  /* Toà dùng đơn vị giá khác với đơn vị của phân bố thì KHÔNG so được — để trống
+     thay vì ném nó vào một cột mà nó không thuộc về. */
+  const off = m.key === "price" && m.note && fld(b, "price_unit") &&
+              fld(b, "price_unit") !== m.unit;
+  if (off) v = null;
+  const hi = binOf(m, v);
   const mx = Math.max(...m.bins.map(x => x.n)) || 1;
-  const bars = m.bins.map((x, i) => `<div class="${i === hi ? "on" : ""}" title="${esc(x.label)}: ${num(x.n)}">
+  const bars = m.bins.map((x, i) => {
+    const lb = binLabel(x, m.key);
+    return `<div class="${i === hi ? "on" : ""}" title="${esc(lb)}: ${num(x.n)}">
       <div class="bar" style="height:${(x.n / mx * 44).toFixed(1)}px"></div>
-      <div class="lb">${esc(x.label)}</div></div>`).join("");
-  const v = val(b, m.key);
+      <div class="lb">${esc(lb)}</div></div>`;
+  }).join("");
   return `<div class="cell">
     <div class="h"><b>${esc(m.label)}</b><em>n = ${num(m.n)}</em></div>
     <div class="bars">${bars}</div>
+    ${m.note ? `<div style="font-size:10px;color:var(--warn);margin-top:6px;line-height:1.45">${esc(m.note)}</div>` : ""}
     <div class="qrow">
       <span class="q">${short(m.p25)} · <b>${short(m.med)}</b> · ${short(m.p75)}
         <span style="color:var(--faint)">${esc(m.unit)}</span></span>
-      <span class="v">${v == null ? "toà này: —" : short(v) + " " + esc(m.unit)}</span>
+      <span class="v">${v == null
+        ? (off ? `toà này: ${short(val(b, "price"))} ${esc(priceUnit(b))} — khác thang`
+               : `${isVN() ? "dự án" : "toà"} này: —`)
+        : (m.key === "year" ? String(Math.round(v)) : short(v)) + " " + esc(m.unit)}</span>
     </div></div>`;
 }
 function coreBlock() {
@@ -431,7 +523,8 @@ function coreBlock() {
 }
 
 function renderBand(b) {
-  const have = MK.coverage.filter(c => c.pct >= 50), miss = MK.coverage.filter(c => c.pct < 50);
+  const cov = MK.coverage || [];
+  const have = cov.filter(c => c.pct >= 50), miss = cov.filter(c => c.pct < 50);
   const auth = vi("id_kind", META.id_kind);
   document.getElementById("band").innerHTML = `<div class="card">
     <div class="sec-head"><h2>Tóm tắt thị trường</h2>
@@ -529,6 +622,20 @@ function normMix(raw, kind) {
       const units = it.units != null ? +it.units : (it.n_units != null ? +it.n_units : null);
       const share = it.share != null ? +it.share : null;
       let lab = null;
+      /* HÌNH DẠNG CHÍNH THỨC từ 2026-08-25: `{bucket, bucket_label, units, share}`.
+         Kho đã tự khai nhãn dải — `bucket_label` phủ 100% — nên không còn phải suy
+         ra tên dải rồi kiểm ngược bằng `area_m2` như trước. Mảng cũng đã sắp sẵn
+         thứ tự, giữ nguyên thứ tự nguồn thay vì tự xếp lại.
+         `bucket` vẫn mang hậu tố `_sold`/`_rental` nên tách bán / cho thuê từ đó. */
+      if (it.bucket_label != null || it.bucket != null) {
+        const rk = it.bucket != null ? roomKey(it.bucket) : null;
+        let txt = it.bucket_label || (rk ? rk.text : String(it.bucket));
+        /* Tiêu đề nhóm đã ghi "Căn bán" / "Căn cho thuê" rồi, nên bỏ hậu tố
+           "(bán)" / "(cho thuê)" ở từng dòng cho khỏi lặp. */
+        if (rk) txt = txt.replace(/\s*\((bán|thuê|cho thuê)\)\s*$/, "");
+        out.push({ text: txt, tenure: rk ? rk.tenure : null, units, share, lo: i });
+        return;
+      }
       if (it.band_m2 != null) lab = bandLabel(it.band_m2);
       else if (it.br != null) lab = brLabel(it.br);
       else if (it.unit_kind != null) lab = { lo: i, text: String(it.unit_kind) };
@@ -559,11 +666,14 @@ function mixSection(b) {
   const kind = fld(b, "mix_kind");
   const M = normMix(b.mix, kind);
   const isArr = typeof b.mix === "string" && b.mix.trim().startsWith("[");
+  /* Trước 2026-08-25 kho trả về dãy số trần không kèm tên dải, nên trang phải tự
+     suy tên rồi kiểm ngược bằng `area_m2`. Nay `mix` khai sẵn `bucket_label` cho
+     100% bản ghi — bỏ hẳn phép suy đó, chỉ giữ nhánh cũ để bản xuất cũ vẫn mở được. */
   const mb = MK.mix_bands;
   const inferred = isArr && mb && mb.keys
-    ? ` <span style="color:var(--muted)">Nguồn chỉ trả về dãy số không kèm tên dải;
-        tên dải ở đây suy từ các bản ghi có tên của chính thị trường này và đã đối chiếu với
-        diện tích căn — khớp ${(mb.accuracy * 100).toFixed(1)}% trên ${num(mb.checked)} toà.</span>`
+    ? ` <span style="color:var(--muted)">Bản dựng cũ: tên dải suy từ bản ghi có tên của
+        chính thị trường này, đối chiếu với diện tích căn — khớp
+        ${(mb.accuracy * 100).toFixed(1)}% trên ${num(mb.checked)} toà.</span>`
     : "";
   const note = kind
     ? `Cách phân nhóm của thị trường ${esc(META.label)}: <b>${esc(vi("mix_kind", kind))}</b>.
@@ -678,7 +788,7 @@ function priceSection(b) {
   return sec("Giá", "1 quan sát", "price",
     `<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
       <span style="font-size:26px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums">${num(b.price)}</span>
-      <span style="font-size:13px;color:var(--muted)">${esc(vi("price_unit", fld(b, "price_unit")))}</span>
+      <span style="font-size:13px;color:var(--muted)">${esc(priceUnit(b))}</span>
       <span class="badge">${esc(vi("price_kind", b.price_kind))}</span></div>` +
     kv([["Nền của giá", esc(basisVi(b.price_basis) || "—")],
         ["Quy đổi", '<span class="empty">kho không lưu tỷ giá — giá giữ nguyên đơn vị bản địa</span>']]),
@@ -693,7 +803,7 @@ function detail(b) {
       : ["Năm hoàn thành", num(b.year_completed), ""],
     dens != null ? ["Mật độ căn", num(dens), " căn/ha"]
       : ["Số toà dự án", num(b.n_buildings), ""],
-    ["Giá", short(b.price), " " + esc(vi("price_unit", fld(b, "price_unit")))],
+    ["Giá", short(b.price), " " + esc(priceUnit(b))],
   ];
   const badges = [
     b.building_form ? `<span class="badge">${esc(vi("building_form", b.building_form))}</span>` : "",
@@ -707,8 +817,12 @@ function detail(b) {
     <div class="card">
       <div class="hero">
         <h1>${esc(nameOf(b))}</h1>
-        <div class="local">${esc(b.project_name && b.project_name !== b.building_name ? b.project_name : "")}${orig(rawOf(b))}</div>
-        <div class="addr">${esc(b.address || b.admin || "")}</div>
+        <div class="local">${b.project_name && b.project_name !== b.building_name
+          ? esc(lat(b, "project_name", "proj_latin")) + orig(latOrig(b, "project_name", "proj_latin"))
+          : ""}${orig(rawOf(b))}</div>
+        <div class="addr">${b.address
+          ? esc(lat(b, "address", "addr_latin")) + orig(latOrig(b, "address", "addr_latin"))
+          : esc(lat(b, "admin", "admin_latin")) + orig(latOrig(b, "admin", "admin_latin"))}</div>
         <div class="badges">${badges}</div>
       </div>
       <div class="stats">${stats.map(([k, v, u]) =>
@@ -716,7 +830,8 @@ function detail(b) {
     </div>` +
     sec("Tổng quan", "", SRCTBL(), kv([
       ["Chủ đầu tư", b.dev_latin ? esc(b.dev_latin) + orig(b.developer) : esc(b.developer || "")],
-      ["Địa bàn", esc(b.admin || "")],
+      ["Địa bàn", b.admin
+        ? esc(lat(b, "admin", "admin_latin")) + orig(latOrig(b, "admin", "admin_latin")) : ""],
       ["Số tầng nổi", b.n_floors != null ? num(b.n_floors) + " tầng" : ""],
       ["Số căn trong toà", b.n_units_building != null ? num(b.n_units_building) + " căn" : ""],
       ["Diện tích căn bình quân", b.area_m2 != null
@@ -762,9 +877,20 @@ function vnTierBar() {
   </div>`;
 }
 
-function vnMetrics() { return (MK.metrics_by_cat || {})[VNCAT] || MK.metrics_by_cat[""] || []; }
+/* Bản nhúng dựng sẵn phân bố cho từng loại dự án; chế độ API tính lại theo bộ
+   lọc đang chọn và để thẳng ở `MK.metrics`. */
+function vnMetrics() {
+  if (ONLINE) return MK.metrics || [];
+  const byCat = MK.metrics_by_cat || {};
+  return byCat[VNCAT] || byCat[""] || [];
+}
 
 let MAPBG = null;   /* nền bản đồ ghép một lần, không dựng lại mỗi lần vẽ */
+
+/* Khoá tra đoạn chấm của một tỉnh: chế độ API khoá theo SLUG (`ha-noi`), bản
+   nhúng khoá theo NHÃN (`Hà Nội`). Tra nhầm thì bấm tỉnh không tô gì mà cũng
+   không báo lỗi. */
+const provKey = x => (x && (x.slug || x.province)) || "";
 
 function vnMap(sel) {
   const mp = MK.map, dim = META.map;
@@ -773,12 +899,26 @@ function vnMap(sel) {
   let hi = "";
   if (VNPIN && VNPIN.rest) {                       /* thanh gộp: tô mọi tỉnh ngoài nhóm đầu */
     hi = Object.keys(mp.prov).filter(k => !VNPIN.names.has(k)).map(k => mp.prov[k]).join("");
-  } else if (VNPIN && mp.prov[VNPIN.province]) {
-    hi = mp.prov[VNPIN.province];
+  } else if (VNPIN && mp.prov[provKey(VNPIN)]) {
+    hi = mp.prov[provKey(VNPIN)];
   }
-  const mk = (o, col) => o && o._x != null
-    ? `<circle cx="${o._x}" cy="${o._y}" r="8" fill="none" stroke="${col}" stroke-width="2"></circle>
-       <circle cx="${o._x}" cy="${o._y}" r="2.8" fill="${col}"></circle>` : "";
+  /* Bản nhúng đã chiếu sẵn `_x`/`_y` lúc build; chế độ API chỉ có lat/lon nên
+     chiếu tại chỗ bằng tham số máy chủ gửi kèm. */
+  const P = mp.proj;
+  const xy = o => {
+    if (!o) return null;
+    if (o._x != null) return [o._x, o._y];
+    if (!P || o.lat == null || o.lon == null) return null;
+    return [+(P.dx + (o.lon - P.lon0) / (P.lon1 - P.lon0) * P.land_w).toFixed(1),
+            +((P.lat1 - o.lat) / (P.lat1 - P.lat0) * dim.h).toFixed(1)];
+  };
+  const mk = (o, col, r) => {
+    const c = xy(o);
+    if (!c) return "";
+    return `<circle cx="${c[0]}" cy="${c[1]}" r="${r + 4}" fill="${col}" opacity=".18"></circle>
+      <circle cx="${c[0]}" cy="${c[1]}" r="${r}" fill="none" stroke="${col}" stroke-width="2.6"></circle>
+      <circle cx="${c[0]}" cy="${c[1]}" r="${r * 0.42}" fill="${col}"></circle>`;
+  };
   return `<div style="background:var(--panel);padding:12px 14px 10px;display:flex;flex-direction:column;min-width:0">
     <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600">
       Vị trí ${num(mp.n)} dự án</div>
@@ -786,11 +926,11 @@ function vnMap(sel) {
       preserveAspectRatio="xMidYMid meet" role="img" aria-label="Phân bố dự án theo toạ độ thật">
       <path d="${MAPBG}" stroke="var(--s3)" stroke-width="2.2" stroke-linecap="round" fill="none" opacity=".55"></path>
       ${hi ? `<path d="${hi}" stroke="var(--good)" stroke-width="3.4" stroke-linecap="round" fill="none"></path>` : ""}
-      ${mk(sel, "var(--accent)")}</svg>
+      ${mk(sel, "var(--pin)", 11)}</svg>
     <div style="margin-top:8px;font-size:10.5px;color:var(--faint);line-height:1.55">
       Không có file bản đồ — mỗi chấm là toạ độ thật của một dự án; hình đất nước do chính chúng tạo ra.
       Khoảng trống hai bên là lề khung, tỷ lệ chiếu không đổi.
-      ${sel && sel._x != null ? "Vòng xanh dương là dự án đang xem." : ""}
+      ${xy(sel) ? "Vòng cam là dự án đang xem." : ""}
       ${VNPIN ? (hi
         ? ` Chấm xanh lá là ${num((hi.match(/M/g) || []).length)} vị trí ${VNPIN.rest
             ? "của các tỉnh ngoài nhóm đầu" : `ở ${esc(VNPIN.province)}
@@ -853,7 +993,7 @@ function vnProvBars() {
   const bp = (MK.by_province || []).slice().sort((a, b) => b.n - a.n);
   if (!bp.length) return "";
   const tot = bp.reduce((a, x) => a + x.n, 0);
-  const hasPts = pv => !!((MK.map || {}).prov || {})[pv];
+  const hasPts = x => !!((MK.map || {}).prov || {})[provKey(x)];
   /* trung vị của tỉnh không mất đi — chuyển xuống tooltip, không chiếm chỗ */
   const tip = x => [`${num(x.n)} dự án (${num(x.n / tot * 100, 1)}% kho)`,
     x.n_geo != null ? `${num(x.n_geo)} có toạ độ` : null,
@@ -872,8 +1012,8 @@ function vnProvBars() {
   const mx = Math.max(head[0].n, restN);
   const tail = bp.filter(x => x.n <= 2), tailN = tail.reduce((a, x) => a + x.n, 0);
 
-  const row = x => `<div class="pbar${VNPIN && VNPIN.province === x.province ? " on" : ""}${
-      hasPts(x.province) ? "" : " dead"}" data-prov="${esc(x.province)}" title="${esc(tip(x))}">
+  const row = x => `<div class="pbar${VNPIN && provKey(VNPIN) === provKey(x) ? " on" : ""}${
+      hasPts(x) ? "" : " dead"}" data-prov="${esc(provKey(x))}" title="${esc(tip(x))}">
     <span class="nm">${esc(x.province)}</span>
     <span class="t"><i style="width:${(x.n / mx * 100).toFixed(2)}%"></i></span>
     <span class="v">${num(x.n)}</span></div>`;
@@ -911,12 +1051,12 @@ function wireProvTable() {
     el.onclick = () => {
       if (el.dataset.rest) {
         const head = (MK.by_province || []).slice().sort((a, b) => b.n - a.n).slice(0, PROVTOP);
-        const names = new Set(head.map(x => x.province));
+        const names = new Set(head.map(provKey));
         VNPIN = (VNPIN && VNPIN.rest) ? null : { rest: true, names, province: null };
       } else {
         const pv = el.dataset.prov;
-        VNPIN = (VNPIN && VNPIN.province === pv)
-          ? null : (MK.by_province || []).find(x => x.province === pv) || null;
+        VNPIN = (VNPIN && provKey(VNPIN) === pv)
+          ? null : (MK.by_province || []).find(x => provKey(x) === pv) || null;
       }
       const top = box.scrollTop;
       vnBand(cur); wireProvTable();
@@ -1053,8 +1193,10 @@ function vnDetail(p) {
         n != null ? ` · ${num(n)} tin có` : ""}</div></div>`;
   }
   /* phân bố rời rạc (phòng ngủ, loại giao dịch) dưới dạng thanh ngang */
-  function distBars(lab, pairs, fmtKey, all) {
-    if (!pairs || !pairs.length) return "";
+  function distBars(lab, raw, fmtKey, all) {
+    /* Bản nhúng cho `[[khoá, số]]`, API cho `[{k, n}]` — nhận cả hai. */
+    const pairs = (raw || []).map(x => Array.isArray(x) ? x : [x.k, x.n]);
+    if (!pairs.length) return "";
     const tot = pairs.reduce((a, b) => a + b[1], 0), mx = Math.max(...pairs.map(x => x[1]));
     return `<div style="background:var(--panel);padding:11px 14px;min-width:0">
       <div style="font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.045em;margin-bottom:6px">${esc(lab)}
@@ -1133,36 +1275,86 @@ function vnDetail(p) {
 let FF = null, forms = [];
 const selForm = document.getElementById("form"), selMarket = document.getElementById("market");
 
-function loadMarket(slug) {
-  MK = D.markets[slug]; META = MK.meta; DEF = MK.defaults || {};
-  if (MK.meta.kind === "vn") {
-    VNCAT = "";
-    MET = vnMetrics();
-    ALL = (MK.projects || []).map(p => ({ ...p }));
-    ALL.forEach(p => p._md = 0);
+async function loadMarket(slug) {
+  if (!ONLINE) {
+    MK = D.markets[slug]; META = MK.meta; DEF = MK.defaults || {};
+    if (MK.meta.kind === "vn") {
+      VNCAT = ""; MET = vnMetrics();
+      ALL = (MK.projects || []).map(p => ({ ...p, _md: 0 }));
+    } else {
+      MET = MK.metrics || [];
+      ALL = (MK.buildings || []).map(b => ({ ...b, _md: medDist(b) }));
+    }
   } else {
-    MET = MK.metrics || [];
-    ALL = (MK.buildings || []).map(b => ({ ...b }));
-    ALL.forEach(b => b._md = medDist(b));
+    try {
+      if (slug === "vn") {
+        const [cov, cats, tiers, mets, mp, pv] = await Promise.all([
+          get("vn/coverage"), get("vn/categories"), get("vn/tiers"), get("vn/metrics"),
+          once("vnmap", () => get("vn/map")), once("vnprov", () => get("vn/provinces"))]);
+        VNCAT = "";
+        /* `META.map` là KHUNG vẽ (w,h) còn `MK.map` là các đoạn chấm — hai thứ
+           khác nhau, gộp nhầm thì bản đồ biến mất không báo gì. */
+        MK = { meta: { market: "vn", label: "Việt Nam", kind: "vn",
+                       n_projects: tiers.rows[0].n, n_buildings: tiers.rows[1].n,
+                       n_units: tiers.rows[2].n, n_listings: tiers.rows[3].n,
+                       tiers: tiers.rows, map: { w: mp.w, h: mp.h } },
+               map: { prov: mp.prov, rest: mp.rest, n: mp.n, total: mp.total,
+                      proj: mp.proj },
+               coverage: cov.rows, categories: cats.rows.map(c => c.slug),
+               catLabels: Object.fromEntries(cats.rows.map(c => [c.slug, c.label])),
+               metrics: mets.rows, by_province: pv.rows };
+        META = MK.meta; MET = MK.metrics; DEF = {};
+        MAPBG = null;                      /* nền bản đồ dựng lại theo dữ liệu mới */
+      } else {
+        const [d, mets] = await Promise.all([
+          get(`markets/${slug}`), get(`markets/${slug}/metrics`)]);
+        MK = { meta: d.meta, core: d.core, coverage: d.coverage,
+               metrics: mets.rows, forms: d.forms || [] };
+        META = d.meta; MET = mets.rows; DEF = {};
+      }
+    } catch (e) { return fail(`nạp thị trường ${slug}`, e); }
   }
-  cur = null;
+  cur = null; PAGE = 0;
   buildFormFilter();
   document.getElementById("sub").textContent = isVN()
     ? `${META.label} · ${num(META.n_projects)} dự án`
     : `${META.label} · ${num(META.n_buildings)} toà`;
   document.title = `${META.label} — Benchmark toà nhà`;
   try { history.replaceState(null, "", "#" + slug); } catch (e) {}
-  renderList();
+  await renderList();
 }
 
 function buildFormFilter() {
+  const lbl = selForm.previousElementSibling;
   if (isVN()) {
     FF = "project_category";
+    if (ONLINE) {
+      forms = MK.categories || [];
+      selForm.parentElement.style.display = "";
+      lbl.textContent = "Loại dự án";
+      selForm.innerHTML = `<option value="">Tất cả</option>` + forms.map(f =>
+        `<option value="${esc(f)}">${esc((MK.catLabels || {})[f] || f)}</option>`).join("");
+      return;
+    }
     forms = (MK.categories || []).filter(k => k !== "(chưa rõ)");
     selForm.parentElement.style.display = "";
-    selForm.previousElementSibling.textContent = "Loại dự án";
+    lbl.textContent = "Loại dự án";
     selForm.innerHTML = `<option value="">Tất cả (${ALL.length})</option>` + forms.map(f =>
       `<option value="${esc(f)}">${esc(f)} (${ALL.filter(p => p.project_category === f).length})</option>`).join("");
+    return;
+  }
+  if (ONLINE) {
+    const fs = MK.forms || [];
+    /* Máy chủ trả loại hình kèm số lượng; nếu thị trường không khai
+       `building_form` thì nó rơi sang `style` — nhãn đổi theo. */
+    FF = (MK.coverage || []).some(c => c.field === "building_form" && c.pct > 0)
+      ? "building_form" : "style";
+    forms = fs.map(f => f.code);
+    if (!fs.length) { selForm.parentElement.style.display = "none"; return; }
+    selForm.parentElement.style.display = "";
+    lbl.textContent = FF === "style" ? "Phong cách" : "Loại hình";
+    selForm.innerHTML = `<option value="">Tất cả (${num(META.n_buildings)})</option>` +
+      fs.map(f => `<option value="${esc(f.code)}">${esc(vi(FF, f.code))} (${num(f.n)})</option>`).join("");
     return;
   }
   FF = ALL.some(b => b.building_form) ? "building_form"
@@ -1171,7 +1363,7 @@ function buildFormFilter() {
     .sort((a, c) => vi(FF, a).localeCompare(vi(FF, c), "vi")) : [];
   if (FF && forms.length) {
     selForm.parentElement.style.display = "";
-    selForm.previousElementSibling.textContent = FF === "style" ? "Phong cách" : "Loại hình";
+    lbl.textContent = FF === "style" ? "Phong cách" : "Loại hình";
     selForm.innerHTML = `<option value="">Tất cả (${ALL.length})</option>` + forms.map(f =>
       `<option value="${esc(f)}">${esc(vi(FF, f))} (${ALL.filter(b => b[FF] === f).length})</option>`).join("");
   } else { selForm.parentElement.style.display = "none"; }
@@ -1198,18 +1390,71 @@ function view() {
   return r.sort(SORTS[document.getElementById("sort").value] || SORTS.full);
 }
 
-function renderList() {
-  const rows = view();
-  document.getElementById("count").textContent =
-    isVN()
-      ? `${num(rows.length)} / ${num(ALL.length)} dự án trong mẫu · kho có ${num(META.n_projects)}`
-      : `${num(rows.length)} / ${num(ALL.length)} toà trong mẫu · kho có ${num(META.n_buildings)}`;
+const PER = 50;
+let PAGE = 0, TOTAL = 0, BUSY = false;
+
+/* Trang chi tiết Việt Nam cần toà thuộc dự án và thống kê tin rao — hai thứ
+   không nằm trong danh sách, phải hỏi thêm. Bản nhúng đã có sẵn trong payload. */
+async function pick(b) {
+  if (!isVN()) return detail(b);
+  if (ONLINE && b.entity_id && !b._full) {
+    try {
+      const d = await get(`vn/projects/${encodeURIComponent(b.entity_id)}`);
+      Object.assign(b, d, { _full: true });
+      MK.buildings_of = { ...(MK.buildings_of || {}), [b.entity_id]: d.buildings || [] };
+      MK.listings_of = { ...(MK.listings_of || {}), [b.entity_id]: d.listings || null };
+    } catch (e) { return fail("nạp chi tiết dự án", e); }
+  }
+  return vnDetail(b);
+}
+
+/* Chế độ API: lọc, sắp xếp, phân trang đều ở máy chủ — nếu làm ở trình duyệt
+   thì phải tải cả 618.421 toà về, đúng cái đang muốn bỏ. */
+async function fetchPage() {
+  const q = document.getElementById("q").value.trim();
+  const form = selForm.value || "";
+  const sort = document.getElementById("sort").value;
+  const params = { q, sort, limit: PER, offset: PAGE * PER };
+  if (isVN()) {
+    if (form) params.category = form;
+    const d = await get("vn/projects", params);
+    TOTAL = d.total;
+    return d.rows.map(r => ({ ...r, _md: 0 }));
+  }
+  params.form = form;
+  const d = await get(`markets/${META.market}/buildings`, params);
+  TOTAL = d.total;
+  return d.rows.map(r => ({ ...r, _md: medDist(r) }));
+}
+
+async function renderList() {
+  const list = document.getElementById("list");
+  let rows;
+  if (ONLINE) {
+    if (BUSY) return;
+    BUSY = true;
+    list.setAttribute("aria-busy", "true");
+    try { rows = ALL = await fetchPage(); }
+    catch (e) { BUSY = false; list.removeAttribute("aria-busy"); return fail("nạp danh sách", e); }
+    BUSY = false; list.removeAttribute("aria-busy");
+  } else {
+    rows = view();
+    TOTAL = rows.length;
+  }
+  const unit = isVN() ? "dự án" : "toà";
+  const shown = PAGE * PER;
+  document.getElementById("count").textContent = ONLINE
+    ? `${num(shown + rows.length)} / ${num(TOTAL)} ${unit}` +
+      (TOTAL ? ` · trang ${PAGE + 1} / ${num(Math.ceil(TOTAL / PER))}` : "")
+    : `${num(rows.length)} / ${num(ALL.length)} ${unit} trong mẫu · kho có ${num(
+        isVN() ? META.n_projects : META.n_buildings)}`;
   if (!rows.length) {
-    document.getElementById("list").innerHTML = '<div class="empty" style="padding:10px">Không có toà nào khớp.</div>';
+    list.innerHTML = `<div class="empty" style="padding:10px">Không có ${unit} nào khớp.</div>`;
+    document.getElementById("detail").innerHTML = "";
     return;
   }
-  if (!cur || !rows.includes(cur)) { cur = rows[0]; (isVN() ? vnDetail : detail)(cur); }
-  document.getElementById("list").innerHTML = rows.slice(0, 200).map((b, i) => {
+  if (!cur || !rows.includes(cur)) { cur = rows[0]; await pick(cur); }
+  list.innerHTML = rows.slice(0, ONLINE ? PER : 200).map((b, i) => {
     if (isVN()) {
       const pc = Math.round(100 * (b._core || 0) / 8);
       return `<button class="tower${b === cur ? " on" : ""}" data-i="${i}">
@@ -1225,36 +1470,67 @@ function renderList() {
     const p = Math.round(100 * nCore(b) / 6);
     return `<button class="tower${b === cur ? " on" : ""}" data-i="${i}">
       <div class="n">${esc(nameOf(b))}</div>
-      <div class="o">${esc(rawOf(b) || b.admin || "")}</div>
+      <div class="o">${esc(rawOf(b) || lat(b, "admin", "admin_latin") || "")}</div>
       <div class="m">${[b.n_floors != null ? num(b.n_floors) + " tầng" : null,
         b.n_units_building != null ? num(b.n_units_building) + " căn" : null,
         b.year_completed || null].filter(Boolean).join(" · ")}</div>
       <div class="score"><div class="score-bar"><i style="width:${p}%"></i></div>
         <div class="score-pct">${nCore(b)}/6</div></div></button>`;
-  }).join("");
-  const list = document.getElementById("list");
+  }).join("") + pager();
   list.querySelectorAll(".tower").forEach(el => el.onclick = () => {
-    cur = rows[+el.dataset.i]; (isVN() ? vnDetail : detail)(cur);
+    cur = rows[+el.dataset.i]; pick(cur);
     list.querySelectorAll(".tower").forEach(x => x.classList.remove("on"));
     el.classList.add("on");
     if (window.matchMedia("(max-width:900px)").matches)
       document.getElementById("detail").scrollIntoView({ behavior: "smooth", block: "start" });
   });
+  list.querySelectorAll("[data-page]").forEach(el => el.onclick = () => {
+    PAGE = Math.max(0, PAGE + (+el.dataset.page));
+    cur = null;
+    renderList().then(() => { if (list.scrollTo) list.scrollTo({ top: 0 }); });
+  });
 }
 
-selMarket.innerHTML = D.order.map(s => {
-  const m = D.markets[s].meta;
+/* Phân trang chỉ có ở chế độ API — bản nhúng chỉ mang 250 toà mẫu nên không có
+   trang thứ hai để lật. */
+function pager() {
+  if (!ONLINE || TOTAL <= PER) return "";
+  const last = Math.ceil(TOTAL / PER) - 1;
+  const btn = (d, txt, on) => `<button class="tower" data-page="${d}"
+    style="text-align:center;${on ? "" : "opacity:.4;pointer-events:none"}">${txt}</button>`;
+  return `<div style="display:flex;gap:8px;padding-top:2px">
+    ${btn(-1, "← Trước", PAGE > 0)}${btn(1, "Sau →", PAGE < last)}</div>`;
+}
+
+function marketOption(m) {
   if (m.kind === "vn")
-    return `<option value="${esc(s)}">${esc(m.label)} — ${num(m.n_projects)} dự án · ${num(m.n_listings)} tin rao</option>`;
-  const cr = D.markets[s].core;
-  return `<option value="${esc(s)}">${esc(m.label)} — lõi ${cr.n_have}/6 · đạt chuẩn ${num(cr.pct)}% · ${num(m.n_buildings)} toà</option>`;
-}).join("");
+    return `<option value="vn">${esc(m.label)} — ${num(m.n_projects)} dự án · ${num(m.n_listings)} tin rao</option>`;
+  const cr = m.core || {};
+  return `<option value="${esc(m.market)}">${esc(m.label)} — lõi ${cr.n_have || 0}/6` +
+    ` · đạt chuẩn ${num(cr.pct || 0)}% · ${num(m.n_buildings)} toà</option>`;
+}
+
 selMarket.addEventListener("change", () => setView("market", true));
-["q", "sort", "form"].forEach(id =>
-  document.getElementById(id).addEventListener("input", () => {
-    if (isVN()) { VNCAT = selForm.value; MET = vnMetrics(); }
-    renderList();
-  }));
+
+/* Gõ vào ô tìm thì đợi người ta ngừng gõ mới hỏi máy chủ — mỗi phím một truy vấn
+   trên 618k dòng là cách chắc chắn nhất để làm nghẽn. */
+let typing = null;
+function onFilterChange(immediate) {
+  PAGE = 0;
+  if (isVN() && !ONLINE) { VNCAT = selForm.value; MET = vnMetrics(); }
+  if (isVN() && ONLINE) {
+    VNCAT = selForm.value;
+    get("vn/metrics", { category: VNCAT || undefined })
+      .then(d => { MET = MK.metrics = d.rows; if (cur) vnBand(cur); })
+      .catch(e => console.error("phân bố VN", e));
+  }
+  if (!ONLINE || immediate) return renderList();
+  clearTimeout(typing);
+  typing = setTimeout(renderList, 220);
+}
+document.getElementById("q").addEventListener("input", () => onFilterChange(false));
+["sort", "form"].forEach(id =>
+  document.getElementById(id).addEventListener("change", () => onFilterChange(true)));
 document.getElementById("theme").onclick = () => {
   const r = document.documentElement;
   const now = r.getAttribute("data-theme")
@@ -1267,6 +1543,10 @@ document.getElementById("theme").onclick = () => {
 
 function ovBars(title, cnt, rows, unit, tbl, foot) {
   if (!rows || !rows.length) return "";
+  /* Biểu đồ thanh PHẢI xếp theo độ dài, nếu không mắt không đọc được: bản trước
+     lấy nguyên thứ tự danh sách thị trường (xếp theo số trường lõi) nên ra
+     82% → 12% → 9% → 0,4% → 6% → 14%. Nhóm gộp "Còn lại" luôn nằm cuối. */
+  rows = rows.slice().sort((a, b) => (a.rest ? 1 : 0) - (b.rest ? 1 : 0) || b.n - a.n);
   const mx = Math.max(...rows.map(r => r.n));
   return `<section class="card">
     <div class="sec-head"><h2>${esc(title)}</h2>
@@ -1290,8 +1570,8 @@ function ovBars(title, cnt, rows, unit, tbl, foot) {
 const COREC = c => c >= 6 ? "var(--s5)" : c === 5 ? "var(--s4)"
   : c === 4 ? "var(--s3)" : c === 3 ? "var(--s2)" : c >= 1 ? "var(--s1)" : "var(--track)";
 
-function ovMap() {
-  const M = (D.overview || {}).map;
+function ovMap(O) {
+  const M = (O || {}).map;
   if (!M || !M.features) return "";
   const DA = M.data || {};
   const fill = iso => {
@@ -1370,7 +1650,7 @@ function ovBlock(o) {
         <span style="font-size:13px;color:var(--muted)">${esc(o.unit)}</span></div>
       <div style="font-size:12.5px;color:var(--muted);margin-top:9px;line-height:1.6">${o.desc}</div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(${o.stats.length},minmax(0,1fr));gap:1px;
+    <div class="ovstats" style="--n:${o.stats.length};
       background:var(--border);border-top:1px solid var(--border);margin-top:14px">
       ${o.stats.map(x => `<div style="background:var(--panel);padding:10px 12px;min-width:0">
         <div style="font-size:15.5px;font-weight:620;font-variant-numeric:tabular-nums;
@@ -1381,8 +1661,32 @@ function ovBlock(o) {
     ${o.foot ? `<div class="foot">${o.foot}</div>` : ""}</section>`;
 }
 
-function renderOverview() {
-  const O = D.overview;
+let OV = null;
+
+async function renderOverview() {
+  if (ONLINE && !OV) {
+    try {
+      const [o, mk] = await Promise.all([get("overview"), get("markets")]);
+      /* Hình đường biên quốc gia là HÌNH HỌC tĩnh, không phải dữ liệu — giữ nhúng
+         trong trang. Chỉ phần tô màu theo thị trường mới lấy từ máy chủ. */
+      const geo = D.world || {};
+      const data = {};
+      for (const m of mk.rows) {
+        const iso = (geo.iso || {})[m.market];
+        if (!iso) continue;
+        data[iso] = { slug: m.market, k: m.label,
+                      n: m.kind === "vn" ? m.n_projects : m.n_buildings,
+                      unit: m.kind === "vn" ? "dự án" : "toà",
+                      core: m.kind === "vn" ? null : (m.core || {}).n_have,
+                      off: m.market === "japan" };
+      }
+      OV = { ...o, map: geo.features ? { ...geo, data } : null,
+             corpus: { ...o.corpus,
+                       tables: o.corpus.tables || [], vn_tables: o.corpus.vn_tables || [],
+                       by_market: o.corpus.by_market || [] } };
+    } catch (e) { return fail("nạp tổng quan", e); }
+  }
+  const O = ONLINE ? OV : D.overview;
   const box = document.getElementById("view-overview");
   if (!O) { box.innerHTML = '<div class="card"><div class="foot">Chưa dựng được số tổng quan.</div></div>'; return; }
   const C = O.corpus, doc = O.docs;
@@ -1446,7 +1750,7 @@ function renderOverview() {
     <div class="ovmain">
       <div style="display:flex;flex-direction:column;gap:16px;min-width:0">${bVN}${bWorld}${bDoc}</div>
       <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
-        ${ovMap()}
+        ${ovMap(O)}
         ${ovBars("Toà theo thị trường", `${num(nMarket)} thị trường`,
           (C.by_market || []).map(m => ({ k: m.k, n: m.n })), "toà", "",
           "Thang tuyến tính. Bấm tab <b>Thị trường</b> để mở từng cái.")}
@@ -1457,13 +1761,13 @@ function renderOverview() {
 
   box.querySelectorAll(".wpt").forEach(g => g.onclick = () => {
     const s2 = g.dataset.slug;
-    if (D.markets[s2]) { selMarket.value = s2; setView("market", true); }
+    selMarket.value = s2; setView("market", true);
   });
 }
 
 /* ---------- chuyển trang ---------- */
 let VIEW = "market";
-function setView(v, push) {
+async function setView(v, push) {
   VIEW = v === "overview" ? "overview" : "market";
   document.getElementById("view-overview").hidden = VIEW !== "overview";
   document.getElementById("view-market").hidden = VIEW === "overview";
@@ -1472,9 +1776,9 @@ function setView(v, push) {
   document.querySelectorAll("#nav button").forEach(b =>
     b.classList.toggle("on", b.dataset.view === VIEW));
   if (VIEW === "overview") {
-    renderOverview();
     document.getElementById("sub").textContent = "· tổng quan ba nguồn";
     document.title = "Tổng quan — Benchmark toà nhà";
+    renderOverview();
   } else {
     loadMarket(selMarket.value);
   }
@@ -1483,19 +1787,38 @@ function setView(v, push) {
 document.querySelectorAll("#nav button").forEach(b =>
   b.onclick = () => setView(b.dataset.view, true));
 
-const want = decodeURIComponent((location.hash || "").slice(1));
-const first = D.markets[want] ? want : D.order[0];
-selMarket.value = first;
-if (want === "tong-quan") { loadMarket(first); setView("overview", false); }
-else { setView("market", false); }
-addEventListener("hashchange", () => {
-  const s = decodeURIComponent(location.hash.slice(1));
-  if (s === "tong-quan") { setView("overview", false); return; }
-  if (D.markets[s]) {
-    if (s !== selMarket.value) selMarket.value = s;
-    setView("market", false);
+let KNOWN = new Set();
+
+async function boot() {
+  let order;
+  if (ONLINE) {
+    try {
+      const [mk, en] = await Promise.all([get("markets"), get("enums")]);
+      E_LIVE = en.enums || {};
+      selMarket.innerHTML = mk.rows.map(marketOption).join("");
+      order = mk.rows.map(m => m.market);
+    } catch (e) { return fail("nạp danh sách thị trường", e); }
+  } else {
+    selMarket.innerHTML = D.order.map(sl => marketOption(
+      { ...D.markets[sl].meta, core: D.markets[sl].core })).join("");
+    order = D.order;
   }
-});
+  KNOWN = new Set(order);
+
+  const want = decodeURIComponent((location.hash || "").slice(1));
+  selMarket.value = KNOWN.has(want) ? want : order[0];
+  await setView(want === "tong-quan" ? "overview" : "market", false);
+
+  addEventListener("hashchange", () => {
+    const h = decodeURIComponent(location.hash.slice(1));
+    if (h === "tong-quan") return setView("overview", false);
+    if (KNOWN.has(h)) {
+      if (h !== selMarket.value) selMarket.value = h;
+      setView("market", false);
+    }
+  });
+}
+boot();
 </script>
 </body>
 </html>

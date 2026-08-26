@@ -4,6 +4,13 @@
 #   code_ui/refresh_market.sh                 # mặc định: 250 toà mẫu / thị trường
 #   code_ui/refresh_market.sh --sample 400    # sâu hơn, file to hơn
 #
+# CHỈ dựng bản GỌI API (payload rỗng, ~210 KB) rồi để systemd đẩy lên /ws1-data/.
+# Bản tự chứa thì chạy tay và nó ra `dist/export.html`, KHÔNG vào đường deploy:
+#
+#   python3 code_ui/build_market.py --export
+#
+# Builder từ chối nếu `--export` bị trỏ vào `dist/index.html`.
+#
 # `ws1-data-sync.path` theo dõi code_ui/dist/index.html nên không cần copy tay.
 set -euo pipefail
 
@@ -17,6 +24,12 @@ PY="${PYTHON:-python3}"
 
 echo "corpus : $CORPUS"
 stat -c '  parquet mới nhất: %y' "$CORPUS/corpus_loose.parquet"
+
+case " $* " in
+  *" --export "*) echo "refresh_market.sh chỉ dựng bản gọi API." >&2
+                  echo "Bản tự chứa: python3 code_ui/build_market.py --export" >&2
+                  exit 2 ;;
+esac
 
 "$PY" "$HERE/build_market.py" --corpus "$CORPUS" --out "$OUT" "$@"
 

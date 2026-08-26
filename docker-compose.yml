@@ -1,0 +1,63 @@
+# Stack API dữ liệu ws1.
+#
+#     docker compose up -d --build      dựng và chạy
+#     docker compose logs -f api        xem log
+#     docker compose down               dừng
+#
+# nginx trên host đã proxy /ws1-data/api/ -> 127.0.0.1:8040 (xem
+# /etc/nginx/snippets/ws1-data.conf), nên cổng dưới đây là hợp đồng, đừng đổi.
+
+services:
+  api:
+    build: ./services/api
+    image: ws1-data-api:local
+    container_name: ws1-data-api
+    restart: unless-stopped
+
+    # CHỈ nghe trên loopback. Không mở ra ngoài: lớp xác thực nằm ở nginx, mở
+    # thẳng cổng này ra 0.0.0.0 là đi vòng qua nó.
+    ports:
+      - "127.0.0.1:8040:8000"
+
+    environment:
+      # mock = dữ liệu giả, đủ để dựng hạ tầng. Đổi thành `real` khi nối parquet.
+      DATA_MODE: "${DATA_MODE:-real}"
+      CORPUS_DIR: /data/corpus
+      JP_CSV_DIR: /data/output_csv
+      DOCS_INDEX: /data/mdindex/index.db
+      DUCKDB_MEMORY_LIMIT: "4GB"
+      TZ: Asia/Ho_Chi_Minh
+
+    # Tất cả CHỈ ĐỌC. Service này không có việc gì phải ghi vào dữ liệu.
+    volumes:
+      - ${CORPUS_DIR:-/mnt/data/ws1-data/lanch}:/data/corpus:ro
+      - ./output_csv:/data/output_csv:ro
+      - ${DOCS_DIR:-/mnt/data/ws1-data/vinhhd/mdindex}:/data/mdindex:ro
+
+    # DuckDB đổ file tràn ra đây; để tmpfs cho khỏi bẩn lớp ghi của container.
+    tmpfs:
+      - /tmp/duckdb-spill:size=512m
+
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=3).status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+    # Log: để rộng tay. Đĩa còn 104 GB, mà mất lịch sử log lúc cần truy thì đắt
+    # hơn nhiều so với 1 GB chỗ chứa. Không có giới hạn nào thì Docker để lớn vô
+    # hạn — đó mới là rủi ro thật.
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    cap_drop:
+      - ALL
+    mem_limit: 6g
