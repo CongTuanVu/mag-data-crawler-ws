@@ -183,6 +183,44 @@
   .ovstats{display:grid; grid-template-columns:repeat(var(--n), minmax(0,1fr)); gap:1px}
   @media (max-width:520px){ .ovstats{grid-template-columns:repeat(2, minmax(0,1fr))} }
   .ov .n{font-variant-numeric:tabular-nums}
+
+  /* ---------- thanh ngang: một dòng một tỉnh ---------- */
+  #provbars{display:flex; flex-direction:column; justify-content:space-between; flex:1; min-height:0}
+  #provbars.all{justify-content:flex-start; overflow:auto; padding-right:2px}
+  .pbar{display:grid; grid-template-columns:82px minmax(0,1fr) 38px; gap:7px; align-items:center;
+    padding:2px 4px; border-radius:4px; cursor:pointer; flex:0 0 auto}
+  #provbars:not(.all) .pbar{flex:1 1 0; min-height:17px; max-height:44px}
+  .pbar:hover{background:var(--panel-2)}
+  .pbar.on{background:var(--accent-soft)}
+  .pbar.dead{cursor:default; opacity:.55}
+  .pbar .nm{font-size:11px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .pbar.on .nm{color:var(--accent); font-weight:600}
+  .pbar .t{height:7px; border-radius:4px; background:var(--track); overflow:hidden}
+  #provbars:not(.all) .pbar .t{height:min(48%, 16px)}
+  .pbar .t i{display:block; height:100%; border-radius:4px; background:var(--s4); min-width:2px}
+  .pbar.on .t i{background:var(--accent)}
+  .pbar .v{font-size:10.5px; text-align:right; color:var(--muted); font-variant-numeric:tabular-nums}
+  /* "Còn lại" là tổng gộp, không phải một tỉnh — tô khác để không đọc nhầm thành một địa phương */
+  .pbar.rest{margin-top:3px; padding-top:5px; border-top:1px dashed var(--border)}
+  .pbar.rest .nm{font-style:italic}
+  .pbar.rest .t i{background:var(--s2)}
+  .pbar.rest.on .t i{background:var(--accent)}
+  #provmore{margin-top:7px; align-self:flex-start; background:none; border:none; padding:2px 0;
+    color:var(--accent); font-family:inherit; font-size:10.5px; cursor:pointer}
+  #provmore:hover{text-decoration:underline}
+
+  /* ---------- bảng ---------- */
+  table{width:100%; border-collapse:collapse; font-size:12.5px}
+  thead th{position:sticky; top:0; z-index:1; background:var(--panel-2); text-align:left;
+    font-weight:600; font-size:10.5px; text-transform:uppercase; letter-spacing:.045em;
+    color:var(--muted); padding:8px 10px; border-bottom:1px solid var(--border); white-space:nowrap}
+  tbody td{padding:7px 10px; border-bottom:1px solid var(--border); vertical-align:top}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:var(--panel-2)}
+  td.num,th.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
+  tbody tr.on{background:var(--accent-soft)}
+  tbody tr.on td:first-child{box-shadow:inset 2px 0 0 var(--accent)}
+
   @media (max-width:1180px){
     .ovmain{grid-template-columns:330px minmax(0,1fr); gap:14px}
     .mgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -1505,6 +1543,10 @@ document.getElementById("theme").onclick = () => {
 
 function ovBars(title, cnt, rows, unit, tbl, foot) {
   if (!rows || !rows.length) return "";
+  /* Biểu đồ thanh PHẢI xếp theo độ dài, nếu không mắt không đọc được: bản trước
+     lấy nguyên thứ tự danh sách thị trường (xếp theo số trường lõi) nên ra
+     82% → 12% → 9% → 0,4% → 6% → 14%. Nhóm gộp "Còn lại" luôn nằm cuối. */
+  rows = rows.slice().sort((a, b) => (a.rest ? 1 : 0) - (b.rest ? 1 : 0) || b.n - a.n);
   const mx = Math.max(...rows.map(r => r.n));
   return `<section class="card">
     <div class="sec-head"><h2>${esc(title)}</h2>
