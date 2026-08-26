@@ -96,7 +96,8 @@ def romanize(rows: list[dict]) -> list[dict]:
 BLD_COLS = [
     "building_name", "project_name", "admin", "address", "developer",
     "n_floors", "n_units_building", "area_m2", "area_kind", "site_area_m2",
-    "price", "price_unit", "price_kind", "price_basis", "year_completed",
+    "price", "price_currency", "price_per", "price_kind", "price_basis",
+    "price_year", "year_completed",
     "mix", "mix_kind", "building_form", "style", "handover", "amenities",
     "lat", "lon", "n_buildings", "building_code", "market",
 ]
@@ -208,7 +209,9 @@ def _scan_all() -> dict[str, dict]:
                count(*) filter (where {STRICT()}) as n_strict,
                count(*) filter (where id_kind = 'official_registry') as n_reg,
                any_value(id_kind) as id_kind,
-               any_value(price_unit) filter (where price_unit is not null) as price_unit
+               any_value(price_currency) filter (where price_currency is not null)
+                 as price_currency,
+               any_value(price_per) filter (where price_per is not null) as price_per
         from {LOOSE()} group by 1""")
 
     merged = {c: g for g, cs in config.MARKET_GROUPS.items() for c in cs}
@@ -217,12 +220,13 @@ def _scan_all() -> dict[str, dict]:
         slug = merged.get(r["market"], r["market"])
         a = acc.setdefault(slug, {"slug": slug, "n": 0, "n_strict": 0, "n_reg": 0,
                                   "core": {}, "cov": {}, "id_kind": None,
-                                  "price_unit": None})
+                                  "price_currency": None, "price_per": None})
         a["n"] += r["n"]
         a["n_strict"] += r["n_strict"]
         a["n_reg"] += r["n_reg"]
         a["id_kind"] = a["id_kind"] or r["id_kind"]
-        a["price_unit"] = a["price_unit"] or r["price_unit"]
+        a["price_currency"] = a["price_currency"] or r["price_currency"]
+        a["price_per"] = a["price_per"] or r["price_per"]
         for f, _ in CORE6:
             a["core"][f] = a["core"].get(f, 0) + r[f"core_{f}"]
         for f, _ in COV_FIELDS:
@@ -242,7 +246,8 @@ def _shape(a: dict) -> dict:
         "meta": {"market": a["slug"],
                  "label": config.MARKET_VI.get(a["slug"], a["slug"]),
                  "n_buildings": n, "id_kind": a["id_kind"],
-                 "price_unit": a["price_unit"]},
+                 "price_currency": a["price_currency"], "price_per": a["price_per"],
+                 "price_unit": price_label(a["price_currency"], a["price_per"])},
         "core": {"fields": fields, "n_pass": a["n_strict"],
                  "pct": round(100.0 * a["n_strict"] / n, 1),
                  "registry_pct": round(100.0 * a["n_reg"] / n, 1),
@@ -278,6 +283,15 @@ def _price_basis(slug: str) -> list[dict]:
                 f"where {w} and price_basis is not null group by 1 order by n desc", p)
 
 
+def price_label(cur: str | None, per: str | None) -> str | None:
+    """`KRW` + `m2` → `KRW/m²`. Cột `price_unit` cũ bị tách làm hai từ bản
+    corpus 23:40 — tách thế đúng hơn, vì `manwon/m2` trước đây trộn cả tiền tệ
+    lẫn mẫu số vào một chuỗi."""
+    if not cur:
+        return None
+    return cur + {"m2": "/m²", "total": "", None: ""}.get(per, f"/{per}" if per else "")
+
+
 def price_units(slug: str) -> list[dict]:
     """Đơn vị giá của thị trường, kèm số dòng.
 
@@ -287,10 +301,12 @@ def price_units(slug: str) -> list[dict]:
     toà thuộc nhóm nhỏ rơi vào cột thấp nhất: đúng về số, vô nghĩa về nghĩa.
     """
     w, p = _in(codes_of(slug))
-    return cached(f"pu:{slug}", lambda: db.q(
-        f"select price_unit as code, count(*) as n from {LOOSE()} "
-        f"where {w} and price is not null and price_unit is not null "
-        f"group by 1 order by n desc", p))
+    rows = cached(f"pu:{slug}", lambda: db.q(
+        f"select price_currency as cur, price_per as per, count(*) as n from {LOOSE()} "
+        f"where {w} and price is not null and price_currency is not null "
+        f"group by 1,2 order by n desc", p))
+    return [{"code": f"{r['cur']}|{r['per']}", "label": price_label(r["cur"], r["per"]),
+             "cur": r["cur"], "per": r["per"], "n": r["n"]} for r in rows]
 
 
 def _forms(slug: str) -> list[dict]:
@@ -391,7 +407,8 @@ def metrics(slug: str, form: str | None) -> list[dict]:
     # Giá chỉ tính trên ĐƠN VỊ CHIẾM ĐA SỐ. Trộn hai thang trong một biểu đồ là
     # dựng ra một phân bố không tồn tại — xem `price_units()`.
     pu = price_units(slug)
-    main_unit = pu[0]["code"] if pu else None
+    main = pu[0] if pu else None
+    main_unit = main["label"] if main else None
     mixed = len(pu) > 1
 
     guard = {}
@@ -399,8 +416,9 @@ def metrics(slug: str, form: str | None) -> list[dict]:
         g = f"{m[4]} is not null"
         if m[0] == "dens":
             g += " and site_area_m2 > 0 and n_units_building > 0"
-        if m[0] == "price" and mixed and main_unit:
-            g += f" and price_unit = '{main_unit}'"
+        if m[0] == "price" and mixed and main:
+            g += (f" and price_currency = '{main['cur']}'"
+                  f" and price_per = '{main['per']}'")
         guard[m[0]] = g
     qcols = ", ".join(
         f"quantile_cont({m[3]}, {QS}) filter (where {guard[m[0]]}) as q_{m[0]}, "
@@ -433,8 +451,9 @@ def metrics(slug: str, form: str | None) -> list[dict]:
             e["unit"] = main_unit
             if mixed:
                 e["note"] = ("Cột giá thị trường này trộn "
-                             + " và ".join(f"{x['n']:,} dòng {x['code']}".replace(",", ".")
-                                           for x in pu)
+                             + " và ".join(
+                                 f"{x['n']:,} dòng {x['label']}".replace(",", ".")
+                                 for x in pu)
                              + f" — lệch thang. Phân bố chỉ tính trên {main_unit}; "
                                "toà thuộc đơn vị khác không so được vào đây.")
         out.append(e)

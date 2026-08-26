@@ -178,58 +178,11 @@
   .ovhero .sub{font-size:11.5px; color:var(--faint); margin-top:7px; line-height:1.6}
   /* ba khối bộ dữ liệu bên trái, bản đồ bên phải */
   .ovmain{display:grid; grid-template-columns:400px minmax(0,1fr); gap:16px; align-items:start}
+  /* Số ô thay đổi theo khối (3 hoặc 4). Trên điện thoại 4 ô còn ~80px mỗi ô —
+     chữ "MB chữ", "có URL gốc" bị vỡ dòng, nên xuống 2 ô. */
+  .ovstats{display:grid; grid-template-columns:repeat(var(--n), minmax(0,1fr)); gap:1px}
+  @media (max-width:520px){ .ovstats{grid-template-columns:repeat(2, minmax(0,1fr))} }
   .ov .n{font-variant-numeric:tabular-nums}
-  .funnel{display:flex; flex-direction:column; gap:7px; padding:14px 18px}
-  .funnel .fr{display:grid; grid-template-columns:132px minmax(0,1fr) 96px; gap:10px; align-items:center}
-  .funnel .fr .nm{font-size:12px; color:var(--muted)}
-  .funnel .fr .bar{height:22px; border-radius:5px; background:var(--track); overflow:hidden}
-  .funnel .fr .bar i{display:block; height:100%; border-radius:5px; background:var(--s3)}
-  .funnel .fr.hi .bar i{background:var(--accent)}
-  .funnel .fr .v{font-size:12.5px; font-weight:600; text-align:right; font-variant-numeric:tabular-nums}
-  @media (max-width:900px){
-    .ovhero{grid-template-columns:1fr}
-    .ovmain{grid-template-columns:1fr}
-    .funnel .fr{grid-template-columns:96px minmax(0,1fr) 78px; gap:8px}
-  }
-
-  /* ---------- thanh ngang: một dòng một tỉnh ---------- */
-  #provbars{display:flex; flex-direction:column; justify-content:space-between; flex:1; min-height:0}
-  #provbars.all{justify-content:flex-start; overflow:auto; padding-right:2px}
-  .pbar{display:grid; grid-template-columns:82px minmax(0,1fr) 38px; gap:7px; align-items:center;
-    padding:2px 4px; border-radius:4px; cursor:pointer; flex:0 0 auto}
-  #provbars:not(.all) .pbar{flex:1 1 0; min-height:17px; max-height:44px}
-  .pbar:hover{background:var(--panel-2)}
-  .pbar.on{background:var(--accent-soft)}
-  .pbar.dead{cursor:default; opacity:.55}
-  .pbar .nm{font-size:11px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-  .pbar.on .nm{color:var(--accent); font-weight:600}
-  .pbar .t{height:7px; border-radius:4px; background:var(--track); overflow:hidden}
-  #provbars:not(.all) .pbar .t{height:min(48%, 16px)}
-  .pbar .t i{display:block; height:100%; border-radius:4px; background:var(--s4); min-width:2px}
-  .pbar.on .t i{background:var(--accent)}
-  .pbar .v{font-size:10.5px; text-align:right; color:var(--muted); font-variant-numeric:tabular-nums}
-  /* "Còn lại" là tổng gộp, không phải một tỉnh — tô khác để không đọc nhầm thành một địa phương */
-  .pbar.rest{margin-top:3px; padding-top:5px; border-top:1px dashed var(--border)}
-  .pbar.rest .nm{font-style:italic}
-  .pbar.rest .t i{background:var(--s2)}
-  .pbar.rest.on .t i{background:var(--accent)}
-  #provmore{margin-top:7px; align-self:flex-start; background:none; border:none; padding:2px 0;
-    color:var(--accent); font-family:inherit; font-size:10.5px; cursor:pointer}
-  #provmore:hover{text-decoration:underline}
-
-  /* ---------- bảng ---------- */
-  table{width:100%; border-collapse:collapse; font-size:12.5px}
-  thead th{position:sticky; top:0; z-index:1; background:var(--panel-2); text-align:left;
-    font-weight:600; font-size:10.5px; text-transform:uppercase; letter-spacing:.045em;
-    color:var(--muted); padding:8px 10px; border-bottom:1px solid var(--border); white-space:nowrap}
-  tbody td{padding:7px 10px; border-bottom:1px solid var(--border); vertical-align:top}
-  tbody tr:last-child td{border-bottom:none}
-  tbody tr:hover{background:var(--panel-2)}
-  td.num,th.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
-  tbody tr.on{background:var(--accent-soft)}
-  tbody tr.on td:first-child{box-shadow:inset 2px 0 0 var(--accent)}
-
-  /* ---------- responsive ---------- */
   @media (max-width:1180px){
     .ovmain{grid-template-columns:330px minmax(0,1fr); gap:14px}
     .mgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -239,6 +192,11 @@
     .wrap{grid-template-columns:250px minmax(0,1fr); gap:14px}
   }
   @media (max-width:900px){
+    /* Trang tổng quan: khối 900px này PHẢI nằm sau khối 1180px, nếu không
+       `.ovmain` bị 1180px kéo về `330px + cột` và tràn ngang trên điện thoại. */
+    .ovhero{grid-template-columns:1fr}
+    .ovmain{grid-template-columns:1fr}
+    .ov{padding-left:14px; padding-right:14px}
     .vnrow{grid-template-columns:1fr}
     .vnmet{grid-template-columns:repeat(3,minmax(0,1fr))}
     .vnrow svg{max-height:52vh}
@@ -369,6 +327,15 @@ function short(v) {
   return num(v);
 }
 const orig = s => s ? ` <span class="src">${esc(s)}</span>` : "";
+/* `price_unit` bị tách thành `price_currency` + `price_per` ở corpus 23:40.
+   Ghép lại để hiển thị; bản dựng cũ vẫn còn `price_unit` nên nhận cả hai. */
+function priceUnit(b) {
+  const u = fld(b, "price_unit");
+  if (u) return vi("price_unit", u);
+  const c = fld(b, "price_currency"), p = fld(b, "price_per");
+  if (!c) return "";
+  return c + (p === "m2" ? "/m²" : "");
+}
 /* `price_basis` chưa có trong dim_enum — nhãn tạm, nên chuyển về tầng dữ liệu */
 const BASIS = { measured: "đo thật", derived: "suy ra", policy: "hằng số thị trường",
   listing: "giá chào", transactions: "giá giao dịch", verified_none: "nguồn xác nhận không có",
@@ -482,7 +449,7 @@ function cell(m, b) {
       <span class="q">${short(m.p25)} · <b>${short(m.med)}</b> · ${short(m.p75)}
         <span style="color:var(--faint)">${esc(m.unit)}</span></span>
       <span class="v">${v == null
-        ? (off ? `toà này: ${short(val(b, "price"))} ${esc(vi("price_unit", fld(b, "price_unit")))} — khác thang`
+        ? (off ? `toà này: ${short(val(b, "price"))} ${esc(priceUnit(b))} — khác thang`
                : `${isVN() ? "dự án" : "toà"} này: —`)
         : (m.key === "year" ? String(Math.round(v)) : short(v)) + " " + esc(m.unit)}</span>
     </div></div>`;
@@ -783,7 +750,7 @@ function priceSection(b) {
   return sec("Giá", "1 quan sát", "price",
     `<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
       <span style="font-size:26px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums">${num(b.price)}</span>
-      <span style="font-size:13px;color:var(--muted)">${esc(vi("price_unit", fld(b, "price_unit")))}</span>
+      <span style="font-size:13px;color:var(--muted)">${esc(priceUnit(b))}</span>
       <span class="badge">${esc(vi("price_kind", b.price_kind))}</span></div>` +
     kv([["Nền của giá", esc(basisVi(b.price_basis) || "—")],
         ["Quy đổi", '<span class="empty">kho không lưu tỷ giá — giá giữ nguyên đơn vị bản địa</span>']]),
@@ -798,7 +765,7 @@ function detail(b) {
       : ["Năm hoàn thành", num(b.year_completed), ""],
     dens != null ? ["Mật độ căn", num(dens), " căn/ha"]
       : ["Số toà dự án", num(b.n_buildings), ""],
-    ["Giá", short(b.price), " " + esc(vi("price_unit", fld(b, "price_unit")))],
+    ["Giá", short(b.price), " " + esc(priceUnit(b))],
   ];
   const badges = [
     b.building_form ? `<span class="badge">${esc(vi("building_form", b.building_form))}</span>` : "",
@@ -1641,7 +1608,7 @@ function ovBlock(o) {
         <span style="font-size:13px;color:var(--muted)">${esc(o.unit)}</span></div>
       <div style="font-size:12.5px;color:var(--muted);margin-top:9px;line-height:1.6">${o.desc}</div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(${o.stats.length},minmax(0,1fr));gap:1px;
+    <div class="ovstats" style="--n:${o.stats.length};
       background:var(--border);border-top:1px solid var(--border);margin-top:14px">
       ${o.stats.map(x => `<div style="background:var(--panel);padding:10px 12px;min-width:0">
         <div style="font-size:15.5px;font-weight:620;font-variant-numeric:tabular-nums;

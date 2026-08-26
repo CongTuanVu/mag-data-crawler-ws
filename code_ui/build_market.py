@@ -44,7 +44,8 @@ MARKET_VI = {
 BLD = [
     "building_name", "project_name", "admin", "address", "developer",
     "n_floors", "n_units_building", "area_m2", "area_kind", "site_area_m2",
-    "price", "price_unit", "price_kind", "price_basis", "year_completed",
+    "price", "price_currency", "price_per", "price_kind", "price_basis",
+    "price_year", "year_completed",
     "mix", "mix_kind", "building_form", "style", "handover", "amenities",
     "lat", "lon", "n_buildings", "building_code", "sources",
 ]
@@ -345,7 +346,11 @@ class Market:
             r[0] for r in self.c.sql(f"select distinct id_authority {self.W} "
                                      f"and id_authority is not null").fetchall()))
         kind = self.one(f"select any_value(id_kind) {self.W}")[0]
-        unit = self.one(f"select any_value(price_unit) {self.W} and price_unit is not null")[0]
+        # `price_unit` bị tách thành `price_currency` + `price_per` ở corpus 23:40.
+        cur = self.one(f"select any_value(price_currency) {self.W} "
+                       f"and price_currency is not null")[0]
+        per = self.one(f"select any_value(price_per) {self.W} and price_per is not null")[0]
+        unit = None if not cur else cur + ("/m²" if per == "m2" else "")
         pk = self.c.sql(f"select price_basis, count(*) n {self.W} and price_basis is not null "
                         f"group by 1 order by n desc").fetchall()
         return {"market": self.m, "label": MARKET_VI.get(self.m, self.m),
@@ -355,7 +360,8 @@ class Market:
 
 
 # hằng số trong phạm vi một thị trường — hoist lên cấp thị trường cho nhẹ file
-HOIST = ["price_unit", "sources", "area_kind", "handover", "mix_kind"]
+HOIST = ["price_currency", "price_per", "sources", "area_kind", "handover",
+         "mix_kind"]
 
 
 def enum_map(con):
